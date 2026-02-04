@@ -1,9 +1,10 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import { Providers } from "./providers";
 
 export const metadata: Metadata = {
-  title: "Orvex Operators Backend",
-  description: "Task submission and operator review API",
+  title: "Orvex Operators",
+  description: "Complete tasks, earn rewards",
 };
 
 export default function RootLayout({
@@ -14,7 +15,7 @@ export default function RootLayout({
   return (
     <html lang="en">
       <body className="antialiased">
-        {children}
+        <Providers>{children}</Providers>
       </body>
     </html>
   );
