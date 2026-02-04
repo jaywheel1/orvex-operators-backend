@@ -40,6 +40,8 @@ export default function DashboardPage() {
   const [leaderboardLoading, setLeaderboardLoading] = useState(true);
   const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
   const [userRank, setUserRank] = useState<number | null>(null);
+  const [userLeaderboardEntry, setUserLeaderboardEntry] = useState<LeaderboardEntry | null>(null);
+  const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
 
   useEffect(() => {
     if (address) {
@@ -101,12 +103,13 @@ export default function DashboardPage() {
       if (data.ok) {
         setLeaderboard(data.data);
         setLastUpdated(new Date(data.lastUpdated));
-        // Find current user's rank
+        // Find current user's rank and entry
         if (address) {
           const userEntry = data.data.find(
             (entry: LeaderboardEntry) => entry.wallet_address.toLowerCase() === address.toLowerCase()
           );
           setUserRank(userEntry?.rank || null);
+          setUserLeaderboardEntry(userEntry || null);
         }
       }
     } catch (err) {
@@ -242,7 +245,7 @@ export default function DashboardPage() {
         </div>
 
         {/* Stats Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-5 mb-12">
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-5 mb-12">
           {/* Points Card */}
           <div className="glass-card p-6 hover-lift opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
             <div className="flex items-center gap-3 mb-4">
@@ -281,106 +284,31 @@ export default function DashboardPage() {
               {campaignLive ? 'LIVE' : 'OFFLINE'}
             </div>
           </div>
-        </div>
 
-        {/* Leaderboard Section */}
-        <div className="mb-12 opacity-0 animate-fade-in-up" style={{ animationDelay: '450ms', animationFillMode: 'forwards' }}>
-          <div className="flex items-center justify-between mb-6">
-            <div>
-              <h2 className="text-2xl font-bold gradient-text">Leaderboard</h2>
-              {lastUpdated && (
-                <p className="text-[#7d85d0] text-xs mt-1">
-                  Updates every 30 min • Last: {lastUpdated.toLocaleTimeString()}
-                </p>
-              )}
+          {/* Leaderboard Card */}
+          <button
+            onClick={() => setShowLeaderboardModal(true)}
+            className="glass-card p-6 hover-lift opacity-0 animate-fade-in-up text-left cursor-pointer group transition-all duration-300 hover:border-[#FFD700]/30"
+            style={{ animationDelay: '450ms', animationFillMode: 'forwards' }}
+          >
+            <div className="flex items-center gap-3 mb-4">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 border border-[#FFD700]/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6 text-[#FFD700]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+              </div>
+              <div className="flex items-center gap-2">
+                <span className="text-[#b6bbff]/50 text-sm">Leaderboard</span>
+                <svg className="w-4 h-4 text-[#b6bbff]/30 group-hover:text-[#FFD700] group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                </svg>
+              </div>
             </div>
-            {userRank && (
-              <div className="glass-card px-4 py-2 flex items-center gap-2">
-                <span className="text-[#b6bbff]/50 text-sm">Your Rank:</span>
-                <span className="text-xl font-bold text-[#b9f0d7]">#{userRank}</span>
-              </div>
-            )}
-          </div>
-
-          <div className="glass-card rounded-2xl overflow-hidden">
-            {leaderboardLoading ? (
-              <div className="flex items-center justify-center py-16">
-                <div className="w-10 h-10 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" />
-              </div>
-            ) : leaderboard.length === 0 ? (
-              <div className="text-center py-16 text-[#b6bbff]/50">
-                No participants yet. Be the first!
-              </div>
-            ) : (
-              <div className="overflow-x-auto">
-                <table className="w-full">
-                  <thead>
-                    <tr className="border-b border-[#7d85d0]/10">
-                      <th className="text-left py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Rank</th>
-                      <th className="text-left py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Wallet</th>
-                      <th className="text-right py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Points</th>
-                    </tr>
-                  </thead>
-                  <tbody>
-                    {leaderboard.slice(0, 10).map((entry, index) => {
-                      const isCurrentUser = address && entry.wallet_address.toLowerCase() === address.toLowerCase();
-                      const isTop3 = entry.rank <= 3;
-
-                      return (
-                        <tr
-                          key={entry.wallet_address}
-                          className={`border-b border-[#7d85d0]/5 transition-all duration-200 ${
-                            isCurrentUser
-                              ? 'bg-[#6265fe]/10'
-                              : 'hover:bg-[#6265fe]/5'
-                          }`}
-                        >
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-2">
-                              {entry.rank === 1 ? (
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA500] flex items-center justify-center text-sm font-bold text-black">
-                                  1
-                                </div>
-                              ) : entry.rank === 2 ? (
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#C0C0C0] to-[#A0A0A0] flex items-center justify-center text-sm font-bold text-black">
-                                  2
-                                </div>
-                              ) : entry.rank === 3 ? (
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#CD7F32] to-[#8B4513] flex items-center justify-center text-sm font-bold text-white">
-                                  3
-                                </div>
-                              ) : (
-                                <div className="w-8 h-8 rounded-full bg-[#7d85d0]/10 flex items-center justify-center text-sm font-medium text-[#7d85d0]">
-                                  {entry.rank}
-                                </div>
-                              )}
-                            </div>
-                          </td>
-                          <td className="py-4 px-6">
-                            <div className="flex items-center gap-2">
-                              <span className={`font-mono text-sm ${isCurrentUser ? 'text-[#6265fe] font-semibold' : 'text-[#c9e8ff]'}`}>
-                                {entry.wallet_address.slice(0, 6)}...{entry.wallet_address.slice(-4)}
-                              </span>
-                              {isCurrentUser && (
-                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#6265fe]/20 text-[#6265fe] font-medium">
-                                  YOU
-                                </span>
-                              )}
-                            </div>
-                          </td>
-                          <td className="py-4 px-6 text-right">
-                            <span className={`font-bold ${isTop3 ? 'text-[#b9f0d7]' : 'text-white'}`}>
-                              {entry.points.toLocaleString()}
-                            </span>
-                          </td>
-                        </tr>
-                      );
-                    })}
-                  </tbody>
-                </table>
-              </div>
-            )}
-          </div>
+            <div className="text-4xl font-bold text-[#FFD700]">
+              {userRank ? `#${userRank}` : '—'}
+            </div>
+            <div className="text-[10px] text-[#b6bbff]/30 mt-1 uppercase tracking-wider">Your Rank</div>
+          </button>
         </div>
 
         {/* Tasks Section */}
@@ -454,6 +382,157 @@ export default function DashboardPage() {
           </div>
         )}
       </main>
+
+      {/* Leaderboard Modal */}
+      {showLeaderboardModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowLeaderboardModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative glass-card w-full max-w-2xl max-h-[80vh] overflow-hidden rounded-2xl animate-scale-in">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-[#7d85d0]/10">
+              <div>
+                <h2 className="text-2xl font-bold gradient-text">Leaderboard</h2>
+                {lastUpdated && (
+                  <p className="text-[#7d85d0] text-xs mt-1">
+                    Updates every 30 min • Last: {lastUpdated.toLocaleTimeString()}
+                  </p>
+                )}
+              </div>
+              <button
+                onClick={() => setShowLeaderboardModal(false)}
+                className="w-10 h-10 rounded-xl bg-[#7d85d0]/10 hover:bg-[#7d85d0]/20 flex items-center justify-center transition-colors"
+              >
+                <svg className="w-5 h-5 text-[#b6bbff]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="overflow-y-auto max-h-[calc(80vh-100px)]">
+              {leaderboardLoading ? (
+                <div className="flex items-center justify-center py-16">
+                  <div className="w-10 h-10 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" />
+                </div>
+              ) : leaderboard.length === 0 ? (
+                <div className="text-center py-16 text-[#b6bbff]/50">
+                  No participants yet. Be the first!
+                </div>
+              ) : (
+                <div className="overflow-x-auto">
+                  <table className="w-full">
+                    <thead className="sticky top-0 bg-[#0d0d1a]">
+                      <tr className="border-b border-[#7d85d0]/10">
+                        <th className="text-left py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Rank</th>
+                        <th className="text-left py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Wallet</th>
+                        <th className="text-right py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Points</th>
+                      </tr>
+                    </thead>
+                    <tbody>
+                      {/* User's position always at top if not in top entries */}
+                      {userLeaderboardEntry && userLeaderboardEntry.rank > 10 && (
+                        <>
+                          <tr className="bg-[#6265fe]/15 border-b-2 border-[#6265fe]/30">
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-2">
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#6265fe] to-[#7d85d0] flex items-center justify-center text-sm font-bold text-white shadow-[0_0_15px_rgba(98,101,254,0.5)]">
+                                  {userLeaderboardEntry.rank}
+                                </div>
+                              </div>
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-2">
+                                <span className="font-mono text-sm text-[#6265fe] font-semibold">
+                                  {userLeaderboardEntry.wallet_address.slice(0, 6)}...{userLeaderboardEntry.wallet_address.slice(-4)}
+                                </span>
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#6265fe]/30 text-[#6265fe] font-bold">
+                                  YOU
+                                </span>
+                              </div>
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <span className="font-bold text-[#6265fe]">
+                                {userLeaderboardEntry.points.toLocaleString()}
+                              </span>
+                            </td>
+                          </tr>
+                          <tr>
+                            <td colSpan={3} className="py-2 px-6 text-center text-[#7d85d0]/40 text-xs">
+                              • • •
+                            </td>
+                          </tr>
+                        </>
+                      )}
+
+                      {/* Main leaderboard */}
+                      {leaderboard.map((entry) => {
+                        const isCurrentUser = address && entry.wallet_address.toLowerCase() === address.toLowerCase();
+                        const isTop3 = entry.rank <= 3;
+
+                        return (
+                          <tr
+                            key={entry.wallet_address}
+                            className={`border-b border-[#7d85d0]/5 transition-all duration-200 ${
+                              isCurrentUser
+                                ? 'bg-[#6265fe]/15'
+                                : 'hover:bg-[#6265fe]/5'
+                            }`}
+                          >
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-2">
+                                {entry.rank === 1 ? (
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA500] flex items-center justify-center text-sm font-bold text-black shadow-[0_0_15px_rgba(255,215,0,0.4)]">
+                                    1
+                                  </div>
+                                ) : entry.rank === 2 ? (
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#C0C0C0] to-[#A0A0A0] flex items-center justify-center text-sm font-bold text-black">
+                                    2
+                                  </div>
+                                ) : entry.rank === 3 ? (
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#CD7F32] to-[#8B4513] flex items-center justify-center text-sm font-bold text-white">
+                                    3
+                                  </div>
+                                ) : (
+                                  <div className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-medium ${isCurrentUser ? 'bg-gradient-to-br from-[#6265fe] to-[#7d85d0] text-white' : 'bg-[#7d85d0]/10 text-[#7d85d0]'}`}>
+                                    {entry.rank}
+                                  </div>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-4 px-6">
+                              <div className="flex items-center gap-2">
+                                <span className={`font-mono text-sm ${isCurrentUser ? 'text-[#6265fe] font-semibold' : 'text-[#c9e8ff]'}`}>
+                                  {entry.wallet_address.slice(0, 6)}...{entry.wallet_address.slice(-4)}
+                                </span>
+                                {isCurrentUser && (
+                                  <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#6265fe]/30 text-[#6265fe] font-bold">
+                                    YOU
+                                  </span>
+                                )}
+                              </div>
+                            </td>
+                            <td className="py-4 px-6 text-right">
+                              <span className={`font-bold ${isCurrentUser ? 'text-[#6265fe]' : isTop3 ? 'text-[#b9f0d7]' : 'text-white'}`}>
+                                {entry.points.toLocaleString()}
+                              </span>
+                            </td>
+                          </tr>
+                        );
+                      })}
+                    </tbody>
+                  </table>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }
