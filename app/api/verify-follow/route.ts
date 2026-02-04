@@ -7,7 +7,7 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
-const REFERRAL_CP_REWARD = 200;
+const REFERRAL_CP_REWARD = 1000;
 const MAX_REFERRALS = 5;
 
 // Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification

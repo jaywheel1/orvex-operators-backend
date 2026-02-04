@@ -142,6 +142,8 @@ export default function DashboardPage() {
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [copied, setCopied] = useState(false);
   const [expandedCategories, setExpandedCategories] = useState<Set<TaskCategory>>(new Set(['social']));
+  const [showNewReferralNotification, setShowNewReferralNotification] = useState(false);
+  const [newReferralCount, setNewReferralCount] = useState(0);
 
   // Rank calculations
   const userCP = userData?.points || 0;
@@ -244,6 +246,23 @@ export default function DashboardPage() {
       const data = await res.json();
       if (data.ok) {
         setReferralStats(data.data);
+
+        // Check for new referrals
+        const storageKey = `orvex_last_seen_referrals_${address?.toLowerCase()}`;
+        const hasVisitedKey = `orvex_visited_${address?.toLowerCase()}`;
+        const lastSeenCount = parseInt(localStorage.getItem(storageKey) || '0', 10);
+        const hasVisitedBefore = localStorage.getItem(hasVisitedKey) === 'true';
+        const currentCount = data.data.verified_referrals || 0;
+
+        if (hasVisitedBefore && currentCount > lastSeenCount) {
+          // New referrals since last visit
+          setNewReferralCount(currentCount - lastSeenCount);
+          setShowNewReferralNotification(true);
+        }
+
+        // Update last seen count and mark as visited
+        localStorage.setItem(storageKey, currentCount.toString());
+        localStorage.setItem(hasVisitedKey, 'true');
       }
     } catch (err) {
       console.error('Failed to fetch referral stats:', err);
@@ -463,7 +482,7 @@ export default function DashboardPage() {
                 <div>
                   <h3 className="text-lg font-semibold text-white mb-1">Invite Friends</h3>
                   <p className="text-[#b6bbff]/50 text-sm">
-                    Earn <span className="text-[#ffc107] font-semibold">200 CP</span> for each friend who registers (max 5)
+                    Earn <span className="text-[#ffc107] font-semibold">1,000 CP</span> for each friend who registers (max 5)
                   </p>
                 </div>
               </div>
@@ -826,6 +845,68 @@ export default function DashboardPage() {
         </div>
       )}
 
+      {/* New Referral Notification */}
+      {showNewReferralNotification && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowNewReferralNotification(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative glass-card w-full max-w-sm overflow-hidden rounded-2xl animate-scale-in">
+            {/* Celebration effect */}
+            <div className="absolute inset-0 bg-gradient-to-br from-[#ffc107]/20 via-transparent to-[#b9f0d7]/20" />
+
+            {/* Content */}
+            <div className="relative p-8 text-center">
+              {/* Icon */}
+              <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#ffc107] to-[#ffab00] flex items-center justify-center shadow-[0_0_40px_rgba(255,193,7,0.5)] animate-pulse">
+                <svg className="w-10 h-10 text-[#070713]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                </svg>
+              </div>
+
+              {/* Title */}
+              <h2 className="text-2xl font-bold text-white mb-2">
+                New Referral{newReferralCount > 1 ? 's' : ''}!
+              </h2>
+
+              {/* Message */}
+              <p className="text-[#b6bbff]/70 mb-2">
+                {newReferralCount} new friend{newReferralCount > 1 ? 's' : ''} joined using your link!
+              </p>
+
+              {/* Reward */}
+              <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#ffc107]/20 border border-[#ffc107]/30 mb-6">
+                <span className="text-[#ffc107] font-bold text-lg">+{(newReferralCount * 1000).toLocaleString()} CP</span>
+                <span className="text-[#ffc107]/70 text-sm">earned!</span>
+              </div>
+
+              {/* Total stats */}
+              <div className="p-4 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20 mb-6">
+                <div className="text-[#b6bbff]/50 text-xs mb-1">Total Referral Earnings</div>
+                <div className="text-2xl font-bold text-[#b9f0d7]">
+                  {referralStats?.total_cp_earned?.toLocaleString() || 0} CP
+                </div>
+                <div className="text-[#b6bbff]/40 text-xs mt-1">
+                  {referralStats?.verified_referrals || 0} of {referralStats?.max_referrals || 5} referrals completed
+                </div>
+              </div>
+
+              {/* Close button */}
+              <button
+                onClick={() => setShowNewReferralNotification(false)}
+                className="w-full py-3 bg-gradient-to-r from-[#ffc107] to-[#ffab00] text-[#070713] font-bold rounded-xl hover:shadow-[0_0_30px_rgba(255,193,7,0.4)] transition-all duration-300"
+              >
+                Awesome!
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+
       {/* Referral Modal */}
       {showReferralModal && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
@@ -917,7 +998,7 @@ export default function DashboardPage() {
                   <div className="text-sm text-[#ffc107]/80">
                     <p className="font-medium mb-1">How it works</p>
                     <p className="text-[#ffc107]/60">
-                      Share your link with friends. When they complete registration, you earn {referralStats?.cp_per_referral || 200} CP automatically.
+                      Share your link with friends. When they complete registration, you earn {referralStats?.cp_per_referral || 1000} CP automatically.
                     </p>
                   </div>
                 </div>

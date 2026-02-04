@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
-const REFERRAL_CP_REWARD = 200;
+const REFERRAL_CP_REWARD = 1000;
 const MAX_REFERRALS = 5;
 
 export async function GET(request: NextRequest) {
