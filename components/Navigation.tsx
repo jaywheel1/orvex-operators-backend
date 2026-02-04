@@ -13,24 +13,10 @@ interface NavigationProps {
 export default function Navigation({ showConnect = false, showPoints = false, points = 0 }: NavigationProps) {
   return (
     <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-4 glass border-b border-[#7d85d0]/10">
-      <div className="flex items-center gap-8">
-        <Link href="/" className="flex items-center gap-3 group">
-          <div className="relative">
-            <div className="absolute inset-0 bg-[#6265fe] rounded-full blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
-            <Image src="/logo.svg" alt="Orvex" width={36} height={36} className="relative rounded-full" />
-          </div>
-          <span className="text-lg font-bold tracking-tight gradient-text">
-            Orvex
-          </span>
+      <div className="flex items-center">
+        <Link href="/" className="group">
+          <Image src="/orvex-text-logo.svg" alt="Orvex" width={100} height={30} className="opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
         </Link>
-        <a
-          href="https://docs.orvex.fi"
-          target="_blank"
-          rel="noopener noreferrer"
-          className="hidden sm:block text-sm text-[#b6bbff]/50 hover:text-white transition-colors duration-300 font-medium"
-        >
-          Docs
-        </a>
       </div>
 
       <div className="flex items-center gap-3">

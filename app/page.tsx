@@ -19,24 +19,10 @@ export default function Home() {
 
       {/* Navigation */}
       <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-5 glass border-b border-[#7d85d0]/10">
-        <div className="flex items-center gap-8">
-          <Link href="/" className="flex items-center gap-3 group">
-            <div className="relative">
-              <div className="absolute inset-0 bg-[#6265fe] rounded-full blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
-              <Image src="/logo.svg" alt="Orvex" width={38} height={38} className="relative rounded-full" />
-            </div>
-            <span className="text-xl font-bold tracking-tight gradient-text">
-              Orvex
-            </span>
+        <div className="flex items-center">
+          <Link href="/" className="group">
+            <Image src="/orvex-text-logo.svg" alt="Orvex" width={120} height={35} className="opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
           </Link>
-          <a
-            href="https://docs.orvex.fi"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="hidden sm:block text-sm text-[#b6bbff]/60 hover:text-white transition-colors duration-300 font-medium"
-          >
-            Docs
-          </a>
         </div>
 
         <div className="flex items-center gap-2 sm:gap-3">
@@ -119,29 +105,36 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right column - Vortex logo */}
-          <div className="relative opacity-0 animate-scale-in flex items-center justify-center lg:justify-end" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
-            <div className="relative">
-              {/* Orbital rings - gravity effect */}
-              <div className="absolute inset-[-80px] rounded-full border border-[#6265fe]/10 animate-[spin_20s_linear_infinite]" />
-              <div className="absolute inset-[-60px] rounded-full border border-[#7d85d0]/8 animate-[spin_15s_linear_infinite_reverse]" />
-              <div className="absolute inset-[-40px] rounded-full border border-[#6265fe]/6 animate-[spin_25s_linear_infinite]" />
-
-              {/* Orbiting particles */}
-              <div className="absolute inset-[-75px] animate-[spin_12s_linear_infinite]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#6265fe] rounded-full opacity-60" />
-              </div>
-              <div className="absolute inset-[-55px] animate-[spin_8s_linear_infinite_reverse]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#b9f0d7] rounded-full opacity-50" />
-              </div>
-              <div className="absolute inset-[-90px] animate-[spin_18s_linear_infinite]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#7d85d0] rounded-full opacity-40" />
+          {/* Right column - Vortex with Orvex logo */}
+          <div className="relative opacity-0 animate-scale-in flex items-center justify-center lg:justify-center flex-1" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
+            <div className="relative flex flex-col items-center">
+              {/* Orvex text logo on top */}
+              <div className="mb-8 lg:mb-12">
+                <Image src="/orvex-text-logo.svg" alt="Orvex" width={280} height={80} className="md:w-[350px] lg:w-[420px]" />
               </div>
 
-              {/* Logo */}
-              <div className="relative w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64 rounded-full overflow-hidden">
-                <div className="absolute inset-0 bg-[#0a0a1a] rounded-full" />
-                <Image src="/logo.svg" alt="Orvex" fill className="object-contain p-4 relative z-10" />
+              {/* Vortex animation */}
+              <div className="relative">
+                {/* Orbital rings - gravity effect */}
+                <div className="absolute inset-[-100px] rounded-full border border-[#6265fe]/10 animate-[spin_20s_linear_infinite]" />
+                <div className="absolute inset-[-75px] rounded-full border border-[#7d85d0]/8 animate-[spin_15s_linear_infinite_reverse]" />
+                <div className="absolute inset-[-50px] rounded-full border border-[#6265fe]/6 animate-[spin_25s_linear_infinite]" />
+
+                {/* Orbiting particles */}
+                <div className="absolute inset-[-95px] animate-[spin_12s_linear_infinite]">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#6265fe] rounded-full opacity-60" />
+                </div>
+                <div className="absolute inset-[-70px] animate-[spin_8s_linear_infinite_reverse]">
+                  <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#b9f0d7] rounded-full opacity-50" />
+                </div>
+                <div className="absolute inset-[-110px] animate-[spin_18s_linear_infinite]">
+                  <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#7d85d0] rounded-full opacity-40" />
+                </div>
+
+                {/* Center point */}
+                <div className="relative w-32 h-32 md:w-40 md:h-40 lg:w-48 lg:h-48 rounded-full">
+                  <div className="absolute inset-0 bg-[#6265fe]/5 rounded-full" />
+                </div>
               </div>
             </div>
           </div>
