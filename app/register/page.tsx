@@ -86,55 +86,101 @@ Code: ${verificationCode}
     }
   };
 
+  const steps = ['wallet', 'tweet', 'follow', 'complete'];
+  const currentIndex = steps.indexOf(step);
+
   return (
-    <div className="min-h-screen bg-black text-white">
-      <nav className="flex items-center justify-between px-8 py-6 border-b border-zinc-800">
-        <Link href="/" className="text-2xl font-bold">ORVEX</Link>
+    <div className="min-h-screen bg-[#070713] text-white overflow-hidden">
+      {/* Background effects */}
+      <div className="fixed inset-0 pointer-events-none">
+        <div className="absolute top-0 right-1/4 w-80 h-80 bg-[#6265fe] rounded-full opacity-10 blur-[100px]" />
+        <div className="absolute bottom-1/4 left-1/4 w-80 h-80 bg-[#b9f0d7] rounded-full opacity-10 blur-[100px]" />
+      </div>
+
+      <nav className="relative flex items-center justify-between px-8 py-6 border-b border-[#7d85d0]/20">
+        <Link href="/" className="flex items-center gap-3">
+          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#6265fe] to-[#b9f0d7] flex items-center justify-center">
+            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+              <circle cx="12" cy="12" r="10" />
+              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)" />
+            </svg>
+          </div>
+          <span className="text-2xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent">
+            Orvex
+          </span>
+        </Link>
         {isConnected && (
           <button
             onClick={() => disconnect()}
-            className="text-zinc-400 hover:text-white transition"
+            className="text-[#b6bbff]/60 hover:text-white transition-colors"
           >
             Disconnect
           </button>
         )}
       </nav>
 
-      <main className="max-w-xl mx-auto px-8 py-16">
-        <div className="mb-8">
-          <div className="flex items-center gap-4 mb-4">
-            {['wallet', 'tweet', 'follow', 'complete'].map((s, i) => (
-              <div key={s} className="flex items-center gap-2">
+      <main className="relative max-w-xl mx-auto px-8 py-16">
+        {/* Progress indicator */}
+        <div className="mb-12">
+          <div className="flex items-center justify-between">
+            {steps.map((s, i) => (
+              <div key={s} className="flex items-center">
                 <div
-                  className={`w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold ${
-                    step === s
-                      ? 'bg-white text-black'
-                      : ['wallet', 'tweet', 'follow', 'complete'].indexOf(step) > i
-                      ? 'bg-green-500 text-white'
-                      : 'bg-zinc-800 text-zinc-500'
+                  className={`w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-300 ${
+                    currentIndex > i
+                      ? 'bg-gradient-to-br from-[#b9f0d7] to-[#6265fe] text-white'
+                      : currentIndex === i
+                      ? 'bg-gradient-to-br from-[#6265fe] to-[#7d85d0] text-white shadow-[0_0_20px_rgba(98,101,254,0.4)]'
+                      : 'bg-[#070713] border border-[#7d85d0]/30 text-[#7d85d0]/50'
                   }`}
                 >
-                  {['wallet', 'tweet', 'follow', 'complete'].indexOf(step) > i ? '✓' : i + 1}
+                  {currentIndex > i ? (
+                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                  ) : (
+                    i + 1
+                  )}
                 </div>
-                {i < 3 && <div className="w-8 h-0.5 bg-zinc-800" />}
+                {i < 3 && (
+                  <div
+                    className={`w-16 sm:w-24 h-0.5 transition-all duration-300 ${
+                      currentIndex > i
+                        ? 'bg-gradient-to-r from-[#b9f0d7] to-[#6265fe]'
+                        : 'bg-[#7d85d0]/20'
+                    }`}
+                  />
+                )}
               </div>
             ))}
+          </div>
+          <div className="flex justify-between mt-2">
+            <span className="text-xs text-[#b6bbff]/50 w-10 text-center">Wallet</span>
+            <span className="text-xs text-[#b6bbff]/50 w-10 text-center">Tweet</span>
+            <span className="text-xs text-[#b6bbff]/50 w-10 text-center">Follow</span>
+            <span className="text-xs text-[#b6bbff]/50 w-10 text-center">Done</span>
           </div>
         </div>
 
         {step === 'wallet' && (
           <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Connect Your Wallet</h1>
-            <p className="text-zinc-400">
-              Connect your wallet to start the verification process.
-            </p>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent mb-3">
+                Connect Your Wallet
+              </h1>
+              <p className="text-[#b6bbff]/60">
+                Connect your wallet to start the verification process.
+              </p>
+            </div>
+
             <div className="flex justify-center py-8">
               <ConnectButton />
             </div>
+
             {isConnected && (
               <button
                 onClick={() => setStep('tweet')}
-                className="w-full py-4 bg-white text-black font-semibold rounded-lg hover:bg-zinc-200 transition"
+                className="w-full py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(98,101,254,0.4)] transition-all duration-300"
               >
                 Continue
               </button>
@@ -144,26 +190,33 @@ Code: ${verificationCode}
 
         {step === 'tweet' && (
           <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Post Verification Tweet</h1>
-            <p className="text-zinc-400">
-              Post this tweet to verify you own this X account.
-            </p>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent mb-3">
+                Post Verification Tweet
+              </h1>
+              <p className="text-[#b6bbff]/60">
+                Post this tweet to verify you own this X account.
+              </p>
+            </div>
 
-            <div className="p-4 bg-zinc-900 rounded-lg border border-zinc-800">
-              <p className="text-sm whitespace-pre-wrap">{tweetText}</p>
+            <div className="p-5 rounded-xl bg-gradient-to-br from-[#6265fe]/10 to-transparent border border-[#7d85d0]/20">
+              <p className="text-sm whitespace-pre-wrap text-[#c9e8ff]">{tweetText}</p>
             </div>
 
             <a
               href={`https://twitter.com/intent/tweet?text=${encodeURIComponent(tweetText)}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full py-4 bg-blue-500 text-white font-semibold rounded-lg text-center hover:bg-blue-600 transition"
+              className="flex items-center justify-center gap-2 w-full py-4 bg-[#1DA1F2] font-semibold rounded-xl hover:bg-[#1a8cd8] transition-all duration-300"
             >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
               Post on X
             </a>
 
             <div className="space-y-2">
-              <label className="block text-sm text-zinc-400">
+              <label className="block text-sm text-[#b6bbff]/60">
                 Paste your tweet URL below
               </label>
               <input
@@ -171,16 +224,20 @@ Code: ${verificationCode}
                 value={tweetUrl}
                 onChange={(e) => setTweetUrl(e.target.value)}
                 placeholder="https://x.com/yourusername/status/..."
-                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-600"
+                className="w-full px-4 py-3.5 bg-[#070713] border border-[#7d85d0]/30 rounded-xl focus:outline-none focus:border-[#6265fe] focus:shadow-[0_0_0_3px_rgba(98,101,254,0.2)] transition-all placeholder:text-[#7d85d0]/40"
               />
             </div>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                {error}
+              </div>
+            )}
 
             <button
               onClick={handleTweetSubmit}
               disabled={isSubmitting}
-              className="w-full py-4 bg-white text-black font-semibold rounded-lg hover:bg-zinc-200 transition disabled:opacity-50"
+              className="w-full py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(98,101,254,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Verifying...' : 'Verify Tweet'}
             </button>
@@ -189,41 +246,54 @@ Code: ${verificationCode}
 
         {step === 'follow' && (
           <div className="space-y-6">
-            <h1 className="text-3xl font-bold">Follow @OrvexOperators</h1>
-            <p className="text-zinc-400">
-              Follow our X account and upload a screenshot as proof.
-            </p>
+            <div className="text-center">
+              <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent mb-3">
+                Follow @OrvexOperators
+              </h1>
+              <p className="text-[#b6bbff]/60">
+                Follow our X account and upload a screenshot as proof.
+              </p>
+            </div>
 
             <a
               href="https://twitter.com/intent/follow?screen_name=OrvexOperators"
               target="_blank"
               rel="noopener noreferrer"
-              className="block w-full py-4 bg-blue-500 text-white font-semibold rounded-lg text-center hover:bg-blue-600 transition"
+              className="flex items-center justify-center gap-2 w-full py-4 bg-[#1DA1F2] font-semibold rounded-xl hover:bg-[#1a8cd8] transition-all duration-300"
             >
+              <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+                <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+              </svg>
               Follow @OrvexOperators
             </a>
 
             <div className="space-y-2">
-              <label className="block text-sm text-zinc-400">
+              <label className="block text-sm text-[#b6bbff]/60">
                 Upload screenshot showing you follow @OrvexOperators
               </label>
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setFollowScreenshot(e.target.files?.[0] || null)}
-                className="w-full px-4 py-3 bg-zinc-900 border border-zinc-800 rounded-lg focus:outline-none focus:border-zinc-600"
-              />
+              <div className="relative">
+                <input
+                  type="file"
+                  accept="image/*"
+                  onChange={(e) => setFollowScreenshot(e.target.files?.[0] || null)}
+                  className="w-full px-4 py-3.5 bg-[#070713] border border-[#7d85d0]/30 rounded-xl focus:outline-none focus:border-[#6265fe] transition-all file:mr-4 file:py-2 file:px-4 file:rounded-lg file:border-0 file:bg-[#6265fe]/20 file:text-[#b6bbff] file:font-medium file:cursor-pointer hover:file:bg-[#6265fe]/30"
+                />
+              </div>
               {followScreenshot && (
-                <p className="text-sm text-zinc-500">{followScreenshot.name}</p>
+                <p className="text-sm text-[#b9f0d7]">{followScreenshot.name}</p>
               )}
             </div>
 
-            {error && <p className="text-red-500 text-sm">{error}</p>}
+            {error && (
+              <div className="p-3 rounded-lg bg-red-500/10 border border-red-500/30 text-red-400 text-sm">
+                {error}
+              </div>
+            )}
 
             <button
               onClick={handleFollowSubmit}
               disabled={isSubmitting}
-              className="w-full py-4 bg-white text-black font-semibold rounded-lg hover:bg-zinc-200 transition disabled:opacity-50"
+              className="w-full py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(98,101,254,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
             >
               {isSubmitting ? 'Verifying...' : 'Complete Registration'}
             </button>
@@ -232,14 +302,25 @@ Code: ${verificationCode}
 
         {step === 'complete' && (
           <div className="space-y-6 text-center">
-            <div className="text-6xl">✓</div>
-            <h1 className="text-3xl font-bold">Registration Complete!</h1>
-            <p className="text-zinc-400">
+            <div className="relative inline-block">
+              <div className="absolute -inset-4 bg-gradient-to-r from-[#b9f0d7] to-[#6265fe] rounded-full opacity-30 blur-xl animate-pulse" />
+              <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-[#b9f0d7] to-[#6265fe] flex items-center justify-center mx-auto">
+                <svg className="w-12 h-12 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                </svg>
+              </div>
+            </div>
+
+            <h1 className="text-3xl font-bold bg-gradient-to-r from-[#b9f0d7] to-[#6265fe] bg-clip-text text-transparent">
+              Registration Complete!
+            </h1>
+            <p className="text-[#b6bbff]/60">
               Your account has been verified. You can now participate in tasks when the campaign goes live.
             </p>
+
             <Link
               href="/dashboard"
-              className="inline-block px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-zinc-200 transition"
+              className="inline-block px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(98,101,254,0.4)] transition-all duration-300"
             >
               Go to Dashboard
             </Link>

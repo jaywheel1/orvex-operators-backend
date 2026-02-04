@@ -1,8 +1,16 @@
 @import "tailwindcss";
 
 :root {
-  --background: #ffffff;
-  --foreground: #171717;
+  /* Orvex Brand Colors */
+  --orvex-black: #070713;
+  --orvex-celadon: #b9f0d7;
+  --orvex-blue: #c9e8ff;
+  --orvex-lavender: #b6bbff;
+  --orvex-indigo: #7d85d0;
+  --orvex-purple: #6265fe;
+
+  --background: #070713;
+  --foreground: #ffffff;
 }
 
 @theme inline {
@@ -12,15 +20,156 @@
   --font-mono: var(--font-geist-mono);
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-  }
-}
-
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: var(--orvex-black);
+}
+
+::-webkit-scrollbar-thumb {
+  background: var(--orvex-indigo);
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: var(--orvex-purple);
+}
+
+/* Glow effects */
+.glow-purple {
+  box-shadow: 0 0 20px rgba(98, 101, 254, 0.3), 0 0 40px rgba(98, 101, 254, 0.1);
+}
+
+.glow-celadon {
+  box-shadow: 0 0 20px rgba(185, 240, 215, 0.3), 0 0 40px rgba(185, 240, 215, 0.1);
+}
+
+/* Gradient backgrounds */
+.gradient-border {
+  position: relative;
+  background: linear-gradient(135deg, rgba(98, 101, 254, 0.1), rgba(185, 240, 215, 0.05));
+  border: 1px solid transparent;
+  background-clip: padding-box;
+}
+
+.gradient-border::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  padding: 1px;
+  background: linear-gradient(135deg, var(--orvex-purple), var(--orvex-celadon));
+  -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+  -webkit-mask-composite: xor;
+  mask-composite: exclude;
+}
+
+/* Button styles */
+.btn-primary {
+  background: linear-gradient(135deg, var(--orvex-purple), var(--orvex-indigo));
+  color: white;
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-primary:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 20px rgba(98, 101, 254, 0.4);
+}
+
+.btn-secondary {
+  background: transparent;
+  border: 1px solid var(--orvex-indigo);
+  color: var(--orvex-lavender);
+  font-weight: 600;
+  padding: 12px 24px;
+  border-radius: 12px;
+  transition: all 0.2s ease;
+}
+
+.btn-secondary:hover {
+  background: rgba(98, 101, 254, 0.1);
+  border-color: var(--orvex-purple);
+}
+
+/* Card styles */
+.card {
+  background: linear-gradient(135deg, rgba(98, 101, 254, 0.08), rgba(7, 7, 19, 0.9));
+  border: 1px solid rgba(125, 133, 208, 0.2);
+  border-radius: 16px;
+  backdrop-filter: blur(10px);
+}
+
+.card:hover {
+  border-color: rgba(98, 101, 254, 0.4);
+}
+
+/* Input styles */
+.input {
+  background: rgba(7, 7, 19, 0.8);
+  border: 1px solid rgba(125, 133, 208, 0.3);
+  border-radius: 12px;
+  padding: 12px 16px;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.input:focus {
+  outline: none;
+  border-color: var(--orvex-purple);
+  box-shadow: 0 0 0 3px rgba(98, 101, 254, 0.2);
+}
+
+.input::placeholder {
+  color: rgba(182, 187, 255, 0.4);
+}
+
+/* Animation keyframes */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-10px); }
+}
+
+@keyframes pulse-glow {
+  0%, 100% { box-shadow: 0 0 20px rgba(98, 101, 254, 0.3); }
+  50% { box-shadow: 0 0 40px rgba(98, 101, 254, 0.5); }
+}
+
+.animate-float {
+  animation: float 3s ease-in-out infinite;
+}
+
+.animate-pulse-glow {
+  animation: pulse-glow 2s ease-in-out infinite;
+}
+
+/* Status badges */
+.badge-pending {
+  background: rgba(255, 193, 7, 0.15);
+  color: #ffc107;
+  border: 1px solid rgba(255, 193, 7, 0.3);
+}
+
+.badge-approved {
+  background: rgba(185, 240, 215, 0.15);
+  color: var(--orvex-celadon);
+  border: 1px solid rgba(185, 240, 215, 0.3);
+}
+
+.badge-rejected {
+  background: rgba(255, 82, 82, 0.15);
+  color: #ff5252;
+  border: 1px solid rgba(255, 82, 82, 0.3);
 }
