@@ -12,7 +12,7 @@ export default function Home() {
       <AnimatedBackground />
 
       {/* Mouse-following glow */}
-      <CursorGlow color="rgba(98, 101, 254, 0.12)" size={500} blur={100} />
+      <CursorGlow color="rgba(98, 101, 254, 0.08)" size={500} blur={100} />
 
       {/* Noise overlay */}
       <div className="noise-overlay" />
@@ -79,14 +79,14 @@ export default function Home() {
         {/* Logo with orbital elements */}
         <div className="relative mb-10 opacity-0 animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
           {/* Outer glow */}
-          <div className="absolute inset-[-40px] bg-gradient-to-r from-[#6265fe]/20 to-[#b9f0d7]/20 rounded-full blur-3xl animate-pulse-glow" />
+          <div className="absolute inset-[-40px] bg-gradient-to-r from-[#6265fe]/14 to-[#b9f0d7]/14 rounded-full blur-3xl animate-pulse-glow" />
 
           {/* Orbiting elements */}
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-3 h-3 bg-[#6265fe] rounded-full animate-orbit opacity-70 shadow-[0_0_10px_rgba(98,101,254,0.8)]" />
+            <div className="w-3 h-3 bg-[#6265fe] rounded-full animate-orbit opacity-50 shadow-[0_0_8px_rgba(98,101,254,0.5)]" />
           </div>
           <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-2 h-2 bg-[#b9f0d7] rounded-full animate-orbit-reverse opacity-60 shadow-[0_0_10px_rgba(185,240,215,0.8)]" />
+            <div className="w-2 h-2 bg-[#b9f0d7] rounded-full animate-orbit-reverse opacity-40 shadow-[0_0_8px_rgba(185,240,215,0.5)]" />
           </div>
 
           {/* Pulse rings */}
@@ -95,7 +95,7 @@ export default function Home() {
 
           {/* Logo */}
           <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden animate-float">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#6265fe]/20 to-[#b9f0d7]/20 animate-glow-pulse rounded-full" />
+            <div className="absolute inset-0 bg-gradient-to-br from-[#6265fe]/14 to-[#b9f0d7]/14 animate-glow-pulse rounded-full" />
             <Image src="/logo.svg" alt="Orvex" fill className="object-contain p-3" />
           </div>
         </div>

@@ -170,11 +170,9 @@ export default function AnimatedBackground() {
       {/* Grid pattern */}
       <div className="absolute inset-0 grid-pattern opacity-40" />
 
-      {/* Gradient orbs */}
-      <div className="absolute top-[-20%] left-[-10%] w-[700px] h-[700px] bg-[#6265fe] rounded-full opacity-[0.07] blur-[150px] animate-pulse-glow" />
-      <div className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-[#b9f0d7] rounded-full opacity-[0.07] blur-[150px] animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
-      <div className="absolute top-[30%] right-[20%] w-[500px] h-[500px] bg-[#7d85d0] rounded-full opacity-[0.05] blur-[120px] animate-pulse-glow" style={{ animationDelay: '3s' }} />
-      <div className="absolute bottom-[20%] left-[30%] w-[400px] h-[400px] bg-[#c9e8ff] rounded-full opacity-[0.04] blur-[100px] animate-pulse-glow" style={{ animationDelay: '2s' }} />
+      {/* Gradient orbs - left and right only */}
+      <div className="absolute top-[-20%] left-[-10%] w-[700px] h-[700px] bg-[#6265fe] rounded-full opacity-[0.05] blur-[150px] animate-pulse-glow" />
+      <div className="absolute bottom-[-20%] right-[-10%] w-[700px] h-[700px] bg-[#b9f0d7] rounded-full opacity-[0.05] blur-[150px] animate-pulse-glow" style={{ animationDelay: '1.5s' }} />
 
       {/* Animated gradient mesh */}
       <div className="absolute inset-0 opacity-30">

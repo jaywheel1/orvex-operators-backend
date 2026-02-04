@@ -10,7 +10,7 @@ interface CursorGlowProps {
 }
 
 export default function CursorGlow({
-  color = 'rgba(98, 101, 254, 0.15)',
+  color = 'rgba(98, 101, 254, 0.10)',
   size = 400,
   blur = 80,
   opacity = 1,
