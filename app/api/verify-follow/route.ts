@@ -1,5 +1,65 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import Anthropic from '@anthropic-ai/sdk';
+
+const anthropic = new Anthropic({
+  apiKey: process.env.ANTHROPIC_API_KEY,
+});
+
+// Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
+const AI_VERIFICATION_ENABLED = process.env.ENABLE_AI_VERIFICATION === 'true';
+
+async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promise<{ verified: boolean; reason: string }> {
+  // Skip AI verification if disabled (for testing)
+  if (!AI_VERIFICATION_ENABLED) {
+    console.log('AI verification disabled - auto-approving for testing');
+    return { verified: true, reason: 'AI verification disabled - auto-approved for testing' };
+  }
+
+  try {
+    const response = await anthropic.messages.create({
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 256,
+      messages: [
+        {
+          role: 'user',
+          content: [
+            {
+              type: 'image',
+              source: {
+                type: 'base64',
+                media_type: mediaType as 'image/jpeg' | 'image/png' | 'image/gif' | 'image/webp',
+                data: imageBase64,
+              },
+            },
+            {
+              type: 'text',
+              text: `Analyze this screenshot and determine if it shows that the user is following the Twitter/X account @OrvexOperators (or a similar Orvex-related account).
+
+Look for:
+1. The "Following" button state (not "Follow")
+2. The account name containing "Orvex" or "OrvexOperators"
+3. Any indication this is a Twitter/X profile page
+
+Respond with JSON only:
+{"verified": true/false, "reason": "brief explanation"}`,
+            },
+          ],
+        },
+      ],
+    });
+
+    const textContent = response.content.find(c => c.type === 'text');
+    if (textContent && textContent.type === 'text') {
+      const parsed = JSON.parse(textContent.text);
+      return { verified: parsed.verified, reason: parsed.reason };
+    }
+    return { verified: false, reason: 'Could not parse AI response' };
+  } catch (error) {
+    console.error('AI verification error:', error);
+    return { verified: false, reason: 'AI verification failed' };
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,7 +116,13 @@ export async function POST(request: NextRequest) {
       console.error('Screenshot upload error:', uploadError);
     }
 
-    const aiVerified = true;
+    const imageBase64 = buffer.toString('base64');
+    const mediaType = screenshot.type || 'image/png';
+
+    const aiResult = await verifyFollowWithAI(imageBase64, mediaType);
+    const aiVerified = aiResult.verified;
+
+    console.log('AI verification result:', aiResult);
 
     const { error: updateError } = await supabaseAdmin
       .from('users')
