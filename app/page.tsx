@@ -105,84 +105,95 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right column - Ultra HD Vortex Animation */}
+          {/* Right column - Vortex Animation with Planets */}
           <div className="relative opacity-0 animate-scale-in flex items-center justify-center flex-1" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
             <div className="relative w-[320px] h-[320px] md:w-[420px] md:h-[420px] lg:w-[520px] lg:h-[520px]">
-              {/* Outer glow effect */}
-              <div className="absolute inset-[-20%] rounded-full bg-[#6265fe]/5 blur-3xl animate-pulse" />
-              <div className="absolute inset-[-10%] rounded-full bg-[#7d85d0]/3 blur-2xl animate-[pulse_3s_ease-in-out_infinite]" />
+              {/* Orbital rings - clean, no flicker */}
+              <div className="absolute inset-[-2%] rounded-full border border-[#6265fe]/10 animate-[spin_120s_linear_infinite]" />
+              <div className="absolute inset-[2%] rounded-full border border-[#7d85d0]/12 animate-[spin_100s_linear_infinite_reverse]" />
+              <div className="absolute inset-[6%] rounded-full border border-[#b6bbff]/10 animate-[spin_90s_linear_infinite]" />
+              <div className="absolute inset-[10%] rounded-full border border-[#6265fe]/15 animate-[spin_80s_linear_infinite_reverse]" />
+              <div className="absolute inset-[14%] rounded-full border border-[#7d85d0]/12 animate-[spin_70s_linear_infinite]" />
+              <div className="absolute inset-[18%] rounded-full border-2 border-[#b6bbff]/10 animate-[spin_60s_linear_infinite_reverse]" />
+              <div className="absolute inset-[22%] rounded-full border border-[#6265fe]/18 animate-[spin_55s_linear_infinite]" />
+              <div className="absolute inset-[26%] rounded-full border border-[#7d85d0]/15 animate-[spin_50s_linear_infinite_reverse]" />
+              <div className="absolute inset-[30%] rounded-full border border-[#b6bbff]/15 animate-[spin_45s_linear_infinite]" />
+              <div className="absolute inset-[34%] rounded-full border-2 border-[#6265fe]/12 animate-[spin_40s_linear_infinite_reverse]" />
+              <div className="absolute inset-[38%] rounded-full border border-[#7d85d0]/20 animate-[spin_35s_linear_infinite]" />
+              <div className="absolute inset-[42%] rounded-full border border-[#b6bbff]/18 animate-[spin_30s_linear_infinite_reverse]" />
+              <div className="absolute inset-[45%] rounded-full border border-[#6265fe]/25 animate-[spin_25s_linear_infinite]" />
+              <div className="absolute inset-[47%] rounded-full border border-[#7d85d0]/22 animate-[spin_20s_linear_infinite_reverse]" />
 
-              {/* Outermost orbital rings */}
-              <div className="absolute inset-[-5%] rounded-full border border-[#6265fe]/8 animate-[spin_90s_linear_infinite]" />
-              <div className="absolute inset-[0%] rounded-full border border-[#7d85d0]/10 animate-[spin_80s_linear_infinite_reverse]" />
-              <div className="absolute inset-[3%] rounded-full border border-[#b6bbff]/8 animate-[spin_70s_linear_infinite]" />
-              <div className="absolute inset-[6%] rounded-full border border-[#6265fe]/12 animate-[spin_65s_linear_infinite_reverse]" />
-
-              {/* Outer rings */}
-              <div className="absolute inset-[10%] rounded-full border border-[#7d85d0]/15 animate-[spin_55s_linear_infinite]" />
-              <div className="absolute inset-[13%] rounded-full border border-[#6265fe]/12 animate-[spin_50s_linear_infinite_reverse]" />
-              <div className="absolute inset-[16%] rounded-full border-2 border-[#b6bbff]/10 animate-[spin_45s_linear_infinite]" />
-              <div className="absolute inset-[19%] rounded-full border border-[#7d85d0]/18 animate-[spin_40s_linear_infinite_reverse]" />
-
-              {/* Middle rings */}
-              <div className="absolute inset-[23%] rounded-full border border-[#6265fe]/20 animate-[spin_35s_linear_infinite]" />
-              <div className="absolute inset-[26%] rounded-full border-2 border-[#7d85d0]/15 animate-[spin_30s_linear_infinite_reverse]" />
-              <div className="absolute inset-[29%] rounded-full border border-[#b6bbff]/20 animate-[spin_28s_linear_infinite]" />
-              <div className="absolute inset-[32%] rounded-full border border-[#6265fe]/22 animate-[spin_25s_linear_infinite_reverse]" />
-
-              {/* Inner rings */}
-              <div className="absolute inset-[36%] rounded-full border-2 border-[#7d85d0]/20 animate-[spin_22s_linear_infinite]" />
-              <div className="absolute inset-[39%] rounded-full border border-[#6265fe]/25 animate-[spin_18s_linear_infinite_reverse]" />
-              <div className="absolute inset-[42%] rounded-full border border-[#b6bbff]/22 animate-[spin_15s_linear_infinite]" />
-              <div className="absolute inset-[44%] rounded-full border-2 border-[#7d85d0]/25 animate-[spin_12s_linear_infinite_reverse]" />
-
-              {/* Core rings */}
-              <div className="absolute inset-[46%] rounded-full border border-[#6265fe]/30 animate-[spin_10s_linear_infinite]" />
-              <div className="absolute inset-[48%] rounded-full border border-[#b6bbff]/35 animate-[spin_8s_linear_infinite_reverse]" />
-
-              {/* Orbiting particles - outer layer */}
-              <div className="absolute inset-[2%] animate-[spin_60s_linear_infinite]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-[#6265fe] rounded-full opacity-70 shadow-[0_0_15px_#6265fe,0_0_30px_#6265fe]" />
+              {/* Orbiting planets - Layer 1 (outermost) */}
+              <div className="absolute inset-[0%] animate-[spin_80s_linear_infinite]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_12px_#6265fe]" />
               </div>
-              <div className="absolute inset-[5%] animate-[spin_55s_linear_infinite_reverse]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#b9f0d7] rounded-full opacity-60 shadow-[0_0_12px_#b9f0d7,0_0_24px_#b9f0d7]" />
+              <div className="absolute inset-[0%] animate-[spin_75s_linear_infinite_reverse]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-gradient-to-br from-[#b9f0d7] to-[#8ae0c0] rounded-full shadow-[0_0_10px_#b9f0d7]" />
               </div>
-              <div className="absolute inset-[8%] animate-[spin_50s_linear_infinite]">
-                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-3 h-3 bg-[#7d85d0] rounded-full opacity-80 shadow-[0_0_18px_#7d85d0,0_0_36px_#7d85d0]" />
-              </div>
-              <div className="absolute inset-[12%] animate-[spin_45s_linear_infinite_reverse]">
-                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-1.5 h-1.5 bg-[#b6bbff] rounded-full opacity-50 shadow-[0_0_10px_#b6bbff]" />
+              <div className="absolute inset-[0%] animate-[spin_85s_linear_infinite]">
+                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_8px_#7d85d0]" />
               </div>
 
-              {/* Orbiting particles - middle layer */}
-              <div className="absolute inset-[18%] animate-[spin_35s_linear_infinite]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#6265fe] rounded-full opacity-75 shadow-[0_0_12px_#6265fe,0_0_24px_#6265fe]" />
+              {/* Orbiting planets - Layer 2 */}
+              <div className="absolute inset-[8%] animate-[spin_60s_linear_infinite_reverse]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_10px_#7d85d0]" />
               </div>
-              <div className="absolute inset-[22%] animate-[spin_30s_linear_infinite_reverse]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-[#b9f0d7] rounded-full opacity-70 shadow-[0_0_15px_#b9f0d7,0_0_30px_#b9f0d7]" />
+              <div className="absolute inset-[8%] animate-[spin_65s_linear_infinite]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
               </div>
-              <div className="absolute inset-[26%] animate-[spin_25s_linear_infinite]">
-                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1.5 h-1.5 bg-[#7d85d0] rounded-full opacity-60 shadow-[0_0_10px_#7d85d0]" />
-              </div>
-              <div className="absolute inset-[30%] animate-[spin_22s_linear_infinite_reverse]">
-                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 bg-[#b6bbff] rounded-full opacity-65 shadow-[0_0_12px_#b6bbff]" />
+              <div className="absolute inset-[8%] animate-[spin_55s_linear_infinite_reverse]">
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-3 h-3 bg-gradient-to-br from-[#b6bbff] to-[#9ba0e6] rounded-full shadow-[0_0_10px_#b6bbff]" />
               </div>
 
-              {/* Orbiting particles - inner layer */}
-              <div className="absolute inset-[36%] animate-[spin_18s_linear_infinite]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#6265fe] rounded-full opacity-80 shadow-[0_0_10px_#6265fe,0_0_20px_#6265fe]" />
+              {/* Orbiting planets - Layer 3 */}
+              <div className="absolute inset-[16%] animate-[spin_45s_linear_infinite]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-gradient-to-br from-[#b9f0d7] to-[#8ae0c0] rounded-full shadow-[0_0_10px_#b9f0d7]" />
               </div>
-              <div className="absolute inset-[40%] animate-[spin_12s_linear_infinite_reverse]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#7d85d0] rounded-full opacity-75 shadow-[0_0_12px_#7d85d0,0_0_24px_#7d85d0]" />
+              <div className="absolute inset-[16%] animate-[spin_50s_linear_infinite_reverse]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_8px_#7d85d0]" />
               </div>
-              <div className="absolute inset-[44%] animate-[spin_8s_linear_infinite]">
-                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1 h-1 bg-[#b9f0d7] rounded-full opacity-70 shadow-[0_0_8px_#b9f0d7]" />
+              <div className="absolute inset-[16%] animate-[spin_40s_linear_infinite]">
+                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2 h-2 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
               </div>
 
-              {/* Glowing center core */}
-              <div className="absolute inset-[46%] rounded-full bg-gradient-to-br from-[#6265fe]/20 to-[#7d85d0]/15 animate-[pulse_4s_ease-in-out_infinite]" />
-              <div className="absolute inset-[48%] rounded-full bg-gradient-to-br from-[#7d85d0]/30 to-[#6265fe]/20 animate-[pulse_3s_ease-in-out_infinite]" />
-              <div className="absolute inset-[49%] rounded-full bg-[#b6bbff]/15 shadow-[0_0_40px_rgba(182,187,255,0.4),0_0_80px_rgba(98,101,254,0.2)] animate-pulse" />
+              {/* Orbiting planets - Layer 4 */}
+              <div className="absolute inset-[24%] animate-[spin_35s_linear_infinite_reverse]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
+              </div>
+              <div className="absolute inset-[24%] animate-[spin_38s_linear_infinite]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-gradient-to-br from-[#b6bbff] to-[#9ba0e6] rounded-full shadow-[0_0_10px_#b6bbff]" />
+              </div>
+              <div className="absolute inset-[24%] animate-[spin_32s_linear_infinite_reverse]">
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 bg-gradient-to-br from-[#b9f0d7] to-[#8ae0c0] rounded-full shadow-[0_0_8px_#b9f0d7]" />
+              </div>
+
+              {/* Orbiting planets - Layer 5 */}
+              <div className="absolute inset-[32%] animate-[spin_28s_linear_infinite]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_8px_#7d85d0]" />
+              </div>
+              <div className="absolute inset-[32%] animate-[spin_25s_linear_infinite_reverse]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
+              </div>
+              <div className="absolute inset-[32%] animate-[spin_30s_linear_infinite]">
+                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1.5 h-1.5 bg-gradient-to-br from-[#b9f0d7] to-[#8ae0c0] rounded-full shadow-[0_0_6px_#b9f0d7]" />
+              </div>
+
+              {/* Orbiting planets - Layer 6 (inner) */}
+              <div className="absolute inset-[40%] animate-[spin_20s_linear_infinite_reverse]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-gradient-to-br from-[#b6bbff] to-[#9ba0e6] rounded-full shadow-[0_0_8px_#b6bbff]" />
+              </div>
+              <div className="absolute inset-[40%] animate-[spin_18s_linear_infinite]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_6px_#7d85d0]" />
+              </div>
+              <div className="absolute inset-[40%] animate-[spin_22s_linear_infinite_reverse]">
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
+              </div>
+
+              {/* Center core - static glow, no flicker */}
+              <div className="absolute inset-[46%] rounded-full bg-gradient-to-br from-[#6265fe]/25 to-[#7d85d0]/20" />
+              <div className="absolute inset-[48%] rounded-full bg-gradient-to-br from-[#7d85d0]/35 to-[#6265fe]/25 shadow-[0_0_30px_rgba(98,101,254,0.3)]" />
+              <div className="absolute inset-[49%] rounded-full bg-[#b6bbff]/25 shadow-[0_0_20px_rgba(182,187,255,0.5)]" />
             </div>
           </div>
         </div>
