@@ -119,13 +119,13 @@ export default function TaskSubmissionPage() {
           <div className="text-6xl mb-6">✓</div>
           <h1 className="text-3xl font-bold mb-4">Task Submitted!</h1>
           <p className="text-zinc-400 mb-8">
-            Your submission is pending review. You&apos;ll receive points once approved.
+            Submission received. Points awarded on verification.
           </p>
           <Link
             href="/dashboard"
             className="inline-block px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-zinc-200 transition"
           >
-            Back to Dashboard
+            Back to Console
           </Link>
         </main>
       </div>
@@ -146,7 +146,7 @@ export default function TaskSubmissionPage() {
             href="/dashboard"
             className="inline-block px-8 py-4 bg-white text-black font-semibold rounded-lg hover:bg-zinc-200 transition"
           >
-            Back to Dashboard
+            Back to Console
           </Link>
         </main>
       </div>
@@ -162,7 +162,7 @@ export default function TaskSubmissionPage() {
 
       <main className="max-w-xl mx-auto px-8 py-12">
         <Link href="/dashboard" className="text-zinc-400 hover:text-white transition mb-8 inline-block">
-          ← Back to Dashboard
+          ← Back to Console
         </Link>
 
         <div className="p-6 bg-zinc-900 rounded-xl border border-zinc-800 mb-8">

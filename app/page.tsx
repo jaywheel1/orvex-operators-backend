@@ -104,17 +104,17 @@ export default function Home() {
         {/* Headline */}
         <h1 className="text-center mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
           <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1]">
-            <span className="gradient-text">Complete Tasks.</span>
+            <span className="gradient-text">Enter The Vortex</span>
           </span>
-          <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] mt-2">
-            <span className="gradient-text-accent animate-text-glow">Earn Rewards.</span>
+          <span className="block text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1] mt-4">
+            <span className="gradient-text-accent animate-text-glow">Incentivised Testnet</span>
           </span>
         </h1>
 
         {/* Subheadline */}
         <p className="text-base md:text-lg text-[#b6bbff]/60 text-center max-w-xl mb-10 leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
-          Join the Orvex community. Connect your wallet, verify your X account,
-          and start earning points by completing social tasks.
+          Liquidity coordination infrastructure. Deploy capital where it matters.
+          Complete tasks. Earn coordination points.
         </p>
 
         {/* CTA Buttons */}
@@ -124,7 +124,7 @@ export default function Home() {
             className="group relative px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-2xl text-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(98,101,254,0.5)] hover:-translate-y-1"
           >
             <span className="relative z-10 flex items-center gap-2">
-              Get Started
+              Enter Console
               <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
               </svg>
@@ -135,7 +135,7 @@ export default function Home() {
             href="/dashboard"
             className="text-[#b6bbff]/60 hover:text-white transition-colors duration-300 text-sm underline underline-offset-4 decoration-[#7d85d0]/30 hover:decoration-[#6265fe]"
           >
-            Already registered? Login
+            Already registered? Enter Console
           </Link>
         </div>
 
@@ -146,9 +146,9 @@ export default function Home() {
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6265fe]/20 to-[#6265fe]/5 border border-[#6265fe]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(98,101,254,0.3)] transition-all duration-300">
               <span className="text-2xl font-bold text-[#6265fe]">1</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Connect Wallet</h3>
+            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Connect</h3>
             <p className="text-sm text-[#b6bbff]/50 leading-relaxed">
-              Link your wallet to get started with Orvex
+              Link your wallet. Enter the Console.
             </p>
           </div>
 
@@ -157,9 +157,9 @@ export default function Home() {
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#7d85d0]/20 to-[#7d85d0]/5 border border-[#7d85d0]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(125,133,208,0.3)] transition-all duration-300">
               <span className="text-2xl font-bold text-[#7d85d0]">2</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Verify X Account</h3>
+            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Verify</h3>
             <p className="text-sm text-[#b6bbff]/50 leading-relaxed">
-              Post a verification tweet and submit proof
+              Post verification. Submit proof.
             </p>
           </div>
 
@@ -168,9 +168,9 @@ export default function Home() {
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#b9f0d7]/20 to-[#b9f0d7]/5 border border-[#b9f0d7]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(185,240,215,0.3)] transition-all duration-300">
               <span className="text-2xl font-bold text-[#b9f0d7]">3</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Earn Points</h3>
+            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Coordinate</h3>
             <p className="text-sm text-[#b6bbff]/50 leading-relaxed">
-              Complete tasks and climb the leaderboard
+              Complete tasks. Collect points.
             </p>
           </div>
         </div>
@@ -181,19 +181,19 @@ export default function Home() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
             </svg>
-            <span>Secure & Verified</span>
+            <span>Secure Infrastructure</span>
           </div>
           <div className="flex items-center gap-2 text-[#7d85d0]/50 text-sm">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M13 10V3L4 14h7v7l9-11h-7z" />
             </svg>
-            <span>Instant Rewards</span>
+            <span>Coordination, Not Extraction</span>
           </div>
           <div className="flex items-center gap-2 text-[#7d85d0]/50 text-sm">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span>Growing Community</span>
+            <span>Depth That Holds</span>
           </div>
         </div>
       </main>

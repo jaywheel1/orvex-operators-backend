@@ -142,7 +142,7 @@ export default function DashboardPage() {
               </svg>
             </div>
             <h1 className="text-2xl font-bold gradient-text mb-3">Connect Wallet</h1>
-            <p className="text-[#b6bbff]/50 text-sm mb-8">Connect your wallet to access your dashboard</p>
+            <p className="text-[#b6bbff]/50 text-sm mb-8">Connect your wallet to enter the Console</p>
             <ConnectButton />
           </div>
         </main>
@@ -158,7 +158,7 @@ export default function DashboardPage() {
         <div className="noise-overlay" />
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen">
           <div className="w-16 h-16 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin mb-4" />
-          <span className="text-[#b6bbff]/50 text-sm">Loading dashboard...</span>
+          <span className="text-[#b6bbff]/50 text-sm">Loading Console...</span>
         </div>
       </div>
     );
@@ -191,7 +191,7 @@ export default function DashboardPage() {
               </svg>
             </div>
             <h1 className="text-2xl font-bold gradient-text mb-3">Complete Registration</h1>
-            <p className="text-[#b6bbff]/50 text-sm mb-8">You need to verify your X account before accessing the dashboard.</p>
+            <p className="text-[#b6bbff]/50 text-sm mb-8">Verify your X account to enter the Console.</p>
             <Link
               href="/register"
               className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.4)] transition-all duration-300 hover:-translate-y-0.5"
@@ -237,8 +237,8 @@ export default function DashboardPage() {
       <main className="relative z-10 max-w-6xl mx-auto px-6 py-8 md:py-12">
         {/* Welcome header */}
         <div className="mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
-          <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Welcome back</h1>
-          <p className="text-[#b6bbff]/50">Track your progress and complete tasks to earn rewards.</p>
+          <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Console</h1>
+          <p className="text-[#b6bbff]/50">Coordinate. Complete tasks. Earn points.</p>
         </div>
 
         {/* Stats Grid */}
@@ -397,7 +397,7 @@ export default function DashboardPage() {
             </div>
             <h3 className="text-xl font-semibold text-white mb-2">Campaign Not Live Yet</h3>
             <p className="text-[#b6bbff]/50 text-sm max-w-sm mx-auto">
-              Tasks will be available when the campaign goes live. Check back soon!
+              Tasks available when the Vortex opens. Stand by.
             </p>
           </div>
         ) : tasks.length === 0 ? (

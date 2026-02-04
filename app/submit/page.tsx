@@ -103,7 +103,7 @@ function SubmitForm() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent mb-4">
             Connect Wallet to Continue
           </h1>
-          <p className="text-[#b6bbff]/60 mb-8">Connect your wallet to submit this task</p>
+          <p className="text-[#b6bbff]/60 mb-8">Connect to submit proof</p>
           <ConnectButton />
         </div>
       </main>
@@ -140,13 +140,13 @@ function SubmitForm() {
             Task Submitted!
           </h1>
           <p className="text-[#b6bbff]/60 mb-8 text-lg">
-            Your submission is pending review. You&apos;ll receive points once approved.
+            Submission received. Points awarded on verification.
           </p>
           <Link
             href="/dashboard"
             className="inline-block px-10 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.5)] hover:scale-[1.02] transition-all duration-300"
           >
-            Back to Dashboard
+            Back to Console
           </Link>
         </div>
       </main>
@@ -170,7 +170,7 @@ function SubmitForm() {
             href="/dashboard"
             className="inline-block px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.5)] hover:scale-[1.02] transition-all duration-300"
           >
-            Back to Dashboard
+            Back to Console
           </Link>
         </div>
       </main>
@@ -186,7 +186,7 @@ function SubmitForm() {
         <svg className="w-4 h-4 group-hover:-translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M15 19l-7-7 7-7" />
         </svg>
-        Back to Dashboard
+        Back to Console
       </Link>
 
       {/* Task Card */}

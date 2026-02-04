@@ -181,7 +181,7 @@ Code: ${verificationCode}
                   Connect Your Wallet
                 </h1>
                 <p className="text-[#b6bbff]/50 text-sm">
-                  Connect your wallet to start the verification process.
+                  Connect to begin verification.
                 </p>
               </div>
 
@@ -373,10 +373,10 @@ Code: ${verificationCode}
 
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold gradient-text-accent mb-3">
-                  Registration Complete!
+                  Verification Complete
                 </h1>
                 <p className="text-[#b6bbff]/50 text-sm max-w-sm mx-auto">
-                  Your account has been verified. You can now participate in tasks when the campaign goes live.
+                  Identity confirmed. You&apos;re cleared to coordinate when the Vortex opens.
                 </p>
               </div>
 
@@ -384,7 +384,7 @@ Code: ${verificationCode}
                 href="/dashboard"
                 className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.4)] transition-all duration-300 hover:-translate-y-0.5"
               >
-                Go to Dashboard
+                Enter Console
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>

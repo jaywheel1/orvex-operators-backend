@@ -215,7 +215,7 @@ export default function AdminPage() {
           <h1 className="text-4xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent mb-4 animate-fade-in-up" style={{ animationDelay: '0.2s' }}>
             Admin Panel
           </h1>
-          <p className="text-[#b6bbff]/60 mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>Connect your wallet to access admin features</p>
+          <p className="text-[#b6bbff]/60 mb-8 animate-fade-in-up" style={{ animationDelay: '0.3s' }}>Connect to access operator controls</p>
           <div className="animate-fade-in-up" style={{ animationDelay: '0.4s' }}>
             <ConnectButton />
           </div>
@@ -234,7 +234,7 @@ export default function AdminPage() {
             <div className="w-16 h-16 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" />
             <div className="absolute inset-0 w-16 h-16 rounded-full border-2 border-transparent border-b-[#b9f0d7]/50 animate-spin" style={{ animationDirection: 'reverse', animationDuration: '1.5s' }} />
           </div>
-          <span className="text-[#b6bbff]/60 animate-pulse">Verifying access...</span>
+          <span className="text-[#b6bbff]/60 animate-pulse">Verifying operator access...</span>
         </div>
       </div>
     );
@@ -255,7 +255,7 @@ export default function AdminPage() {
             <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent mb-4">
               Access Denied
             </h1>
-            <p className="text-[#b6bbff]/60 mb-8">You do not have admin privileges.</p>
+            <p className="text-[#b6bbff]/60 mb-8">Operator credentials not found.</p>
             <Link
               href="/"
               className="inline-block px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.5)] hover:scale-105 transition-all duration-300"
