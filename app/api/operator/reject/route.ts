@@ -6,7 +6,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
   try {
     const body: RejectRequest = await request.json();
     const { submission_id, operator_id, reason } = body;
-    const rejection_reason = reason || body.rejection_reason;
+    const rejection_reason = reason || body.rejection_reason || 'No reason provided';
 
     // Input validation
     if (!submission_id || !operator_id) {

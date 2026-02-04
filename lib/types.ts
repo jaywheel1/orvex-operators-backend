@@ -66,7 +66,8 @@ export interface SubmitTaskRequest {
 export interface RejectRequest {
   submission_id: string;
   operator_id: string;
-  rejection_reason: string;
+  rejection_reason?: string;
+  reason?: string;  // Alias for rejection_reason
 }
 
 export interface ApproveRequest {
