@@ -33,7 +33,7 @@ export default function Home() {
         <div className="flex items-center gap-3">
           {/* X Icon */}
           <a
-            href="https://x.com/OrvexOperators"
+            href="https://x.com/OrvexFi"
             target="_blank"
             rel="noopener noreferrer"
             className="w-10 h-10 rounded-lg bg-[#1a1a2e] border border-[#7d85d0]/20 flex items-center justify-center text-[#b6bbff]/70 hover:text-white hover:border-[#7d85d0]/40 transition-all"

@@ -34,11 +34,11 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
             },
             {
               type: 'text',
-              text: `Analyze this screenshot and determine if it shows that the user is following the Twitter/X account @OrvexOperators (or a similar Orvex-related account).
+              text: `Analyze this screenshot and determine if it shows that the user is following the Twitter/X account @OrvexFi (or a similar Orvex-related account).
 
 Look for:
 1. The "Following" button state (not "Follow")
-2. The account name containing "Orvex" or "OrvexOperators"
+2. The account name containing "Orvex" or "OrvexFi"
 3. Any indication this is a Twitter/X profile page
 
 Respond with JSON only:
