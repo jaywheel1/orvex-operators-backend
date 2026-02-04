@@ -17,6 +17,61 @@ export default function Home() {
       {/* Noise overlay */}
       <div className="noise-overlay" />
 
+      {/* Deep background vortex - behind left text */}
+      <div className="fixed top-0 left-0 w-[800px] h-[800px] md:w-[1000px] md:h-[1000px] -translate-x-1/3 -translate-y-1/4 pointer-events-none z-0 opacity-30">
+        <svg
+          className="w-full h-full animate-[spin_120s_linear_infinite]"
+          viewBox="0 0 500 500"
+        >
+          <defs>
+            <linearGradient id="bgSpiral1" x1="0%" y1="0%" x2="100%" y2="100%">
+              <stop offset="0%" stopColor="#6265fe" stopOpacity="0.4" />
+              <stop offset="50%" stopColor="#7d85d0" stopOpacity="0.2" />
+              <stop offset="100%" stopColor="#b6bbff" stopOpacity="0" />
+            </linearGradient>
+            <linearGradient id="bgSpiral2" x1="100%" y1="0%" x2="0%" y2="100%">
+              <stop offset="0%" stopColor="#7d85d0" stopOpacity="0.3" />
+              <stop offset="50%" stopColor="#6265fe" stopOpacity="0.15" />
+              <stop offset="100%" stopColor="#b9f0d7" stopOpacity="0" />
+            </linearGradient>
+            <filter id="bgBlur" x="-50%" y="-50%" width="200%" height="200%">
+              <feGaussianBlur stdDeviation="8" />
+            </filter>
+          </defs>
+
+          {/* Large outer spiral */}
+          <path
+            d="M250,250 Q290,210 350,200 Q440,190 480,260 Q500,350 440,420 Q360,480 260,460 Q160,430 120,350 Q90,260 140,180 Q200,100 310,100 Q430,110 480,220"
+            fill="none"
+            stroke="url(#bgSpiral1)"
+            strokeWidth="20"
+            strokeLinecap="round"
+            filter="url(#bgBlur)"
+          />
+
+          {/* Secondary spiral */}
+          <path
+            d="M250,250 Q210,290 200,350 Q190,440 260,480 Q350,500 420,440 Q480,360 460,260 Q430,160 350,120 Q260,90 180,140 Q100,200 100,310 Q110,430 220,480"
+            fill="none"
+            stroke="url(#bgSpiral2)"
+            strokeWidth="15"
+            strokeLinecap="round"
+            filter="url(#bgBlur)"
+          />
+
+          {/* Inner spiral hint */}
+          <path
+            d="M250,250 Q280,220 320,215 Q390,210 420,270 Q440,340 390,390 Q320,430 250,410 Q180,380 160,310 Q150,240 200,190 Q260,150 340,170"
+            fill="none"
+            stroke="url(#bgSpiral1)"
+            strokeWidth="10"
+            strokeLinecap="round"
+            filter="url(#bgBlur)"
+            opacity="0.5"
+          />
+        </svg>
+      </div>
+
       {/* Navigation */}
       <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-5 glass border-b border-[#7d85d0]/10">
         <div className="flex items-center">
@@ -105,95 +160,164 @@ export default function Home() {
             </div>
           </div>
 
-          {/* Right column - Vortex Animation with Planets */}
+          {/* Right column - Spiral Vortex Animation */}
           <div className="relative opacity-0 animate-scale-in flex items-center justify-center flex-1" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
             <div className="relative w-[320px] h-[320px] md:w-[420px] md:h-[420px] lg:w-[520px] lg:h-[520px]">
-              {/* Orbital rings - clean, no flicker */}
-              <div className="absolute inset-[-2%] rounded-full border border-[#6265fe]/10 animate-[spin_120s_linear_infinite]" />
-              <div className="absolute inset-[2%] rounded-full border border-[#7d85d0]/12 animate-[spin_100s_linear_infinite_reverse]" />
-              <div className="absolute inset-[6%] rounded-full border border-[#b6bbff]/10 animate-[spin_90s_linear_infinite]" />
-              <div className="absolute inset-[10%] rounded-full border border-[#6265fe]/15 animate-[spin_80s_linear_infinite_reverse]" />
-              <div className="absolute inset-[14%] rounded-full border border-[#7d85d0]/12 animate-[spin_70s_linear_infinite]" />
-              <div className="absolute inset-[18%] rounded-full border-2 border-[#b6bbff]/10 animate-[spin_60s_linear_infinite_reverse]" />
-              <div className="absolute inset-[22%] rounded-full border border-[#6265fe]/18 animate-[spin_55s_linear_infinite]" />
-              <div className="absolute inset-[26%] rounded-full border border-[#7d85d0]/15 animate-[spin_50s_linear_infinite_reverse]" />
-              <div className="absolute inset-[30%] rounded-full border border-[#b6bbff]/15 animate-[spin_45s_linear_infinite]" />
-              <div className="absolute inset-[34%] rounded-full border-2 border-[#6265fe]/12 animate-[spin_40s_linear_infinite_reverse]" />
-              <div className="absolute inset-[38%] rounded-full border border-[#7d85d0]/20 animate-[spin_35s_linear_infinite]" />
-              <div className="absolute inset-[42%] rounded-full border border-[#b6bbff]/18 animate-[spin_30s_linear_infinite_reverse]" />
-              <div className="absolute inset-[45%] rounded-full border border-[#6265fe]/25 animate-[spin_25s_linear_infinite]" />
-              <div className="absolute inset-[47%] rounded-full border border-[#7d85d0]/22 animate-[spin_20s_linear_infinite_reverse]" />
+              {/* Outer glow */}
+              <div className="absolute inset-[-20%] rounded-full bg-[#6265fe]/5 blur-3xl" />
 
-              {/* Orbiting planets - Layer 1 (outermost) */}
-              <div className="absolute inset-[0%] animate-[spin_80s_linear_infinite]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-4 h-4 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_12px_#6265fe]" />
-              </div>
-              <div className="absolute inset-[0%] animate-[spin_75s_linear_infinite_reverse]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-gradient-to-br from-[#b9f0d7] to-[#8ae0c0] rounded-full shadow-[0_0_10px_#b9f0d7]" />
-              </div>
-              <div className="absolute inset-[0%] animate-[spin_85s_linear_infinite]">
-                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_8px_#7d85d0]" />
+              {/* Spiral arms container - rotating */}
+              <svg
+                className="absolute inset-0 w-full h-full animate-[spin_60s_linear_infinite]"
+                viewBox="0 0 400 400"
+              >
+                <defs>
+                  {/* Gradient for spiral arms */}
+                  <linearGradient id="spiralGradient1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#6265fe" stopOpacity="0.8" />
+                    <stop offset="50%" stopColor="#7d85d0" stopOpacity="0.5" />
+                    <stop offset="100%" stopColor="#b6bbff" stopOpacity="0.1" />
+                  </linearGradient>
+                  <linearGradient id="spiralGradient2" x1="100%" y1="0%" x2="0%" y2="100%">
+                    <stop offset="0%" stopColor="#7d85d0" stopOpacity="0.7" />
+                    <stop offset="50%" stopColor="#6265fe" stopOpacity="0.4" />
+                    <stop offset="100%" stopColor="#b9f0d7" stopOpacity="0.1" />
+                  </linearGradient>
+                  <linearGradient id="spiralGradient3" x1="0%" y1="100%" x2="100%" y2="0%">
+                    <stop offset="0%" stopColor="#b6bbff" stopOpacity="0.6" />
+                    <stop offset="50%" stopColor="#7d85d0" stopOpacity="0.3" />
+                    <stop offset="100%" stopColor="#6265fe" stopOpacity="0.05" />
+                  </linearGradient>
+                  <filter id="spiralGlow" x="-50%" y="-50%" width="200%" height="200%">
+                    <feGaussianBlur stdDeviation="3" result="blur" />
+                    <feMerge>
+                      <feMergeNode in="blur" />
+                      <feMergeNode in="SourceGraphic" />
+                    </feMerge>
+                  </filter>
+                </defs>
+
+                {/* Spiral arm 1 */}
+                <path
+                  d="M200,200 Q220,180 250,170 Q300,150 340,180 Q380,220 360,280 Q340,340 280,360 Q220,380 170,340 Q120,300 140,240 Q160,180 200,160 Q260,130 320,160 Q380,200 360,280 Q340,360 260,380"
+                  fill="none"
+                  stroke="url(#spiralGradient1)"
+                  strokeWidth="8"
+                  strokeLinecap="round"
+                  filter="url(#spiralGlow)"
+                  opacity="0.9"
+                />
+
+                {/* Spiral arm 2 */}
+                <path
+                  d="M200,200 Q180,220 170,250 Q150,300 180,340 Q220,380 280,360 Q340,340 360,280 Q380,220 340,170 Q300,120 240,140 Q180,160 160,200 Q130,260 160,320 Q200,380 280,360"
+                  fill="none"
+                  stroke="url(#spiralGradient2)"
+                  strokeWidth="6"
+                  strokeLinecap="round"
+                  filter="url(#spiralGlow)"
+                  opacity="0.8"
+                />
+
+                {/* Spiral arm 3 */}
+                <path
+                  d="M200,200 Q180,180 150,170 Q100,150 60,180 Q20,220 40,280 Q60,340 120,360 Q180,380 230,340 Q280,300 260,240 Q240,180 200,160 Q140,130 80,160 Q20,200 40,280 Q60,360 140,380"
+                  fill="none"
+                  stroke="url(#spiralGradient3)"
+                  strokeWidth="5"
+                  strokeLinecap="round"
+                  filter="url(#spiralGlow)"
+                  opacity="0.7"
+                />
+              </svg>
+
+              {/* Secondary spiral layer - counter-rotating */}
+              <svg
+                className="absolute inset-[5%] w-[90%] h-[90%] animate-[spin_45s_linear_infinite_reverse]"
+                viewBox="0 0 400 400"
+              >
+                <defs>
+                  <linearGradient id="innerSpiral1" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#7d85d0" stopOpacity="0.9" />
+                    <stop offset="100%" stopColor="#6265fe" stopOpacity="0.2" />
+                  </linearGradient>
+                  <linearGradient id="innerSpiral2" x1="100%" y1="100%" x2="0%" y2="0%">
+                    <stop offset="0%" stopColor="#6265fe" stopOpacity="0.8" />
+                    <stop offset="100%" stopColor="#b6bbff" stopOpacity="0.15" />
+                  </linearGradient>
+                </defs>
+
+                <path
+                  d="M200,200 Q230,170 270,165 Q330,160 360,210 Q380,270 340,320 Q290,370 220,360 Q150,340 130,280 Q110,210 160,160 Q220,110 300,130"
+                  fill="none"
+                  stroke="url(#innerSpiral1)"
+                  strokeWidth="4"
+                  strokeLinecap="round"
+                  opacity="0.8"
+                />
+
+                <path
+                  d="M200,200 Q170,230 165,270 Q160,330 210,360 Q270,380 320,340 Q370,290 360,220 Q340,150 280,130 Q210,110 160,160 Q110,220 130,300"
+                  fill="none"
+                  stroke="url(#innerSpiral2)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  opacity="0.7"
+                />
+              </svg>
+
+              {/* Inner spiral layer - faster rotation */}
+              <svg
+                className="absolute inset-[15%] w-[70%] h-[70%] animate-[spin_30s_linear_infinite]"
+                viewBox="0 0 400 400"
+              >
+                <defs>
+                  <linearGradient id="coreSpiral" x1="0%" y1="0%" x2="100%" y2="100%">
+                    <stop offset="0%" stopColor="#b6bbff" stopOpacity="1" />
+                    <stop offset="50%" stopColor="#7d85d0" stopOpacity="0.6" />
+                    <stop offset="100%" stopColor="#6265fe" stopOpacity="0.2" />
+                  </linearGradient>
+                </defs>
+
+                <path
+                  d="M200,200 Q240,160 280,170 Q340,190 350,250 Q350,320 290,350 Q220,370 160,330 Q110,280 130,210 Q160,140 230,130 Q310,130 350,200"
+                  fill="none"
+                  stroke="url(#coreSpiral)"
+                  strokeWidth="3"
+                  strokeLinecap="round"
+                  opacity="0.9"
+                />
+              </svg>
+
+              {/* Particle/star field overlay */}
+              <div className="absolute inset-0 animate-[spin_90s_linear_infinite_reverse]">
+                <div className="absolute top-[15%] left-[20%] w-1.5 h-1.5 bg-[#b6bbff] rounded-full shadow-[0_0_6px_#b6bbff]" />
+                <div className="absolute top-[25%] right-[18%] w-1 h-1 bg-[#6265fe] rounded-full shadow-[0_0_4px_#6265fe]" />
+                <div className="absolute bottom-[20%] left-[15%] w-1 h-1 bg-[#7d85d0] rounded-full shadow-[0_0_4px_#7d85d0]" />
+                <div className="absolute bottom-[30%] right-[22%] w-1.5 h-1.5 bg-[#b9f0d7] rounded-full shadow-[0_0_6px_#b9f0d7]" />
+                <div className="absolute top-[40%] left-[10%] w-1 h-1 bg-[#6265fe] rounded-full shadow-[0_0_4px_#6265fe]" />
+                <div className="absolute top-[60%] right-[12%] w-1 h-1 bg-[#b6bbff] rounded-full shadow-[0_0_4px_#b6bbff]" />
               </div>
 
-              {/* Orbiting planets - Layer 2 */}
-              <div className="absolute inset-[8%] animate-[spin_60s_linear_infinite_reverse]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3.5 h-3.5 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_10px_#7d85d0]" />
+              {/* Orbiting planets */}
+              <div className="absolute inset-[5%] animate-[spin_50s_linear_infinite]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_10px_#6265fe]" />
               </div>
-              <div className="absolute inset-[8%] animate-[spin_65s_linear_infinite]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
+              <div className="absolute inset-[10%] animate-[spin_40s_linear_infinite_reverse]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#b9f0d7] to-[#8ae0c0] rounded-full shadow-[0_0_8px_#b9f0d7]" />
               </div>
-              <div className="absolute inset-[8%] animate-[spin_55s_linear_infinite_reverse]">
-                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-3 h-3 bg-gradient-to-br from-[#b6bbff] to-[#9ba0e6] rounded-full shadow-[0_0_10px_#b6bbff]" />
+              <div className="absolute inset-[20%] animate-[spin_35s_linear_infinite]">
+                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2 h-2 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_8px_#7d85d0]" />
               </div>
-
-              {/* Orbiting planets - Layer 3 */}
-              <div className="absolute inset-[16%] animate-[spin_45s_linear_infinite]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-gradient-to-br from-[#b9f0d7] to-[#8ae0c0] rounded-full shadow-[0_0_10px_#b9f0d7]" />
-              </div>
-              <div className="absolute inset-[16%] animate-[spin_50s_linear_infinite_reverse]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_8px_#7d85d0]" />
-              </div>
-              <div className="absolute inset-[16%] animate-[spin_40s_linear_infinite]">
-                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-2 h-2 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
+              <div className="absolute inset-[25%] animate-[spin_28s_linear_infinite_reverse]">
+                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#b6bbff] to-[#9ba0e6] rounded-full shadow-[0_0_8px_#b6bbff]" />
               </div>
 
-              {/* Orbiting planets - Layer 4 */}
-              <div className="absolute inset-[24%] animate-[spin_35s_linear_infinite_reverse]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
-              </div>
-              <div className="absolute inset-[24%] animate-[spin_38s_linear_infinite]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-3 h-3 bg-gradient-to-br from-[#b6bbff] to-[#9ba0e6] rounded-full shadow-[0_0_10px_#b6bbff]" />
-              </div>
-              <div className="absolute inset-[24%] animate-[spin_32s_linear_infinite_reverse]">
-                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 bg-gradient-to-br from-[#b9f0d7] to-[#8ae0c0] rounded-full shadow-[0_0_8px_#b9f0d7]" />
-              </div>
-
-              {/* Orbiting planets - Layer 5 */}
-              <div className="absolute inset-[32%] animate-[spin_28s_linear_infinite]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_8px_#7d85d0]" />
-              </div>
-              <div className="absolute inset-[32%] animate-[spin_25s_linear_infinite_reverse]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-2.5 h-2.5 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
-              </div>
-              <div className="absolute inset-[32%] animate-[spin_30s_linear_infinite]">
-                <div className="absolute top-1/2 right-0 -translate-y-1/2 w-1.5 h-1.5 bg-gradient-to-br from-[#b9f0d7] to-[#8ae0c0] rounded-full shadow-[0_0_6px_#b9f0d7]" />
-              </div>
-
-              {/* Orbiting planets - Layer 6 (inner) */}
-              <div className="absolute inset-[40%] animate-[spin_20s_linear_infinite_reverse]">
-                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-gradient-to-br from-[#b6bbff] to-[#9ba0e6] rounded-full shadow-[0_0_8px_#b6bbff]" />
-              </div>
-              <div className="absolute inset-[40%] animate-[spin_18s_linear_infinite]">
-                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-gradient-to-br from-[#7d85d0] to-[#5a63b8] rounded-full shadow-[0_0_6px_#7d85d0]" />
-              </div>
-              <div className="absolute inset-[40%] animate-[spin_22s_linear_infinite_reverse]">
-                <div className="absolute top-1/2 left-0 -translate-y-1/2 w-2 h-2 bg-gradient-to-br from-[#6265fe] to-[#4a4dd9] rounded-full shadow-[0_0_8px_#6265fe]" />
-              </div>
-
-              {/* Center core - static glow, no flicker */}
-              <div className="absolute inset-[46%] rounded-full bg-gradient-to-br from-[#6265fe]/25 to-[#7d85d0]/20" />
-              <div className="absolute inset-[48%] rounded-full bg-gradient-to-br from-[#7d85d0]/35 to-[#6265fe]/25 shadow-[0_0_30px_rgba(98,101,254,0.3)]" />
-              <div className="absolute inset-[49%] rounded-full bg-[#b6bbff]/25 shadow-[0_0_20px_rgba(182,187,255,0.5)]" />
+              {/* Center core with gradient glow */}
+              <div className="absolute inset-[42%] rounded-full bg-gradient-to-br from-[#6265fe]/30 to-[#7d85d0]/20 blur-sm" />
+              <div className="absolute inset-[44%] rounded-full bg-gradient-to-br from-[#7d85d0]/50 to-[#6265fe]/30 shadow-[0_0_40px_rgba(98,101,254,0.4)]" />
+              <div className="absolute inset-[46%] rounded-full bg-gradient-to-br from-[#b6bbff]/60 to-[#7d85d0]/40 shadow-[0_0_25px_rgba(182,187,255,0.6)]" />
+              <div className="absolute inset-[48%] rounded-full bg-[#fff]/30 shadow-[0_0_15px_rgba(255,255,255,0.4)]" />
             </div>
           </div>
         </div>
