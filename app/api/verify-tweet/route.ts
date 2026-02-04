@@ -30,18 +30,25 @@ export async function POST(request: NextRequest) {
       );
     }
 
+    // Check if this specific tweet URL has already been used (by anyone)
+    const { data: existingTweet } = await supabaseAdmin
+      .from('users')
+      .select('id, wallet_address')
+      .eq('tweet_url', tweet_url)
+      .single();
+
+    if (existingTweet) {
+      return NextResponse.json(
+        { ok: false, error: 'This tweet has already been used for verification' },
+        { status: 400 }
+      );
+    }
+
     const { data: existingUser } = await supabaseAdmin
       .from('users')
       .select('id, wallet_address, tweet_verified')
       .eq('wallet_address', wallet_address.toLowerCase())
       .single();
-
-    if (existingUser?.tweet_verified) {
-      return NextResponse.json(
-        { ok: false, error: 'Tweet already verified' },
-        { status: 400 }
-      );
-    }
 
     // TODO: Implement real tweet verification with AI when ENABLE_AI_VERIFICATION=true
     // For now, auto-approve in testing mode
