@@ -7,6 +7,89 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
+import {
+  CATEGORIES,
+  getTasksByCategory,
+  getUserRank,
+  getNextRank,
+  getRankProgress,
+  type TaskCategory,
+  type TaskDefinition,
+} from '@/lib/tasks-config';
+
+// Task Card Component
+function TaskCard({ task }: { task: TaskDefinition }) {
+  const isLocked = task.status === 'coming_soon';
+  const isOnce = task.frequency === 'once';
+
+  return (
+    <div
+      className={`p-4 rounded-xl border transition-all ${
+        isLocked
+          ? 'bg-[#0d0d1a]/50 border-[#7d85d0]/10 opacity-60'
+          : 'bg-[#0d0d1a]/80 border-[#7d85d0]/20 hover:border-[#6265fe]/30'
+      }`}
+    >
+      <div className="flex justify-between items-start mb-2">
+        <div className="flex-1">
+          <div className="flex items-center gap-2 mb-1">
+            <h4 className={`font-medium ${isLocked ? 'text-[#7d85d0]/70' : 'text-white'}`}>
+              {task.name}
+            </h4>
+          </div>
+          <p className={`text-xs ${isLocked ? 'text-[#7d85d0]/40' : 'text-[#b6bbff]/50'}`}>
+            {task.description}
+          </p>
+        </div>
+        <div className="text-right ml-3">
+          <div className={`text-lg font-bold ${isLocked ? 'text-[#7d85d0]/50' : 'text-[#b9f0d7]'}`}>
+            +{task.cp_reward}
+          </div>
+          <div className="text-[9px] text-[#7d85d0] uppercase">CP</div>
+        </div>
+      </div>
+      <div className="flex items-center justify-between mt-3 pt-3 border-t border-[#7d85d0]/10">
+        <div className="flex items-center gap-2">
+          {/* Frequency Tag */}
+          {isOnce ? (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#6265fe]/10 text-[#6265fe]">
+              One-time
+            </span>
+          ) : (
+            <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#ffc107]/10 text-[#ffc107] flex items-center gap-1">
+              <svg className="w-2.5 h-2.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
+              </svg>
+              {task.frequency === 'daily' ? 'Daily' : task.frequency === 'weekly' ? 'Weekly' : 'Repeatable'}
+            </span>
+          )}
+          {/* Cap */}
+          {task.cap > 1 && (
+            <span className="text-[10px] text-[#7d85d0]">
+              Max {task.cap}x
+            </span>
+          )}
+        </div>
+        {/* Action */}
+        {isLocked ? (
+          <span className="text-[10px] text-[#7d85d0] flex items-center gap-1">
+            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+            </svg>
+            Locked
+          </span>
+        ) : (
+          <a
+            href={`/submit?task=${task.id}`}
+            className="text-[10px] px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#6265fe] to-[#7d85d0] text-white font-medium hover:shadow-[0_0_15px_rgba(98,101,254,0.3)] transition-all"
+          >
+            Start
+          </a>
+        )}
+      </div>
+    </div>
+  );
+}
 
 interface UserData {
   wallet_address: string;
@@ -58,6 +141,25 @@ export default function DashboardPage() {
   const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
   const [showReferralModal, setShowReferralModal] = useState(false);
   const [copied, setCopied] = useState(false);
+  const [expandedCategories, setExpandedCategories] = useState<Set<TaskCategory>>(new Set(['social']));
+
+  // Rank calculations
+  const userCP = userData?.points || 0;
+  const currentRank = getUserRank(userCP);
+  const nextRank = getNextRank(userCP);
+  const rankProgress = getRankProgress(userCP);
+
+  const toggleCategory = (category: TaskCategory) => {
+    setExpandedCategories(prev => {
+      const newSet = new Set(prev);
+      if (newSet.has(category)) {
+        newSet.delete(category);
+      } else {
+        newSet.add(category);
+      }
+      return newSet;
+    });
+  };
 
   useEffect(() => {
     if (address) {
@@ -405,76 +507,172 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        {/* Tasks Section */}
-        <div className="mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms', animationFillMode: 'forwards' }}>
-          <h2 className="text-2xl font-bold gradient-text">Available Tasks</h2>
+        {/* Rank Progress Section */}
+        <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '550ms', animationFillMode: 'forwards' }}>
+          <div className="glass-card p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4 mb-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6265fe]/30 to-[#7d85d0]/20 border border-[#6265fe]/30 flex items-center justify-center">
+                  <span className="text-2xl font-bold gradient-text">{currentRank?.multiplier || 1}x</span>
+                </div>
+                <div>
+                  <div className="flex items-center gap-2">
+                    <h3 className="text-lg font-semibold text-white">{currentRank?.name || 'Recruit'}</h3>
+                    {currentRank && (
+                      <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#6265fe]/20 text-[#6265fe] font-medium uppercase">
+                        {currentRank.multiplier}x Multiplier
+                      </span>
+                    )}
+                  </div>
+                  <p className="text-[#b6bbff]/50 text-sm">
+                    {nextRank
+                      ? `${(nextRank.cp_required - userCP).toLocaleString()} CP to ${nextRank.name}`
+                      : 'Maximum rank achieved!'}
+                  </p>
+                </div>
+              </div>
+              <div className="text-right">
+                <div className="text-sm text-[#b6bbff]/50">Total CP</div>
+                <div className="text-2xl font-bold gradient-text">{userCP.toLocaleString()}</div>
+              </div>
+            </div>
+            {nextRank && (
+              <div>
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="text-[#b6bbff]/50">{currentRank?.name || 'Start'}</span>
+                  <span className="text-[#6265fe]">{nextRank.name} ({nextRank.cp_required.toLocaleString()} CP)</span>
+                </div>
+                <div className="h-2 bg-[#0d0d1a] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#6265fe] to-[#7d85d0] transition-all duration-500"
+                    style={{ width: `${rankProgress}%` }}
+                  />
+                </div>
+              </div>
+            )}
+          </div>
         </div>
 
-        {!campaignLive ? (
-          <div className="glass-card p-12 text-center opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
-            <div className="w-20 h-20 rounded-2xl bg-gradient-to-br from-[#6265fe]/20 to-[#7d85d0]/10 border border-[#7d85d0]/20 flex items-center justify-center mx-auto mb-6">
-              <svg className="w-10 h-10 text-[#7d85d0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 6v6h4.5m4.5 0a9 9 0 11-18 0 9 9 0 0118 0z" />
+        {/* Tasks Section Header */}
+        <div className="mb-6 flex items-center justify-between opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
+          <h2 className="text-2xl font-bold gradient-text">Operations</h2>
+          <div className="flex items-center gap-3 text-xs">
+            <span className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[#b9f0d7]/10 text-[#b9f0d7]">
+              <span className="w-2 h-2 rounded-full bg-[#b9f0d7]" />
+              Active
+            </span>
+            <span className="flex items-center gap-1.5 px-2 py-1 rounded-lg bg-[#7d85d0]/10 text-[#7d85d0]">
+              <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
               </svg>
-            </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Campaign Not Live Yet</h3>
-            <p className="text-[#b6bbff]/50 text-sm max-w-sm mx-auto">
-              Tasks available when the Vortex opens. Stand by.
-            </p>
+              Coming Soon
+            </span>
           </div>
-        ) : tasks.length === 0 ? (
-          <div className="glass-card p-12 text-center opacity-0 animate-fade-in-up" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
-            <p className="text-[#b6bbff]/50">No tasks available at the moment.</p>
-          </div>
-        ) : (
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-5">
-            {tasks.map((task, index) => (
-              <div
-                key={task.id}
-                className="glass-card p-6 hover-lift opacity-0 animate-fade-in-up"
-                style={{ animationDelay: `${600 + index * 100}ms`, animationFillMode: 'forwards' }}
-              >
-                <div className="flex justify-between items-start mb-4">
-                  <div>
-                    <span className="inline-block text-[10px] px-3 py-1 rounded-full bg-[#6265fe]/20 text-[#b6bbff]/70 uppercase tracking-wider font-medium mb-3">
-                      {task.category}
-                    </span>
-                    <h3 className="text-lg font-semibold text-white">{task.name}</h3>
-                  </div>
-                  <div className="text-right">
-                    <div className="text-2xl font-bold text-[#b9f0d7]">+{task.points}</div>
-                    <div className="text-[10px] text-[#7d85d0] uppercase tracking-wider">points</div>
-                  </div>
-                </div>
-                <p className="text-[#b6bbff]/50 text-sm mb-6 leading-relaxed">{task.description}</p>
+        </div>
 
-                {task.status === 'completed' ? (
-                  <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#b9f0d7]/10 border border-[#b9f0d7]/20 text-[#b9f0d7] font-medium">
-                    <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
-                    </svg>
-                    Completed
+        {/* Task Categories */}
+        <div className="space-y-4">
+          {CATEGORIES.map((category, catIndex) => {
+            const categoryTasks = getTasksByCategory(category.id);
+            const isExpanded = expandedCategories.has(category.id);
+            const isLocked = category.status === 'coming_soon';
+            const activeTasks = categoryTasks.filter(t => t.status === 'active');
+
+            return (
+              <div
+                key={category.id}
+                className="glass-card overflow-hidden opacity-0 animate-fade-in-up"
+                style={{ animationDelay: `${650 + catIndex * 50}ms`, animationFillMode: 'forwards' }}
+              >
+                {/* Category Header */}
+                <button
+                  onClick={() => toggleCategory(category.id)}
+                  className="w-full p-5 flex items-center justify-between hover:bg-[#6265fe]/5 transition-colors"
+                >
+                  <div className="flex items-center gap-4">
+                    <div className={`w-12 h-12 rounded-xl flex items-center justify-center ${
+                      isLocked
+                        ? 'bg-[#7d85d0]/10 border border-[#7d85d0]/20'
+                        : 'bg-gradient-to-br from-[#6265fe]/20 to-[#6265fe]/5 border border-[#6265fe]/20'
+                    }`}>
+                      {category.id === 'social' && (
+                        <svg className={`w-6 h-6 ${isLocked ? 'text-[#7d85d0]/50' : 'text-[#6265fe]'}`} fill="currentColor" viewBox="0 0 24 24">
+                          <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+                        </svg>
+                      )}
+                      {category.id === 'trading' && (
+                        <svg className={`w-6 h-6 ${isLocked ? 'text-[#7d85d0]/50' : 'text-[#6265fe]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M7 16V4m0 0L3 8m4-4l4 4m6 0v12m0 0l4-4m-4 4l-4-4" />
+                        </svg>
+                      )}
+                      {category.id === 'liquidity' && (
+                        <svg className={`w-6 h-6 ${isLocked ? 'text-[#7d85d0]/50' : 'text-[#6265fe]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M19.5 12c0-1.232-.046-2.453-.138-3.662a4.006 4.006 0 00-3.7-3.7 48.678 48.678 0 00-7.324 0 4.006 4.006 0 00-3.7 3.7c-.017.22-.032.441-.046.662M19.5 12l3-3m-3 3l-3-3m-12 3c0 1.232.046 2.453.138 3.662a4.006 4.006 0 003.7 3.7 48.656 48.656 0 007.324 0 4.006 4.006 0 003.7-3.7c.017-.22.032-.441.046-.662M4.5 12l3 3m-3-3l-3 3" />
+                        </svg>
+                      )}
+                      {category.id === 'advanced' && (
+                        <svg className={`w-6 h-6 ${isLocked ? 'text-[#7d85d0]/50' : 'text-[#6265fe]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.594 3.94c.09-.542.56-.94 1.11-.94h2.593c.55 0 1.02.398 1.11.94l.213 1.281c.063.374.313.686.645.87.074.04.147.083.22.127.324.196.72.257 1.075.124l1.217-.456a1.125 1.125 0 011.37.49l1.296 2.247a1.125 1.125 0 01-.26 1.431l-1.003.827c-.293.24-.438.613-.431.992a6.759 6.759 0 010 .255c-.007.378.138.75.43.99l1.005.828c.424.35.534.954.26 1.43l-1.298 2.247a1.125 1.125 0 01-1.369.491l-1.217-.456c-.355-.133-.75-.072-1.076.124a6.57 6.57 0 01-.22.128c-.331.183-.581.495-.644.869l-.213 1.28c-.09.543-.56.941-1.11.941h-2.594c-.55 0-1.02-.398-1.11-.94l-.213-1.281c-.062-.374-.312-.686-.644-.87a6.52 6.52 0 01-.22-.127c-.325-.196-.72-.257-1.076-.124l-1.217.456a1.125 1.125 0 01-1.369-.49l-1.297-2.247a1.125 1.125 0 01.26-1.431l1.004-.827c.292-.24.437-.613.43-.992a6.932 6.932 0 010-.255c.007-.378-.138-.75-.43-.99l-1.004-.828a1.125 1.125 0 01-.26-1.43l1.297-2.247a1.125 1.125 0 011.37-.491l1.216.456c.356.133.751.072 1.076-.124.072-.044.146-.087.22-.128.332-.183.582-.495.644-.869l.214-1.281z" />
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 12a3 3 0 11-6 0 3 3 0 016 0z" />
+                        </svg>
+                      )}
+                      {category.id === 'consistency' && (
+                        <svg className={`w-6 h-6 ${isLocked ? 'text-[#7d85d0]/50' : 'text-[#6265fe]'}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16.5 18.75h-9m9 0a3 3 0 013 3h-15a3 3 0 013-3m9 0v-3.375c0-.621-.503-1.125-1.125-1.125h-.871M7.5 18.75v-3.375c0-.621.504-1.125 1.125-1.125h.872m5.007 0H9.497m5.007 0a7.454 7.454 0 01-.982-3.172M9.497 14.25a7.454 7.454 0 00.981-3.172M5.25 4.236c-.982.143-1.954.317-2.916.52A6.003 6.003 0 007.73 9.728M5.25 4.236V4.5c0 2.108.966 3.99 2.48 5.228M5.25 4.236V2.721C7.456 2.41 9.71 2.25 12 2.25c2.291 0 4.545.16 6.75.47v1.516M7.73 9.728a6.726 6.726 0 002.748 1.35m8.272-6.842V4.5c0 2.108-.966 3.99-2.48 5.228m2.48-5.492a46.32 46.32 0 012.916.52 6.003 6.003 0 01-5.395 4.972m0 0a6.726 6.726 0 01-2.749 1.35m0 0a6.772 6.772 0 01-3.044 0" />
+                        </svg>
+                      )}
+                    </div>
+                    <div className="text-left">
+                      <div className="flex items-center gap-2">
+                        <h3 className={`font-semibold ${isLocked ? 'text-[#7d85d0]/70' : 'text-white'}`}>
+                          {category.name}
+                        </h3>
+                        {isLocked && (
+                          <span className="flex items-center gap-1 text-[10px] px-2 py-0.5 rounded-full bg-[#7d85d0]/20 text-[#7d85d0]">
+                            <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                            </svg>
+                            Coming Soon
+                          </span>
+                        )}
+                      </div>
+                      <p className={`text-sm ${isLocked ? 'text-[#7d85d0]/40' : 'text-[#b6bbff]/50'}`}>
+                        {category.description}
+                      </p>
+                    </div>
                   </div>
-                ) : task.status === 'pending' ? (
-                  <div className="flex items-center justify-center gap-2 px-4 py-3 rounded-xl bg-[#ffc107]/10 border border-[#ffc107]/20 text-[#ffc107] font-medium">
-                    <div className="w-4 h-4 rounded-full border-2 border-[#ffc107]/30 border-t-[#ffc107] animate-spin" />
-                    Pending Review
-                  </div>
-                ) : (
-                  <Link
-                    href={`/submit?task=${task.id}`}
-                    className="group flex items-center justify-center gap-2 px-4 py-3 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.4)] transition-all duration-300"
-                  >
-                    Start Task
-                    <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  <div className="flex items-center gap-4">
+                    <div className="text-right hidden sm:block">
+                      <div className={`text-lg font-bold ${isLocked ? 'text-[#7d85d0]/50' : 'text-[#b9f0d7]'}`}>
+                        {category.max_cp.toLocaleString()} CP
+                      </div>
+                      <div className="text-[10px] text-[#7d85d0] uppercase">Max Possible</div>
+                    </div>
+                    <svg
+                      className={`w-5 h-5 text-[#7d85d0] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`}
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
                     </svg>
-                  </Link>
+                  </div>
+                </button>
+
+                {/* Category Tasks */}
+                {isExpanded && (
+                  <div className="border-t border-[#7d85d0]/10 p-5">
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                      {categoryTasks.map((task) => (
+                        <TaskCard key={task.id} task={task} />
+                      ))}
+                    </div>
+                  </div>
                 )}
               </div>
-            ))}
-          </div>
-        )}
+            );
+          })}
+        </div>
       </main>
 
       {/* Leaderboard Modal */}
