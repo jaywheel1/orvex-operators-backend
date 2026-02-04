@@ -9,7 +9,7 @@ import { useSearchParams } from 'next/navigation';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
 
-type Step = 'wallet' | 'tweet' | 'follow' | 'complete';
+type Step = 'welcome' | 'wallet' | 'tweet' | 'follow' | 'complete';
 
 function RegisterContent() {
   const { address, isConnected } = useAccount();
@@ -22,11 +22,12 @@ function RegisterContent() {
   const [error, setError] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
 
-  // Capture referral code from URL on mount
+  // Capture referral code from URL on mount and show welcome screen if referred
   useEffect(() => {
     const ref = searchParams.get('ref');
     if (ref) {
       setReferralCode(ref.toUpperCase());
+      setStep('welcome');
     }
   }, [searchParams]);
 
@@ -101,8 +102,9 @@ Code: ${verificationCode}
     }
   };
 
-  const steps = ['wallet', 'tweet', 'follow', 'complete'];
-  const currentIndex = steps.indexOf(step);
+  const steps = ['welcome', 'wallet', 'tweet', 'follow', 'complete'];
+  const displaySteps = ['wallet', 'tweet', 'follow', 'complete'];
+  const currentIndex = displaySteps.indexOf(step);
 
   return (
     <div className="min-h-screen bg-[#070713] text-white overflow-hidden">
@@ -137,10 +139,11 @@ Code: ${verificationCode}
       </nav>
 
       <main className="relative z-10 max-w-xl mx-auto px-6 py-12 md:py-16">
-        {/* Progress indicator */}
+        {/* Progress indicator - hidden on welcome step */}
+        {step !== 'welcome' && (
         <div className="mb-12 opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
           <div className="flex items-center justify-between">
-            {steps.map((s, i) => (
+            {displaySteps.map((s, i) => (
               <div key={s} className="flex items-center">
                 <div
                   className={`relative w-12 h-12 rounded-full flex items-center justify-center text-sm font-bold transition-all duration-500 ${
@@ -178,9 +181,79 @@ Code: ${verificationCode}
             <span className={`text-xs w-12 text-center transition-colors ${currentIndex >= 3 ? 'text-[#b6bbff]/70' : 'text-[#b6bbff]/30'}`}>Done</span>
           </div>
         </div>
+        )}
 
         {/* Step Content */}
         <div className="glass-card p-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+          {step === 'welcome' && referralCode && (
+            <div className="space-y-8 text-center py-4">
+              {/* Welcome Icon */}
+              <div className="relative inline-block">
+                <div className="absolute -inset-6 bg-gradient-to-r from-[#ffc107]/30 to-[#6265fe]/30 rounded-full blur-2xl animate-pulse-glow" />
+                <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-[#ffc107] to-[#ffab00] flex items-center justify-center mx-auto shadow-[0_0_40px_rgba(255,193,7,0.4)]">
+                  <svg className="w-12 h-12 text-[#070713]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" />
+                  </svg>
+                </div>
+              </div>
+
+              {/* Welcome Message */}
+              <div>
+                <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-3">
+                  You&apos;ve Been Invited!
+                </h1>
+                <p className="text-[#b6bbff]/70 text-sm max-w-sm mx-auto mb-4">
+                  A friend has invited you to join the <span className="text-white font-semibold">Orvex Console Operators</span> incentivized testnet campaign.
+                </p>
+              </div>
+
+              {/* Referral Badge */}
+              <div className="inline-flex items-center gap-2 px-5 py-3 rounded-xl bg-[#ffc107]/10 border border-[#ffc107]/30">
+                <svg className="w-5 h-5 text-[#ffc107]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                </svg>
+                <span className="text-[#ffc107]">Referred by</span>
+                <span className="text-[#ffc107] font-mono font-bold">{referralCode}</span>
+              </div>
+
+              {/* Benefits */}
+              <div className="p-5 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20 text-left">
+                <h3 className="text-sm font-semibold text-white mb-3">What you&apos;ll get:</h3>
+                <ul className="space-y-3 text-sm text-[#b6bbff]/70">
+                  <li className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-[#b9f0d7] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Earn <span className="text-[#b9f0d7] font-semibold">Console Points (CP)</span> by completing tasks</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-[#b9f0d7] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Climb <span className="text-[#6265fe] font-semibold">Operator ranks</span> for point multipliers</span>
+                  </li>
+                  <li className="flex items-start gap-3">
+                    <svg className="w-5 h-5 text-[#b9f0d7] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    <span>Position yourself for <span className="text-[#ffc107] font-semibold">future rewards</span></span>
+                  </li>
+                </ul>
+              </div>
+
+              {/* CTA Button */}
+              <button
+                onClick={() => setStep('wallet')}
+                className="group w-full py-4 bg-gradient-to-r from-[#ffc107] to-[#ffab00] text-[#070713] font-bold rounded-xl hover:shadow-[0_0_30px_rgba(255,193,7,0.4)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
+              >
+                Start Registration
+                <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                </svg>
+              </button>
+            </div>
+          )}
+
           {step === 'wallet' && (
             <div className="space-y-8">
               {referralCode && (

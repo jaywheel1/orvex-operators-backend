@@ -848,11 +848,8 @@ export default function DashboardPage() {
       {/* New Referral Notification */}
       {showNewReferralNotification && (
         <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-          {/* Backdrop */}
-          <div
-            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
-            onClick={() => setShowNewReferralNotification(false)}
-          />
+          {/* Backdrop - no click to dismiss, must use button */}
+          <div className="absolute inset-0 bg-black/80 backdrop-blur-sm" />
 
           {/* Modal */}
           <div className="relative glass-card w-full max-w-sm overflow-hidden rounded-2xl animate-scale-in">
