@@ -94,12 +94,7 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    if (user.follow_verified) {
-      return NextResponse.json(
-        { ok: false, error: 'Follow already verified' },
-        { status: 400 }
-      );
-    }
+    // Allow re-verification - no blocking if already verified
 
     const bytes = await screenshot.arrayBuffer();
     const buffer = Buffer.from(bytes);
