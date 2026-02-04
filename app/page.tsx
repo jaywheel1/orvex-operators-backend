@@ -14,18 +14,41 @@ export default function Home() {
       </div>
 
       <nav className="relative flex items-center justify-between px-8 py-6 border-b border-[#7d85d0]/20">
-        <div className="flex items-center gap-3">
-          <Image src="/logo.svg" alt="Orvex" width={40} height={40} className="rounded-full" />
-          <span className="text-2xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent">
-            Orvex
-          </span>
+        <div className="flex items-center gap-6">
+          <div className="flex items-center gap-3">
+            <Image src="/logo.svg" alt="Orvex" width={40} height={40} className="rounded-full" />
+            <span className="text-2xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent">
+              Orvex
+            </span>
+          </div>
+          <a
+            href="https://docs.orvex.fi"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#b6bbff]/70 hover:text-white transition-colors font-medium"
+          >
+            Docs
+          </a>
         </div>
-        <Link
-          href="/register"
-          className="px-6 py-2.5 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(98,101,254,0.4)] transition-all duration-300"
-        >
-          Register
-        </Link>
+        <div className="flex items-center gap-4">
+          <a
+            href="https://x.com/OrvexOperators"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-[#b6bbff]/70 hover:text-white transition-colors"
+            aria-label="Follow us on X"
+          >
+            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+              <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
+            </svg>
+          </a>
+          <Link
+            href="/dashboard"
+            className="px-6 py-2.5 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(98,101,254,0.4)] transition-all duration-300"
+          >
+            Launch App
+          </Link>
+        </div>
       </nav>
 
       <main className="relative flex flex-col items-center justify-center px-8 py-24 md:py-32">
@@ -50,7 +73,7 @@ export default function Home() {
           and start earning points by completing social tasks.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4">
+        <div className="flex flex-col sm:flex-row gap-4 items-center">
           <Link
             href="/register"
             className="px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl text-lg hover:shadow-[0_0_30px_rgba(98,101,254,0.5)] transition-all duration-300 hover:-translate-y-1"
@@ -59,9 +82,9 @@ export default function Home() {
           </Link>
           <Link
             href="/dashboard"
-            className="px-8 py-4 border border-[#7d85d0]/50 font-semibold rounded-xl text-lg text-[#b6bbff] hover:bg-[#6265fe]/10 hover:border-[#6265fe] transition-all duration-300"
+            className="text-[#b6bbff]/70 hover:text-white transition-colors underline underline-offset-4"
           >
-            View Dashboard
+            Already registered? Login
           </Link>
         </div>
 
