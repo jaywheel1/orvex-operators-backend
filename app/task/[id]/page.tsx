@@ -15,7 +15,8 @@ interface Task {
 }
 
 export default function TaskSubmissionPage() {
-  const { id } = useParams();
+  const params = useParams();
+  const id = params?.id as string;
   const router = useRouter();
   const { address, isConnected } = useAccount();
   const [task, setTask] = useState<Task | null>(null);
@@ -27,7 +28,9 @@ export default function TaskSubmissionPage() {
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    fetchTask();
+    if (id) {
+      fetchTask();
+    }
   }, [id]);
 
   const fetchTask = async () => {
@@ -60,7 +63,7 @@ export default function TaskSubmissionPage() {
     try {
       const formData = new FormData();
       formData.append('wallet_address', address || '');
-      formData.append('task_id', id as string);
+      formData.append('task_id', id);
       if (proofUrl) formData.append('proof_url', proofUrl);
       if (screenshot) formData.append('screenshot', screenshot);
 
