@@ -75,7 +75,7 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <main className="relative z-10 flex flex-col items-center justify-center px-6 pt-16 pb-24 md:pt-24 md:pb-32">
+      <main className="relative z-10 flex flex-col items-start px-6 md:px-12 lg:px-24 pt-16 pb-24 md:pt-24 md:pb-32 max-w-7xl">
         {/* Logo with gravitational orbit rings */}
         <div className="relative mb-10 opacity-0 animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
           {/* Orbital rings - gravity effect */}
@@ -102,7 +102,7 @@ export default function Home() {
         </div>
 
         {/* Headline */}
-        <h1 className="text-center mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+        <h1 className="mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
           <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1]">
             <span className="gradient-text">Enter The Vortex</span>
           </span>
@@ -112,13 +112,13 @@ export default function Home() {
         </h1>
 
         {/* Subheadline */}
-        <p className="text-base md:text-lg text-[#b6bbff]/60 text-center max-w-xl mb-10 leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
+        <p className="text-base md:text-lg text-[#b6bbff]/60 max-w-xl mb-10 leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
           Liquidity coordination infrastructure. Deploy capital where it matters.
           Complete tasks. Earn coordination points.
         </p>
 
         {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 items-center opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
+        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
           <Link
             href="/register"
             className="group relative px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-2xl text-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(98,101,254,0.5)] hover:-translate-y-1"
@@ -140,7 +140,7 @@ export default function Home() {
         </div>
 
         {/* Stats/Features Grid */}
-        <div className="mt-24 md:mt-32 grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl w-full">
+        <div className="mt-24 md:mt-32 grid grid-cols-1 md:grid-cols-3 gap-5 w-full">
           {/* Card 1 */}
           <div className="group glass-card p-6 hover-lift opacity-0 animate-fade-in-up cursor-default" style={{ animationDelay: '500ms', animationFillMode: 'forwards' }}>
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#6265fe]/20 to-[#6265fe]/5 border border-[#6265fe]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(98,101,254,0.3)] transition-all duration-300">
@@ -176,7 +176,7 @@ export default function Home() {
         </div>
 
         {/* Trust indicators */}
-        <div className="mt-20 flex flex-wrap items-center justify-center gap-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms', animationFillMode: 'forwards' }}>
+        <div className="mt-20 flex flex-wrap items-center gap-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '800ms', animationFillMode: 'forwards' }}>
           <div className="flex items-center gap-2 text-[#7d85d0]/50 text-sm">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m5.618-4.016A11.955 11.955 0 0112 2.944a11.955 11.955 0 01-8.618 3.04A12.02 12.02 0 003 9c0 5.591 3.824 10.29 9 11.622 5.176-1.332 9-6.03 9-11.622 0-1.042-.133-2.052-.382-3.016z" />
