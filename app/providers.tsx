@@ -3,11 +3,14 @@
 import { useState } from 'react';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { WagmiProvider } from 'wagmi';
-import { RainbowKitProvider, darkTheme, getDefaultWallets, connectorsForWallets } from '@rainbow-me/rainbowkit';
+import { RainbowKitProvider, darkTheme, connectorsForWallets } from '@rainbow-me/rainbowkit';
 import {
+  metaMaskWallet,
   phantomWallet,
+  coinbaseWallet,
+  walletConnectWallet,
+  rainbowWallet,
   trustWallet,
-  ledgerWallet,
 } from '@rainbow-me/rainbowkit/wallets';
 import { createConfig, http } from 'wagmi';
 import { mainnet, base, sepolia } from 'wagmi/chains';
@@ -15,20 +18,22 @@ import '@rainbow-me/rainbowkit/styles.css';
 
 const projectId = 'a0907a623f2adde61e9e244d21c3cfa9';
 
-const { wallets: defaultWallets } = getDefaultWallets({
-  appName: 'Orvex Operators',
-  projectId,
-});
-
 const connectors = connectorsForWallets(
   [
-    ...defaultWallets,
+    {
+      groupName: 'Recommended',
+      wallets: [
+        metaMaskWallet,
+        phantomWallet,
+        coinbaseWallet,
+        rainbowWallet,
+      ],
+    },
     {
       groupName: 'Other',
       wallets: [
-        phantomWallet,
+        walletConnectWallet,
         trustWallet,
-        ledgerWallet,
       ],
     },
   ],
@@ -47,7 +52,6 @@ const config = createConfig({
     [sepolia.id]: http(),
   },
   ssr: true,
-  multiInjectedProviderDiscovery: true,
 });
 
 export function Providers({ children }: { children: React.ReactNode }) {
@@ -58,7 +62,7 @@ export function Providers({ children }: { children: React.ReactNode }) {
       <QueryClientProvider client={queryClient}>
         <RainbowKitProvider
           theme={darkTheme()}
-          modalSize="compact"
+          modalSize="wide"
         >
           {children}
         </RainbowKitProvider>
