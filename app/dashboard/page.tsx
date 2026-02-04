@@ -24,18 +24,36 @@ interface Task {
   status: 'available' | 'pending' | 'completed';
 }
 
+interface LeaderboardEntry {
+  rank: number;
+  wallet_address: string;
+  points: number;
+}
+
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [tasks, setTasks] = useState<Task[]>([]);
   const [campaignLive, setCampaignLive] = useState(false);
   const [loading, setLoading] = useState(true);
+  const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
+  const [leaderboardLoading, setLeaderboardLoading] = useState(true);
+  const [lastUpdated, setLastUpdated] = useState<Date | null>(null);
+  const [userRank, setUserRank] = useState<number | null>(null);
 
   useEffect(() => {
     if (address) {
       fetchUserData();
       fetchTasks();
       checkCampaignStatus();
+      fetchLeaderboard();
+
+      // Refresh leaderboard every 30 minutes
+      const interval = setInterval(() => {
+        fetchLeaderboard();
+      }, 30 * 60 * 1000);
+
+      return () => clearInterval(interval);
     }
   }, [address]);
 
@@ -72,6 +90,29 @@ export default function DashboardPage() {
       setCampaignLive(data.live);
     } catch {
       setCampaignLive(false);
+    }
+  };
+
+  const fetchLeaderboard = async () => {
+    setLeaderboardLoading(true);
+    try {
+      const res = await fetch('/api/leaderboard?limit=50');
+      const data = await res.json();
+      if (data.ok) {
+        setLeaderboard(data.data);
+        setLastUpdated(new Date(data.lastUpdated));
+        // Find current user's rank
+        if (address) {
+          const userEntry = data.data.find(
+            (entry: LeaderboardEntry) => entry.wallet_address.toLowerCase() === address.toLowerCase()
+          );
+          setUserRank(userEntry?.rank || null);
+        }
+      }
+    } catch (err) {
+      console.error('Failed to fetch leaderboard:', err);
+    } finally {
+      setLeaderboardLoading(false);
     }
   };
 
@@ -239,6 +280,106 @@ export default function DashboardPage() {
             <div className={`text-4xl font-bold ${campaignLive ? 'text-[#b9f0d7]' : 'text-[#7d85d0]/60'}`}>
               {campaignLive ? 'LIVE' : 'OFFLINE'}
             </div>
+          </div>
+        </div>
+
+        {/* Leaderboard Section */}
+        <div className="mb-12 opacity-0 animate-fade-in-up" style={{ animationDelay: '450ms', animationFillMode: 'forwards' }}>
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-2xl font-bold gradient-text">Leaderboard</h2>
+              {lastUpdated && (
+                <p className="text-[#7d85d0] text-xs mt-1">
+                  Updates every 30 min • Last: {lastUpdated.toLocaleTimeString()}
+                </p>
+              )}
+            </div>
+            {userRank && (
+              <div className="glass-card px-4 py-2 flex items-center gap-2">
+                <span className="text-[#b6bbff]/50 text-sm">Your Rank:</span>
+                <span className="text-xl font-bold text-[#b9f0d7]">#{userRank}</span>
+              </div>
+            )}
+          </div>
+
+          <div className="glass-card rounded-2xl overflow-hidden">
+            {leaderboardLoading ? (
+              <div className="flex items-center justify-center py-16">
+                <div className="w-10 h-10 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" />
+              </div>
+            ) : leaderboard.length === 0 ? (
+              <div className="text-center py-16 text-[#b6bbff]/50">
+                No participants yet. Be the first!
+              </div>
+            ) : (
+              <div className="overflow-x-auto">
+                <table className="w-full">
+                  <thead>
+                    <tr className="border-b border-[#7d85d0]/10">
+                      <th className="text-left py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Rank</th>
+                      <th className="text-left py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Wallet</th>
+                      <th className="text-right py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Points</th>
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {leaderboard.slice(0, 10).map((entry, index) => {
+                      const isCurrentUser = address && entry.wallet_address.toLowerCase() === address.toLowerCase();
+                      const isTop3 = entry.rank <= 3;
+
+                      return (
+                        <tr
+                          key={entry.wallet_address}
+                          className={`border-b border-[#7d85d0]/5 transition-all duration-200 ${
+                            isCurrentUser
+                              ? 'bg-[#6265fe]/10'
+                              : 'hover:bg-[#6265fe]/5'
+                          }`}
+                        >
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-2">
+                              {entry.rank === 1 ? (
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA500] flex items-center justify-center text-sm font-bold text-black">
+                                  1
+                                </div>
+                              ) : entry.rank === 2 ? (
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#C0C0C0] to-[#A0A0A0] flex items-center justify-center text-sm font-bold text-black">
+                                  2
+                                </div>
+                              ) : entry.rank === 3 ? (
+                                <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#CD7F32] to-[#8B4513] flex items-center justify-center text-sm font-bold text-white">
+                                  3
+                                </div>
+                              ) : (
+                                <div className="w-8 h-8 rounded-full bg-[#7d85d0]/10 flex items-center justify-center text-sm font-medium text-[#7d85d0]">
+                                  {entry.rank}
+                                </div>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-4 px-6">
+                            <div className="flex items-center gap-2">
+                              <span className={`font-mono text-sm ${isCurrentUser ? 'text-[#6265fe] font-semibold' : 'text-[#c9e8ff]'}`}>
+                                {entry.wallet_address.slice(0, 6)}...{entry.wallet_address.slice(-4)}
+                              </span>
+                              {isCurrentUser && (
+                                <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#6265fe]/20 text-[#6265fe] font-medium">
+                                  YOU
+                                </span>
+                              )}
+                            </div>
+                          </td>
+                          <td className="py-4 px-6 text-right">
+                            <span className={`font-bold ${isTop3 ? 'text-[#b9f0d7]' : 'text-white'}`}>
+                              {entry.points.toLocaleString()}
+                            </span>
+                          </td>
+                        </tr>
+                      );
+                    })}
+                  </tbody>
+                </table>
+              </div>
+            )}
           </div>
         </div>
 
