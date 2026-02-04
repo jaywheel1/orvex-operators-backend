@@ -6,6 +6,7 @@ interface VerifyTweetRequest {
   wallet_address: string;
   tweet_url: string;
   verification_code: string;
+  referral_code?: string;
 }
 
 // Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
@@ -14,7 +15,7 @@ const AI_VERIFICATION_ENABLED = process.env.ENABLE_AI_VERIFICATION === 'true';
 export async function POST(request: NextRequest) {
   try {
     const body: VerifyTweetRequest = await request.json();
-    const { wallet_address, tweet_url, verification_code } = body;
+    const { wallet_address, tweet_url, verification_code, referral_code } = body;
 
     if (!wallet_address || !tweet_url || !verification_code) {
       return NextResponse.json(
@@ -62,6 +63,20 @@ export async function POST(request: NextRequest) {
     }
 
     if (!existingUser) {
+      // Validate referral code if provided
+      let validReferralCode: string | null = null;
+      if (referral_code) {
+        const { data: referrer } = await supabaseAdmin
+          .from('users')
+          .select('id, referral_code')
+          .eq('referral_code', referral_code.toUpperCase())
+          .single();
+
+        if (referrer) {
+          validReferralCode = referrer.referral_code;
+        }
+      }
+
       const { error: insertError } = await supabaseAdmin
         .from('users')
         .insert({
@@ -70,6 +85,7 @@ export async function POST(request: NextRequest) {
           verification_code,
           tweet_verified: aiVerified,
           tweet_verified_at: aiVerified ? new Date().toISOString() : null,
+          referred_by: validReferralCode,
         });
 
       if (insertError) {

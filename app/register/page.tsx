@@ -1,23 +1,34 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useEffect, Suspense } from 'react';
 import { useAccount, useDisconnect } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 import Image from 'next/image';
+import { useSearchParams } from 'next/navigation';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
 
 type Step = 'wallet' | 'tweet' | 'follow' | 'complete';
 
-export default function RegisterPage() {
+function RegisterContent() {
   const { address, isConnected } = useAccount();
   const { disconnect } = useDisconnect();
+  const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>('wallet');
   const [tweetUrl, setTweetUrl] = useState('');
   const [followScreenshot, setFollowScreenshot] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
+  const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  // Capture referral code from URL on mount
+  useEffect(() => {
+    const ref = searchParams.get('ref');
+    if (ref) {
+      setReferralCode(ref.toUpperCase());
+    }
+  }, [searchParams]);
 
   const verificationCode = address ? address.slice(-8).toUpperCase() : '';
   const tweetText = `Verifying my wallet for @OrvexFi
@@ -42,6 +53,7 @@ Code: ${verificationCode}
           wallet_address: address,
           tweet_url: tweetUrl,
           verification_code: verificationCode,
+          referral_code: referralCode,
         }),
       });
 
@@ -171,6 +183,14 @@ Code: ${verificationCode}
         <div className="glass-card p-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
           {step === 'wallet' && (
             <div className="space-y-8">
+              {referralCode && (
+                <div className="flex items-center justify-center gap-2 px-4 py-2 rounded-xl bg-[#ffc107]/10 border border-[#ffc107]/20 text-[#ffc107] text-sm">
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                  Referred by <span className="font-mono font-semibold">{referralCode}</span>
+                </div>
+              )}
               <div className="text-center">
                 <div className="w-16 h-16 rounded-2xl bg-gradient-to-br from-[#6265fe]/20 to-[#6265fe]/5 border border-[#6265fe]/20 flex items-center justify-center mx-auto mb-6">
                   <svg className="w-8 h-8 text-[#6265fe]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -394,5 +414,17 @@ Code: ${verificationCode}
         </div>
       </main>
     </div>
+  );
+}
+
+export default function RegisterPage() {
+  return (
+    <Suspense fallback={
+      <div className="min-h-screen bg-[#070713] text-white flex items-center justify-center">
+        <div className="w-16 h-16 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" />
+      </div>
+    }>
+      <RegisterContent />
+    </Suspense>
   );
 }

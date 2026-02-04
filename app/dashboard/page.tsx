@@ -13,6 +13,19 @@ interface UserData {
   points: number;
   registration_complete: boolean;
   tasks_completed: number;
+  referral_code?: string;
+  referral_count?: number;
+}
+
+interface ReferralStats {
+  referral_code: string;
+  referral_link: string;
+  total_referrals: number;
+  verified_referrals: number;
+  remaining_slots: number;
+  max_referrals: number;
+  cp_per_referral: number;
+  total_cp_earned: number;
 }
 
 interface Task {
@@ -42,6 +55,9 @@ export default function DashboardPage() {
   const [userRank, setUserRank] = useState<number | null>(null);
   const [userLeaderboardEntry, setUserLeaderboardEntry] = useState<LeaderboardEntry | null>(null);
   const [showLeaderboardModal, setShowLeaderboardModal] = useState(false);
+  const [referralStats, setReferralStats] = useState<ReferralStats | null>(null);
+  const [showReferralModal, setShowReferralModal] = useState(false);
+  const [copied, setCopied] = useState(false);
 
   useEffect(() => {
     if (address) {
@@ -49,6 +65,7 @@ export default function DashboardPage() {
       fetchTasks();
       checkCampaignStatus();
       fetchLeaderboard();
+      fetchReferralStats();
 
       // Refresh leaderboard every 30 minutes
       const interval = setInterval(() => {
@@ -116,6 +133,26 @@ export default function DashboardPage() {
       console.error('Failed to fetch leaderboard:', err);
     } finally {
       setLeaderboardLoading(false);
+    }
+  };
+
+  const fetchReferralStats = async () => {
+    try {
+      const res = await fetch(`/api/referral/stats?wallet=${address}`);
+      const data = await res.json();
+      if (data.ok) {
+        setReferralStats(data.data);
+      }
+    } catch (err) {
+      console.error('Failed to fetch referral stats:', err);
+    }
+  };
+
+  const copyReferralLink = async () => {
+    if (referralStats?.referral_link) {
+      await navigator.clipboard.writeText(referralStats.referral_link);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
     }
   };
 
@@ -309,6 +346,63 @@ export default function DashboardPage() {
             </div>
             <div className="text-[10px] text-[#b6bbff]/30 mt-1 uppercase tracking-wider">Your Rank</div>
           </button>
+        </div>
+
+        {/* Referral Section */}
+        <div className="mb-12 opacity-0 animate-fade-in-up" style={{ animationDelay: '500ms', animationFillMode: 'forwards' }}>
+          <div className="glass-card p-6">
+            <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#ffc107]/20 to-[#ffc107]/5 border border-[#ffc107]/20 flex items-center justify-center">
+                  <svg className="w-7 h-7 text-[#ffc107]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
+                  </svg>
+                </div>
+                <div>
+                  <h3 className="text-lg font-semibold text-white mb-1">Invite Friends</h3>
+                  <p className="text-[#b6bbff]/50 text-sm">
+                    Earn <span className="text-[#ffc107] font-semibold">200 CP</span> for each friend who registers (max 5)
+                  </p>
+                </div>
+              </div>
+              <div className="flex items-center gap-3">
+                <div className="flex items-center gap-2 px-4 py-2 rounded-xl bg-[#0d0d1a] border border-[#7d85d0]/20">
+                  <span className="text-[#b6bbff]/70 text-sm font-mono">
+                    {referralStats?.referral_code || '...'}
+                  </span>
+                </div>
+                <button
+                  onClick={copyReferralLink}
+                  className="flex items-center gap-2 px-4 py-2 bg-gradient-to-r from-[#ffc107] to-[#ffab00] text-[#070713] font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(255,193,7,0.3)] transition-all duration-300"
+                >
+                  {copied ? (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                      </svg>
+                      Copied!
+                    </>
+                  ) : (
+                    <>
+                      <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z" />
+                      </svg>
+                      Copy Link
+                    </>
+                  )}
+                </button>
+                <button
+                  onClick={() => setShowReferralModal(true)}
+                  className="flex items-center gap-2 px-4 py-2 rounded-xl glass-card border border-[#7d85d0]/20 hover:border-[#ffc107]/30 text-[#b6bbff]/70 hover:text-white transition-all"
+                >
+                  <span className="font-semibold">{referralStats?.verified_referrals || 0}/5</span>
+                  <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                  </svg>
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
 
         {/* Tasks Section */}
@@ -529,6 +623,107 @@ export default function DashboardPage() {
                   </table>
                 </div>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Referral Modal */}
+      {showReferralModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
+          {/* Backdrop */}
+          <div
+            className="absolute inset-0 bg-black/80 backdrop-blur-sm"
+            onClick={() => setShowReferralModal(false)}
+          />
+
+          {/* Modal */}
+          <div className="relative glass-card w-full max-w-md overflow-hidden rounded-2xl animate-scale-in">
+            {/* Header */}
+            <div className="flex items-center justify-between p-6 border-b border-[#7d85d0]/10">
+              <div>
+                <h2 className="text-2xl font-bold gradient-text">Your Referrals</h2>
+                <p className="text-[#7d85d0] text-xs mt-1">
+                  {referralStats?.verified_referrals || 0} of {referralStats?.max_referrals || 5} slots used
+                </p>
+              </div>
+              <button
+                onClick={() => setShowReferralModal(false)}
+                className="w-10 h-10 rounded-xl bg-[#7d85d0]/10 hover:bg-[#7d85d0]/20 flex items-center justify-center transition-colors"
+              >
+                <svg className="w-5 h-5 text-[#b6bbff]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" />
+                </svg>
+              </button>
+            </div>
+
+            {/* Content */}
+            <div className="p-6 space-y-6">
+              {/* Stats */}
+              <div className="grid grid-cols-2 gap-4">
+                <div className="p-4 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20">
+                  <div className="text-[#b6bbff]/50 text-xs mb-1">Total Earned</div>
+                  <div className="text-2xl font-bold text-[#ffc107]">
+                    {referralStats?.total_cp_earned || 0} CP
+                  </div>
+                </div>
+                <div className="p-4 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20">
+                  <div className="text-[#b6bbff]/50 text-xs mb-1">Remaining</div>
+                  <div className="text-2xl font-bold text-[#b6bbff]">
+                    {referralStats?.remaining_slots || 5} slots
+                  </div>
+                </div>
+              </div>
+
+              {/* Referral Link */}
+              <div>
+                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Your Referral Link</label>
+                <div className="flex items-center gap-2">
+                  <input
+                    type="text"
+                    readOnly
+                    value={referralStats?.referral_link || ''}
+                    className="flex-1 px-4 py-3 bg-[#0d0d1a]/80 border border-[#7d85d0]/20 rounded-xl text-sm text-[#c9e8ff] font-mono"
+                  />
+                  <button
+                    onClick={copyReferralLink}
+                    className="px-4 py-3 bg-gradient-to-r from-[#ffc107] to-[#ffab00] text-[#070713] font-semibold rounded-xl hover:shadow-[0_0_20px_rgba(255,193,7,0.3)] transition-all"
+                  >
+                    {copied ? 'Copied!' : 'Copy'}
+                  </button>
+                </div>
+              </div>
+
+              {/* Referral Progress */}
+              <div>
+                <div className="flex items-center justify-between text-xs mb-2">
+                  <span className="text-[#b6bbff]/50">Progress</span>
+                  <span className="text-[#ffc107]">
+                    {referralStats?.verified_referrals || 0} / {referralStats?.max_referrals || 5} referrals
+                  </span>
+                </div>
+                <div className="h-2 bg-[#0d0d1a] rounded-full overflow-hidden">
+                  <div
+                    className="h-full bg-gradient-to-r from-[#ffc107] to-[#ffab00] transition-all duration-500"
+                    style={{ width: `${((referralStats?.verified_referrals || 0) / (referralStats?.max_referrals || 5)) * 100}%` }}
+                  />
+                </div>
+              </div>
+
+              {/* Info */}
+              <div className="p-4 rounded-xl bg-[#ffc107]/10 border border-[#ffc107]/20">
+                <div className="flex items-start gap-3">
+                  <svg className="w-5 h-5 text-[#ffc107] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div className="text-sm text-[#ffc107]/80">
+                    <p className="font-medium mb-1">How it works</p>
+                    <p className="text-[#ffc107]/60">
+                      Share your link with friends. When they complete registration, you earn {referralStats?.cp_per_referral || 200} CP automatically.
+                    </p>
+                  </div>
+                </div>
+              </div>
             </div>
           </div>
         </div>

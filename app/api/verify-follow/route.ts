@@ -7,6 +7,9 @@ const anthropic = new Anthropic({
   apiKey: process.env.ANTHROPIC_API_KEY,
 });
 
+const REFERRAL_CP_REWARD = 200;
+const MAX_REFERRALS = 5;
+
 // Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
 const AI_VERIFICATION_ENABLED = process.env.ENABLE_AI_VERIFICATION === 'true';
 
@@ -77,7 +80,7 @@ export async function POST(request: NextRequest) {
 
     const { data: user } = await supabaseAdmin
       .from('users')
-      .select('id, tweet_verified, follow_verified')
+      .select('id, tweet_verified, follow_verified, referred_by, registration_complete')
       .eq('wallet_address', wallet_address.toLowerCase())
       .single();
 
@@ -143,6 +146,62 @@ export async function POST(request: NextRequest) {
         { ok: false, error: 'Failed to update user', details: updateError.message },
         { status: 500 }
       );
+    }
+
+    // Process referral if registration just completed and user was referred
+    if (aiVerified && !user.registration_complete && user.referred_by) {
+      try {
+        // Find the referrer by their referral code
+        const { data: referrer } = await supabaseAdmin
+          .from('users')
+          .select('id, wallet_address, points')
+          .eq('referral_code', user.referred_by)
+          .single();
+
+        if (referrer) {
+          // Check if referrer hasn't hit the cap
+          const { count: existingReferrals } = await supabaseAdmin
+            .from('referrals')
+            .select('*', { count: 'exact', head: true })
+            .eq('referrer_id', referrer.id)
+            .eq('verified', true);
+
+          if ((existingReferrals || 0) < MAX_REFERRALS) {
+            // Create referral record
+            await supabaseAdmin
+              .from('referrals')
+              .insert({
+                referrer_id: referrer.id,
+                referee_id: user.id,
+                referrer_wallet: referrer.wallet_address,
+                referee_wallet: wallet_address.toLowerCase(),
+                verified: true,
+                verified_at: new Date().toISOString(),
+                cp_awarded: REFERRAL_CP_REWARD,
+              });
+
+            // Award CP to referrer
+            await supabaseAdmin
+              .from('users')
+              .update({ points: (referrer.points || 0) + REFERRAL_CP_REWARD })
+              .eq('id', referrer.id);
+
+            // Log to CP ledger
+            await supabaseAdmin
+              .from('cp_ledger')
+              .insert({
+                user_id: referrer.id,
+                amount: REFERRAL_CP_REWARD,
+                reason: `Referral bonus: ${wallet_address.slice(0, 6)}...${wallet_address.slice(-4)} registered`,
+              });
+
+            console.log(`Referral processed: ${referrer.wallet_address} earned ${REFERRAL_CP_REWARD} CP for referring ${wallet_address}`);
+          }
+        }
+      } catch (refError) {
+        // Log but don't fail the registration
+        console.error('Referral processing error:', refError);
+      }
     }
 
     return NextResponse.json({

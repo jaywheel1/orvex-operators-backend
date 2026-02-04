@@ -34,11 +34,19 @@ export async function GET(request: NextRequest) {
       .eq('user_id', data.id)
       .eq('status', 'approved');
 
+    // Get referral stats
+    const { count: referralCount } = await supabaseAdmin
+      .from('referrals')
+      .select('*', { count: 'exact', head: true })
+      .eq('referrer_id', data.id)
+      .eq('verified', true);
+
     return NextResponse.json({
       ok: true,
       data: {
         ...data,
         tasks_completed: tasksCompleted || 0,
+        referral_count: referralCount || 0,
       },
     });
   } catch {
