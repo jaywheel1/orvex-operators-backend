@@ -7,6 +7,7 @@ interface VerifyTweetRequest {
   tweet_url: string;
   verification_code: string;
   referral_code?: string;
+  x_handle?: string;
 }
 
 // Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
@@ -15,9 +16,9 @@ const AI_VERIFICATION_ENABLED = process.env.ENABLE_AI_VERIFICATION === 'true';
 export async function POST(request: NextRequest) {
   try {
     const body: VerifyTweetRequest = await request.json();
-    const { wallet_address, tweet_url, verification_code, referral_code } = body;
+    const { wallet_address, tweet_url, verification_code, referral_code, x_handle } = body;
 
-    if (!wallet_address || !tweet_url || !verification_code) {
+    if (!wallet_address || !tweet_url || !verification_code || !x_handle) {
       return NextResponse.json(
         { ok: false, error: 'Missing required fields' },
         { status: 400 }
@@ -86,6 +87,7 @@ export async function POST(request: NextRequest) {
           tweet_verified: aiVerified,
           tweet_verified_at: aiVerified ? new Date().toISOString() : null,
           referred_by: validReferralCode,
+          x_handle: x_handle.toLowerCase(),
         });
 
       if (insertError) {
@@ -103,6 +105,7 @@ export async function POST(request: NextRequest) {
           verification_code,
           tweet_verified: aiVerified,
           tweet_verified_at: aiVerified ? new Date().toISOString() : null,
+          x_handle: x_handle.toLowerCase(),
         })
         .eq('wallet_address', wallet_address.toLowerCase());
 

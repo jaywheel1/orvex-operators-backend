@@ -17,10 +17,31 @@ function RegisterContent() {
   const searchParams = useSearchParams();
   const [step, setStep] = useState<Step>('wallet');
   const [tweetUrl, setTweetUrl] = useState('');
+  const [xHandle, setXHandle] = useState('');
   const [followScreenshot, setFollowScreenshot] = useState<File | null>(null);
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [error, setError] = useState('');
   const [referralCode, setReferralCode] = useState<string | null>(null);
+
+  // Extract X handle from @handle or URL format
+  const parseXHandle = (input: string): string => {
+    if (!input) return '';
+    const trimmed = input.trim();
+
+    // If it's a URL (x.com or twitter.com)
+    const urlMatch = trimmed.match(/(?:https?:\/\/)?(?:www\.)?(?:twitter\.com|x\.com)\/(@)?([a-zA-Z0-9_]+)/i);
+    if (urlMatch) {
+      return urlMatch[2];
+    }
+
+    // If it starts with @, remove it
+    if (trimmed.startsWith('@')) {
+      return trimmed.slice(1);
+    }
+
+    // Otherwise return as-is (just the handle)
+    return trimmed;
+  };
 
   // Capture referral code from URL on mount and show welcome screen if referred
   useEffect(() => {
@@ -39,6 +60,11 @@ Code: ${verificationCode}
 #Orvex #Web3`;
 
   const handleTweetSubmit = async () => {
+    const parsedHandle = parseXHandle(xHandle);
+    if (!parsedHandle) {
+      setError('Please enter your X handle');
+      return;
+    }
     if (!tweetUrl) {
       setError('Please enter your tweet URL');
       return;
@@ -55,6 +81,7 @@ Code: ${verificationCode}
           tweet_url: tweetUrl,
           verification_code: verificationCode,
           referral_code: referralCode,
+          x_handle: parsedHandle,
         }),
       });
 
@@ -310,6 +337,27 @@ Code: ${verificationCode}
                 <p className="text-[#b6bbff]/50 text-sm">
                   Post this tweet to verify you own this X account.
                 </p>
+              </div>
+
+              <div className="space-y-2">
+                <label className="block text-sm text-[#b6bbff]/50">
+                  Your X handle
+                </label>
+                <input
+                  type="text"
+                  value={xHandle}
+                  onChange={(e) => setXHandle(e.target.value)}
+                  placeholder="@yourhandle or https://x.com/yourhandle"
+                  className="input w-full"
+                />
+                {xHandle && parseXHandle(xHandle) && (
+                  <div className="flex items-center gap-2 text-sm text-[#b9f0d7]">
+                    <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
+                    </svg>
+                    @{parseXHandle(xHandle)}
+                  </div>
+                )}
               </div>
 
               <div className="p-5 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20">
