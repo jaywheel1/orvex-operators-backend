@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import Image from 'next/image';
 
 export default function Home() {
   return (
@@ -14,12 +15,7 @@ export default function Home() {
 
       <nav className="relative flex items-center justify-between px-8 py-6 border-b border-[#7d85d0]/20">
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-gradient-to-br from-[#6265fe] to-[#b9f0d7] flex items-center justify-center">
-            <svg className="w-6 h-6 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
-              <circle cx="12" cy="12" r="10" />
-              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)" />
-            </svg>
-          </div>
+          <Image src="/logo.svg" alt="Orvex" width={40} height={40} className="rounded-full" />
           <span className="text-2xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent">
             Orvex
           </span>
@@ -36,12 +32,7 @@ export default function Home() {
         {/* Hero section */}
         <div className="relative mb-8">
           <div className="absolute -inset-4 bg-gradient-to-r from-[#6265fe] to-[#b9f0d7] rounded-full opacity-20 blur-2xl animate-pulse" />
-          <div className="relative w-24 h-24 rounded-full bg-gradient-to-br from-[#6265fe] to-[#b9f0d7] flex items-center justify-center animate-float">
-            <svg className="w-14 h-14 text-white" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5">
-              <circle cx="12" cy="12" r="10" />
-              <ellipse cx="12" cy="12" rx="10" ry="4" transform="rotate(-30 12 12)" />
-            </svg>
-          </div>
+          <Image src="/logo.svg" alt="Orvex" width={96} height={96} className="relative rounded-full animate-float" />
         </div>
 
         <h1 className="text-5xl md:text-7xl font-bold text-center mb-6 leading-tight">
