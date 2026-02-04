@@ -10,9 +10,9 @@ interface CursorGlowProps {
 }
 
 export default function CursorGlow({
-  color = 'rgba(98, 101, 254, 0.10)',
-  size = 400,
-  blur = 80,
+  color = 'rgba(98, 101, 254, 0.05)',
+  size = 250,
+  blur = 50,
   opacity = 1,
 }: CursorGlowProps) {
   const [position, setPosition] = useState({ x: -1000, y: -1000 });

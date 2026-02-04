@@ -11,8 +11,8 @@ export default function Home() {
       {/* Animated Background with particles */}
       <AnimatedBackground />
 
-      {/* Mouse-following glow */}
-      <CursorGlow color="rgba(98, 101, 254, 0.08)" size={500} blur={100} />
+      {/* Mouse-following subtle trail */}
+      <CursorGlow color="rgba(98, 101, 254, 0.04)" size={300} blur={60} />
 
       {/* Noise overlay */}
       <div className="noise-overlay" />
@@ -76,27 +76,28 @@ export default function Home() {
 
       {/* Hero Section */}
       <main className="relative z-10 flex flex-col items-center justify-center px-6 pt-16 pb-24 md:pt-24 md:pb-32">
-        {/* Logo with orbital elements */}
+        {/* Logo with gravitational orbit rings */}
         <div className="relative mb-10 opacity-0 animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
-          {/* Outer glow */}
-          <div className="absolute inset-[-40px] bg-gradient-to-r from-[#6265fe]/14 to-[#b9f0d7]/14 rounded-full blur-3xl animate-pulse-glow" />
+          {/* Orbital rings - gravity effect */}
+          <div className="absolute inset-[-50px] rounded-full border border-[#6265fe]/10 animate-[spin_20s_linear_infinite]" />
+          <div className="absolute inset-[-35px] rounded-full border border-[#7d85d0]/8 animate-[spin_15s_linear_infinite_reverse]" />
+          <div className="absolute inset-[-20px] rounded-full border border-[#6265fe]/6 animate-[spin_25s_linear_infinite]" />
 
-          {/* Orbiting elements */}
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-3 h-3 bg-[#6265fe] rounded-full animate-orbit opacity-50 shadow-[0_0_8px_rgba(98,101,254,0.5)]" />
+          {/* Orbiting particles */}
+          <div className="absolute inset-[-45px] animate-[spin_12s_linear_infinite]">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#6265fe] rounded-full opacity-60" />
           </div>
-          <div className="absolute inset-0 flex items-center justify-center">
-            <div className="w-2 h-2 bg-[#b9f0d7] rounded-full animate-orbit-reverse opacity-40 shadow-[0_0_8px_rgba(185,240,215,0.5)]" />
+          <div className="absolute inset-[-30px] animate-[spin_8s_linear_infinite_reverse]">
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#b9f0d7] rounded-full opacity-50" />
           </div>
-
-          {/* Pulse rings */}
-          <div className="absolute inset-[-20px] rounded-full border border-[#6265fe]/20 animate-ping" style={{ animationDuration: '3s' }} />
-          <div className="absolute inset-[-35px] rounded-full border border-[#6265fe]/10 animate-ping" style={{ animationDuration: '3s', animationDelay: '1s' }} />
+          <div className="absolute inset-[-55px] animate-[spin_18s_linear_infinite]">
+            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#7d85d0] rounded-full opacity-40" />
+          </div>
 
           {/* Logo */}
-          <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden animate-float">
-            <div className="absolute inset-0 bg-gradient-to-br from-[#6265fe]/14 to-[#b9f0d7]/14 animate-glow-pulse rounded-full" />
-            <Image src="/logo.svg" alt="Orvex" fill className="object-contain p-3" />
+          <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden">
+            <div className="absolute inset-0 bg-[#0a0a1a] rounded-full" />
+            <Image src="/logo.svg" alt="Orvex" fill className="object-contain p-3 relative z-10" />
           </div>
         </div>
 
