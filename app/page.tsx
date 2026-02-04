@@ -75,68 +75,76 @@ export default function Home() {
       </nav>
 
       {/* Hero Section */}
-      <main className="relative z-10 flex flex-col items-start px-6 md:px-12 lg:px-24 pt-16 pb-24 md:pt-24 md:pb-32 max-w-7xl">
-        {/* Logo with gravitational orbit rings */}
-        <div className="relative mb-10 opacity-0 animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
-          {/* Orbital rings - gravity effect */}
-          <div className="absolute inset-[-50px] rounded-full border border-[#6265fe]/10 animate-[spin_20s_linear_infinite]" />
-          <div className="absolute inset-[-35px] rounded-full border border-[#7d85d0]/8 animate-[spin_15s_linear_infinite_reverse]" />
-          <div className="absolute inset-[-20px] rounded-full border border-[#6265fe]/6 animate-[spin_25s_linear_infinite]" />
+      <main className="relative z-10 px-6 md:px-12 lg:px-24 pt-16 pb-24 md:pt-24 md:pb-32">
+        {/* Hero content - two column layout */}
+        <div className="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-12 lg:gap-8">
+          {/* Left column - Text content */}
+          <div className="flex flex-col items-start max-w-2xl">
+            {/* Headline */}
+            <h1 className="mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+              <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1]">
+                <span className="gradient-text">Enter The Vortex</span>
+              </span>
+              <span className="block text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1] mt-4">
+                <span className="gradient-text-accent animate-text-glow">Incentivised Testnet</span>
+              </span>
+            </h1>
 
-          {/* Orbiting particles */}
-          <div className="absolute inset-[-45px] animate-[spin_12s_linear_infinite]">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#6265fe] rounded-full opacity-60" />
+            {/* Subheadline */}
+            <p className="text-base md:text-lg text-[#b6bbff]/60 max-w-xl mb-10 leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
+              Liquidity coordination infrastructure. Deploy capital where it matters.
+              Complete tasks. Earn coordination points.
+            </p>
+
+            {/* CTA Buttons */}
+            <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
+              <Link
+                href="/register"
+                className="group relative px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-2xl text-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(98,101,254,0.5)] hover:-translate-y-1"
+              >
+                <span className="relative z-10 flex items-center gap-2">
+                  Enter Console
+                  <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
+                  </svg>
+                </span>
+                <div className="absolute inset-0 bg-gradient-to-r from-[#7d85d0] to-[#6265fe] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
+              </Link>
+              <Link
+                href="/dashboard"
+                className="text-[#b6bbff]/60 hover:text-white transition-colors duration-300 text-sm underline underline-offset-4 decoration-[#7d85d0]/30 hover:decoration-[#6265fe]"
+              >
+                Already registered? Enter Console
+              </Link>
+            </div>
           </div>
-          <div className="absolute inset-[-30px] animate-[spin_8s_linear_infinite_reverse]">
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#b9f0d7] rounded-full opacity-50" />
+
+          {/* Right column - Vortex logo */}
+          <div className="relative opacity-0 animate-scale-in flex items-center justify-center lg:justify-end" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
+            <div className="relative">
+              {/* Orbital rings - gravity effect */}
+              <div className="absolute inset-[-80px] rounded-full border border-[#6265fe]/10 animate-[spin_20s_linear_infinite]" />
+              <div className="absolute inset-[-60px] rounded-full border border-[#7d85d0]/8 animate-[spin_15s_linear_infinite_reverse]" />
+              <div className="absolute inset-[-40px] rounded-full border border-[#6265fe]/6 animate-[spin_25s_linear_infinite]" />
+
+              {/* Orbiting particles */}
+              <div className="absolute inset-[-75px] animate-[spin_12s_linear_infinite]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-2 h-2 bg-[#6265fe] rounded-full opacity-60" />
+              </div>
+              <div className="absolute inset-[-55px] animate-[spin_8s_linear_infinite_reverse]">
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#b9f0d7] rounded-full opacity-50" />
+              </div>
+              <div className="absolute inset-[-90px] animate-[spin_18s_linear_infinite]">
+                <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1.5 h-1.5 bg-[#7d85d0] rounded-full opacity-40" />
+              </div>
+
+              {/* Logo */}
+              <div className="relative w-40 h-40 md:w-52 md:h-52 lg:w-64 lg:h-64 rounded-full overflow-hidden">
+                <div className="absolute inset-0 bg-[#0a0a1a] rounded-full" />
+                <Image src="/logo.svg" alt="Orvex" fill className="object-contain p-4 relative z-10" />
+              </div>
+            </div>
           </div>
-          <div className="absolute inset-[-55px] animate-[spin_18s_linear_infinite]">
-            <div className="absolute bottom-0 left-1/2 -translate-x-1/2 w-1 h-1 bg-[#7d85d0] rounded-full opacity-40" />
-          </div>
-
-          {/* Logo */}
-          <div className="relative w-28 h-28 md:w-36 md:h-36 rounded-full overflow-hidden">
-            <div className="absolute inset-0 bg-[#0a0a1a] rounded-full" />
-            <Image src="/logo.svg" alt="Orvex" fill className="object-contain p-3 relative z-10" />
-          </div>
-        </div>
-
-        {/* Headline */}
-        <h1 className="mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
-          <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1]">
-            <span className="gradient-text">Enter The Vortex</span>
-          </span>
-          <span className="block text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1] mt-4">
-            <span className="gradient-text-accent animate-text-glow">Incentivised Testnet</span>
-          </span>
-        </h1>
-
-        {/* Subheadline */}
-        <p className="text-base md:text-lg text-[#b6bbff]/60 max-w-xl mb-10 leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
-          Liquidity coordination infrastructure. Deploy capital where it matters.
-          Complete tasks. Earn coordination points.
-        </p>
-
-        {/* CTA Buttons */}
-        <div className="flex flex-col sm:flex-row gap-4 items-start sm:items-center opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
-          <Link
-            href="/register"
-            className="group relative px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-2xl text-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(98,101,254,0.5)] hover:-translate-y-1"
-          >
-            <span className="relative z-10 flex items-center gap-2">
-              Enter Console
-              <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
-              </svg>
-            </span>
-            <div className="absolute inset-0 bg-gradient-to-r from-[#7d85d0] to-[#6265fe] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-          </Link>
-          <Link
-            href="/dashboard"
-            className="text-[#b6bbff]/60 hover:text-white transition-colors duration-300 text-sm underline underline-offset-4 decoration-[#7d85d0]/30 hover:decoration-[#6265fe]"
-          >
-            Already registered? Enter Console
-          </Link>
         </div>
 
         {/* Stats/Features Grid */}
