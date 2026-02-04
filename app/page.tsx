@@ -5,136 +5,189 @@ import Image from 'next/image';
 
 export default function Home() {
   return (
-    <div className="min-h-screen bg-[#070713] text-white overflow-hidden">
-      {/* Background effects */}
+    <div className="min-h-screen bg-[#070713] text-white overflow-hidden noise-overlay">
+      {/* Animated background layers */}
       <div className="fixed inset-0 pointer-events-none">
-        <div className="absolute top-0 left-1/4 w-96 h-96 bg-[#6265fe] rounded-full opacity-10 blur-[100px]" />
-        <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-[#b9f0d7] rounded-full opacity-10 blur-[100px]" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[600px] h-[600px] bg-[#7d85d0] rounded-full opacity-5 blur-[150px]" />
+        {/* Grid pattern */}
+        <div className="absolute inset-0 grid-pattern opacity-50" />
+
+        {/* Gradient orbs */}
+        <div className="absolute top-[-20%] left-[-10%] w-[600px] h-[600px] bg-[#6265fe] rounded-full opacity-[0.08] blur-[120px] animate-pulse-glow" />
+        <div className="absolute bottom-[-20%] right-[-10%] w-[600px] h-[600px] bg-[#b9f0d7] rounded-full opacity-[0.08] blur-[120px] animate-pulse-glow" style={{ animationDelay: '1s' }} />
+        <div className="absolute top-[40%] left-[50%] w-[400px] h-[400px] bg-[#7d85d0] rounded-full opacity-[0.05] blur-[100px]" />
+
+        {/* Floating particles */}
+        <div className="absolute top-[20%] left-[15%] w-2 h-2 bg-[#6265fe] rounded-full opacity-40" style={{ animation: 'particle-float 8s ease-in-out infinite' }} />
+        <div className="absolute top-[60%] left-[80%] w-1.5 h-1.5 bg-[#b9f0d7] rounded-full opacity-50" style={{ animation: 'particle-float 10s ease-in-out infinite', animationDelay: '2s' }} />
+        <div className="absolute top-[30%] right-[20%] w-1 h-1 bg-[#c9e8ff] rounded-full opacity-60" style={{ animation: 'particle-float 7s ease-in-out infinite', animationDelay: '4s' }} />
+        <div className="absolute bottom-[30%] left-[25%] w-1.5 h-1.5 bg-[#b6bbff] rounded-full opacity-40" style={{ animation: 'particle-float 9s ease-in-out infinite', animationDelay: '1s' }} />
       </div>
 
-      <nav className="relative flex items-center justify-between px-8 py-6 border-b border-[#7d85d0]/20">
-        <div className="flex items-center gap-6">
-          <div className="flex items-center gap-3">
-            <Image src="/logo.svg" alt="Orvex" width={40} height={40} className="rounded-full" />
-            <span className="text-2xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent">
+      {/* Navigation */}
+      <nav className="relative z-10 flex items-center justify-between px-6 md:px-12 py-5 glass border-b border-[#7d85d0]/10">
+        <div className="flex items-center gap-8">
+          <Link href="/" className="flex items-center gap-3 group">
+            <div className="relative">
+              <div className="absolute inset-0 bg-[#6265fe] rounded-full blur-md opacity-0 group-hover:opacity-50 transition-opacity duration-300" />
+              <Image src="/logo.svg" alt="Orvex" width={38} height={38} className="relative rounded-full" />
+            </div>
+            <span className="text-xl font-bold tracking-tight gradient-text">
               Orvex
             </span>
-          </div>
+          </Link>
           <a
             href="https://docs.orvex.fi"
             target="_blank"
             rel="noopener noreferrer"
-            className="text-[#b6bbff]/70 hover:text-white transition-colors font-medium"
+            className="hidden sm:block text-sm text-[#b6bbff]/60 hover:text-white transition-colors duration-300 font-medium"
           >
             Docs
           </a>
         </div>
-        <div className="flex items-center gap-3">
+
+        <div className="flex items-center gap-2 sm:gap-3">
           {/* X Icon */}
           <a
             href="https://x.com/OrvexFi"
             target="_blank"
             rel="noopener noreferrer"
-            className="w-10 h-10 rounded-lg bg-[#1a1a2e] border border-[#7d85d0]/20 flex items-center justify-center text-[#b6bbff]/70 hover:text-white hover:border-[#7d85d0]/40 transition-all"
+            className="w-9 h-9 rounded-xl bg-[#0d0d1a] border border-[#7d85d0]/20 flex items-center justify-center text-[#b6bbff]/60 hover:text-white hover:border-[#6265fe]/50 hover:bg-[#6265fe]/10 transition-all duration-300"
             aria-label="Follow us on X"
           >
-            <svg className="w-5 h-5" fill="currentColor" viewBox="0 0 24 24">
+            <svg className="w-4 h-4" fill="currentColor" viewBox="0 0 24 24">
               <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
             </svg>
           </a>
-          {/* Discord with SOON badge */}
-          <div className="flex items-center gap-1.5 px-3 h-10 rounded-lg bg-[#1a1a2e] border border-[#7d85d0]/20">
-            <svg className="w-5 h-5 text-[#b6bbff]/70" fill="currentColor" viewBox="0 0 24 24">
+          {/* Discord */}
+          <div className="flex items-center gap-1.5 px-3 h-9 rounded-xl bg-[#0d0d1a] border border-[#7d85d0]/20">
+            <svg className="w-4 h-4 text-[#b6bbff]/60" fill="currentColor" viewBox="0 0 24 24">
               <path d="M20.317 4.37a19.791 19.791 0 0 0-4.885-1.515.074.074 0 0 0-.079.037c-.21.375-.444.864-.608 1.25a18.27 18.27 0 0 0-5.487 0 12.64 12.64 0 0 0-.617-1.25.077.077 0 0 0-.079-.037A19.736 19.736 0 0 0 3.677 4.37a.07.07 0 0 0-.032.027C.533 9.046-.32 13.58.099 18.057a.082.082 0 0 0 .031.057 19.9 19.9 0 0 0 5.993 3.03.078.078 0 0 0 .084-.028 14.09 14.09 0 0 0 1.226-1.994.076.076 0 0 0-.041-.106 13.107 13.107 0 0 1-1.872-.892.077.077 0 0 1-.008-.128 10.2 10.2 0 0 0 .372-.292.074.074 0 0 1 .077-.01c3.928 1.793 8.18 1.793 12.062 0a.074.074 0 0 1 .078.01c.12.098.246.198.373.292a.077.077 0 0 1-.006.127 12.299 12.299 0 0 1-1.873.892.077.077 0 0 0-.041.107c.36.698.772 1.362 1.225 1.993a.076.076 0 0 0 .084.028 19.839 19.839 0 0 0 6.002-3.03.077.077 0 0 0 .032-.054c.5-5.177-.838-9.674-3.549-13.66a.061.061 0 0 0-.031-.03zM8.02 15.33c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.956-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.956 2.418-2.157 2.418zm7.975 0c-1.183 0-2.157-1.085-2.157-2.419 0-1.333.955-2.419 2.157-2.419 1.21 0 2.176 1.096 2.157 2.42 0 1.333-.946 2.418-2.157 2.418z" />
             </svg>
-            <span className="text-xs font-bold text-[#b9f0d7] tracking-wide">SOON</span>
+            <span className="text-[10px] font-bold text-[#b9f0d7] tracking-wider uppercase">Soon</span>
           </div>
-          {/* Launch Orvex button */}
+          {/* Launch Orvex */}
           <a
             href="https://orvex.fi"
             target="_blank"
             rel="noopener noreferrer"
-            className="flex items-center gap-2 px-5 h-10 rounded-lg bg-[#1a1a2e] border border-[#b9f0d7]/30 text-[#b9f0d7] font-medium hover:bg-[#b9f0d7]/10 hover:border-[#b9f0d7]/50 transition-all"
+            className="hidden sm:flex items-center gap-2 px-4 h-9 rounded-xl bg-[#0d0d1a] border border-[#b9f0d7]/30 text-[#b9f0d7] text-sm font-medium hover:bg-[#b9f0d7]/10 hover:border-[#b9f0d7]/50 transition-all duration-300"
           >
             Launch Orvex
-            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </a>
         </div>
       </nav>
 
-      <main className="relative flex flex-col items-center justify-center px-8 py-24 md:py-32">
-        {/* Hero section */}
-        <div className="relative mb-8">
-          <div className="absolute -inset-4 bg-gradient-to-r from-[#6265fe] to-[#b9f0d7] rounded-full opacity-20 blur-2xl animate-pulse" />
-          <Image src="/logo.svg" alt="Orvex" width={96} height={96} className="relative rounded-full animate-float" />
+      {/* Hero Section */}
+      <main className="relative z-10 flex flex-col items-center justify-center px-6 pt-20 pb-32 md:pt-28 md:pb-40">
+        {/* Logo with orbital elements */}
+        <div className="relative mb-10 opacity-0 animate-scale-in" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
+          {/* Outer glow */}
+          <div className="absolute inset-[-30px] bg-gradient-to-r from-[#6265fe]/30 to-[#b9f0d7]/30 rounded-full blur-3xl animate-pulse-glow" />
+
+          {/* Orbiting elements */}
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-3 h-3 bg-[#6265fe] rounded-full animate-orbit opacity-60" />
+          </div>
+          <div className="absolute inset-0 flex items-center justify-center">
+            <div className="w-2 h-2 bg-[#b9f0d7] rounded-full animate-orbit-reverse opacity-50" />
+          </div>
+
+          {/* Logo */}
+          <div className="relative w-28 h-28 md:w-32 md:h-32 rounded-full overflow-hidden animate-float">
+            <div className="absolute inset-0 bg-gradient-to-br from-[#6265fe]/20 to-[#b9f0d7]/20 animate-glow-pulse rounded-full" />
+            <Image src="/logo.svg" alt="Orvex" fill className="object-contain p-2" />
+          </div>
         </div>
 
-        <h1 className="text-5xl md:text-7xl font-bold text-center mb-6 leading-tight">
-          <span className="bg-gradient-to-r from-white via-[#c9e8ff] to-[#b6bbff] bg-clip-text text-transparent">
-            Complete Tasks.
+        {/* Headline */}
+        <h1 className="text-center mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
+          <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1]">
+            <span className="gradient-text">Complete Tasks.</span>
           </span>
-          <br />
-          <span className="bg-gradient-to-r from-[#b9f0d7] via-[#c9e8ff] to-[#6265fe] bg-clip-text text-transparent">
-            Earn Rewards.
+          <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1] mt-2">
+            <span className="gradient-text-accent animate-text-glow">Earn Rewards.</span>
           </span>
         </h1>
 
-        <p className="text-lg md:text-xl text-[#b6bbff]/70 text-center max-w-2xl mb-12">
+        {/* Subheadline */}
+        <p className="text-base md:text-lg text-[#b6bbff]/60 text-center max-w-xl mb-10 leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
           Join the Orvex community. Connect your wallet, verify your X account,
           and start earning points by completing social tasks.
         </p>
 
-        <div className="flex flex-col sm:flex-row gap-4 items-center">
+        {/* CTA Buttons */}
+        <div className="flex flex-col sm:flex-row gap-4 items-center opacity-0 animate-fade-in-up" style={{ animationDelay: '400ms', animationFillMode: 'forwards' }}>
           <Link
             href="/register"
-            className="px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl text-lg hover:shadow-[0_0_30px_rgba(98,101,254,0.5)] transition-all duration-300 hover:-translate-y-1"
+            className="group relative px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-2xl text-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_40px_rgba(98,101,254,0.5)] hover:-translate-y-1"
           >
-            Get Started
+            <span className="relative z-10">Get Started</span>
+            <div className="absolute inset-0 bg-gradient-to-r from-[#7d85d0] to-[#6265fe] opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
           </Link>
           <Link
             href="/dashboard"
-            className="text-[#b6bbff]/70 hover:text-white transition-colors underline underline-offset-4"
+            className="text-[#b6bbff]/60 hover:text-white transition-colors duration-300 text-sm underline underline-offset-4 decoration-[#7d85d0]/30 hover:decoration-[#6265fe]"
           >
             Already registered? Login
           </Link>
         </div>
 
-        {/* Stats section */}
-        <div className="mt-24 grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl w-full">
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-[#6265fe]/10 to-transparent border border-[#7d85d0]/20 hover:border-[#6265fe]/40 transition-all duration-300">
-            <div className="text-4xl font-bold bg-gradient-to-r from-[#6265fe] to-[#b9f0d7] bg-clip-text text-transparent mb-2">
-              1
+        {/* Stats/Features Grid */}
+        <div className="mt-24 md:mt-32 grid grid-cols-1 md:grid-cols-3 gap-5 max-w-4xl w-full">
+          {/* Card 1 */}
+          <div className="group glass-card p-6 opacity-0 animate-fade-in-up cursor-default" style={{ animationDelay: '500ms', animationFillMode: 'forwards' }}>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#6265fe]/20 to-[#6265fe]/5 border border-[#6265fe]/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-2xl font-bold text-[#6265fe]">1</span>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Connect Wallet</h3>
-            <p className="text-[#b6bbff]/60">Link your wallet to get started with Orvex</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Connect Wallet</h3>
+            <p className="text-sm text-[#b6bbff]/50 leading-relaxed">
+              Link your wallet to get started with Orvex
+            </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-[#7d85d0]/10 to-transparent border border-[#7d85d0]/20 hover:border-[#7d85d0]/40 transition-all duration-300">
-            <div className="text-4xl font-bold bg-gradient-to-r from-[#7d85d0] to-[#c9e8ff] bg-clip-text text-transparent mb-2">
-              2
+          {/* Card 2 */}
+          <div className="group glass-card p-6 opacity-0 animate-fade-in-up cursor-default" style={{ animationDelay: '600ms', animationFillMode: 'forwards' }}>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#7d85d0]/20 to-[#7d85d0]/5 border border-[#7d85d0]/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-2xl font-bold text-[#7d85d0]">2</span>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Verify X Account</h3>
-            <p className="text-[#b6bbff]/60">Post a verification tweet and submit proof</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Verify X Account</h3>
+            <p className="text-sm text-[#b6bbff]/50 leading-relaxed">
+              Post a verification tweet and submit proof
+            </p>
           </div>
 
-          <div className="p-6 rounded-2xl bg-gradient-to-br from-[#b9f0d7]/10 to-transparent border border-[#7d85d0]/20 hover:border-[#b9f0d7]/40 transition-all duration-300">
-            <div className="text-4xl font-bold bg-gradient-to-r from-[#b9f0d7] to-[#6265fe] bg-clip-text text-transparent mb-2">
-              3
+          {/* Card 3 */}
+          <div className="group glass-card p-6 opacity-0 animate-fade-in-up cursor-default" style={{ animationDelay: '700ms', animationFillMode: 'forwards' }}>
+            <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#b9f0d7]/20 to-[#b9f0d7]/5 border border-[#b9f0d7]/20 flex items-center justify-center mb-5 group-hover:scale-110 transition-transform duration-300">
+              <span className="text-2xl font-bold text-[#b9f0d7]">3</span>
             </div>
-            <h3 className="text-xl font-semibold text-white mb-2">Earn Points</h3>
-            <p className="text-[#b6bbff]/60">Complete tasks and climb the leaderboard</p>
+            <h3 className="text-lg font-semibold text-white mb-2">Earn Points</h3>
+            <p className="text-sm text-[#b6bbff]/50 leading-relaxed">
+              Complete tasks and climb the leaderboard
+            </p>
           </div>
         </div>
       </main>
 
-      <footer className="relative border-t border-[#7d85d0]/20 px-8 py-6 text-center text-[#7d85d0]/60">
-        <span className="bg-gradient-to-r from-[#7d85d0] to-[#b6bbff] bg-clip-text text-transparent">
-          Orvex Operators
-        </span>{' '}
-        2026
+      {/* Footer */}
+      <footer className="relative z-10 glass border-t border-[#7d85d0]/10 px-6 py-5">
+        <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm text-[#7d85d0]/60">
+            <span className="gradient-text font-medium">Orvex Operators</span>
+            <span>2026</span>
+          </div>
+          <div className="flex items-center gap-6">
+            <a href="https://docs.orvex.fi" target="_blank" rel="noopener noreferrer" className="text-xs text-[#7d85d0]/50 hover:text-white transition-colors">
+              Documentation
+            </a>
+            <a href="https://x.com/OrvexFi" target="_blank" rel="noopener noreferrer" className="text-xs text-[#7d85d0]/50 hover:text-white transition-colors">
+              Twitter
+            </a>
+          </div>
+        </div>
       </footer>
     </div>
   );
