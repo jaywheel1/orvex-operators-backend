@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { isWhitelisted } from '@/lib/whitelist';
 import Anthropic from '@anthropic-ai/sdk';
 
 const anthropic = new Anthropic({
@@ -94,7 +95,13 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Allow re-verification - no blocking if already verified
+    // Block re-verification unless whitelisted
+    if (user.follow_verified && !isWhitelisted(wallet_address)) {
+      return NextResponse.json(
+        { ok: false, error: 'Follow already verified' },
+        { status: 400 }
+      );
+    }
 
     const bytes = await screenshot.arrayBuffer();
     const buffer = Buffer.from(bytes);

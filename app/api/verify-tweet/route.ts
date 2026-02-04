@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { isWhitelisted } from '@/lib/whitelist';
 
 interface VerifyTweetRequest {
   wallet_address: string;
@@ -31,17 +32,20 @@ export async function POST(request: NextRequest) {
     }
 
     // Check if this specific tweet URL has already been used (by anyone)
-    const { data: existingTweet } = await supabaseAdmin
-      .from('users')
-      .select('id, wallet_address')
-      .eq('tweet_url', tweet_url)
-      .single();
+    // Skip this check for whitelisted wallets
+    if (!isWhitelisted(wallet_address)) {
+      const { data: existingTweet } = await supabaseAdmin
+        .from('users')
+        .select('id, wallet_address')
+        .eq('tweet_url', tweet_url)
+        .single();
 
-    if (existingTweet) {
-      return NextResponse.json(
-        { ok: false, error: 'This tweet has already been used for verification' },
-        { status: 400 }
-      );
+      if (existingTweet && existingTweet.wallet_address !== wallet_address.toLowerCase()) {
+        return NextResponse.json(
+          { ok: false, error: 'This tweet has already been used for verification' },
+          { status: 400 }
+        );
+      }
     }
 
     const { data: existingUser } = await supabaseAdmin
