@@ -1,149 +1,125 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import {
-  TASK_CATEGORIES,
-  TASK_TYPES,
-  TaskCategory,
-  TaskType,
-  SubmitTaskRequest,
-  ApiResponse,
-  TaskSubmission,
-} from '@/lib/types';
 
-// UUID validation regex
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-function isValidUUID(str: string): boolean {
-  return UUID_REGEX.test(str);
-}
-
-function isValidTaskCategory(value: string): value is TaskCategory {
-  return TASK_CATEGORIES.includes(value as TaskCategory);
-}
-
-function isValidTaskType(value: string): value is TaskType {
-  return TASK_TYPES.includes(value as TaskType);
-}
-
-export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<TaskSubmission>>> {
+export async function POST(request: NextRequest) {
   try {
-    const body: SubmitTaskRequest = await request.json();
-    const { user_id, task_id, task_category, task_type, proof, cp_reward } = body;
+    const formData = await request.formData();
+    const wallet_address = formData.get('wallet_address') as string;
+    const task_id = formData.get('task_id') as string;
+    const proof_url = formData.get('proof_url') as string | null;
+    const screenshot = formData.get('screenshot') as File | null;
 
-    // Input validation
-    const errors: string[] = [];
-
-    if (!user_id || typeof user_id !== 'string') {
-      errors.push('user_id is required and must be a string');
-    } else if (!isValidUUID(user_id)) {
-      errors.push('user_id must be a valid UUID');
-    }
-
-    if (!task_id || typeof task_id !== 'string') {
-      errors.push('task_id is required and must be a string');
-    } else if (!isValidUUID(task_id)) {
-      errors.push('task_id must be a valid UUID');
-    }
-
-    if (!task_category || typeof task_category !== 'string') {
-      errors.push('task_category is required and must be a string');
-    } else if (!isValidTaskCategory(task_category)) {
-      errors.push(`task_category must be one of: ${TASK_CATEGORIES.join(', ')}`);
-    }
-
-    if (!task_type || typeof task_type !== 'string') {
-      errors.push('task_type is required and must be a string');
-    } else if (!isValidTaskType(task_type)) {
-      errors.push(`task_type must be one of: ${TASK_TYPES.join(', ')}`);
-    }
-
-    if (errors.length > 0) {
+    // Validate required fields
+    if (!wallet_address || !task_id) {
       return NextResponse.json(
-        {
-          ok: false,
-          error: 'Validation failed',
-          details: errors.join('; '),
-          hint: 'Check that all required fields are provided with valid values',
-        },
+        { ok: false, error: 'Missing required fields' },
         { status: 400 }
       );
     }
 
-    // Derive link_url from proof when task_type is "link"
-    let link_url: string | null = null;
-    if (task_type === 'link' && proof) {
-      // Validate that proof looks like a URL for link-type tasks
-      try {
-        new URL(proof);
-        link_url = proof;
-      } catch {
+    if (!proof_url && !screenshot) {
+      return NextResponse.json(
+        { ok: false, error: 'Please provide a proof URL or screenshot' },
+        { status: 400 }
+      );
+    }
+
+    // Get user by wallet address
+    const { data: user, error: userError } = await supabaseAdmin
+      .from('users')
+      .select('id')
+      .eq('wallet_address', wallet_address.toLowerCase())
+      .single();
+
+    if (userError || !user) {
+      return NextResponse.json(
+        { ok: false, error: 'User not found. Please complete registration first.' },
+        { status: 404 }
+      );
+    }
+
+    // Get task details
+    const { data: task, error: taskError } = await supabaseAdmin
+      .from('tasks')
+      .select('*')
+      .eq('id', task_id)
+      .single();
+
+    if (taskError || !task) {
+      return NextResponse.json(
+        { ok: false, error: 'Task not found' },
+        { status: 404 }
+      );
+    }
+
+    // Check if user already submitted this task
+    const { data: existingSubmission } = await supabaseAdmin
+      .from('task_submissions')
+      .select('id, status')
+      .eq('user_id', user.id)
+      .eq('task_id', task_id)
+      .single();
+
+    if (existingSubmission) {
+      if (existingSubmission.status === 'pending') {
         return NextResponse.json(
-          {
-            ok: false,
-            error: 'Invalid proof URL',
-            details: 'For link-type tasks, proof must be a valid URL',
-            hint: 'Provide a valid URL starting with http:// or https://',
-          },
+          { ok: false, error: 'You already have a pending submission for this task' },
           { status: 400 }
         );
       }
+      if (existingSubmission.status === 'approved') {
+        return NextResponse.json(
+          { ok: false, error: 'You have already completed this task' },
+          { status: 400 }
+        );
+      }
+      // If rejected, allow resubmission by deleting old submission
+      await supabaseAdmin
+        .from('task_submissions')
+        .delete()
+        .eq('id', existingSubmission.id);
     }
 
-    // Build insert payload
-    const insertPayload = {
-      user_id,
-      task_id,
-      task_category: task_category as TaskCategory,
-      task_type: task_type as TaskType,
-      proof: proof || null,
-      link_url,
-      status: 'pending' as const,
-      cp_reward: cp_reward ?? 0,
-      rejection_reason: null,
-      reviewed_by: null,
-      reviewed_at: null,
-    };
+    // Handle screenshot upload (store as base64 for simplicity)
+    let screenshot_data: string | null = null;
+    if (screenshot) {
+      const bytes = await screenshot.arrayBuffer();
+      const buffer = Buffer.from(bytes);
+      screenshot_data = `data:${screenshot.type};base64,${buffer.toString('base64')}`;
+    }
 
-    // Insert into task_submissions table
-    const { data, error } = await supabaseAdmin
+    // Create submission
+    const { data: submission, error: insertError } = await supabaseAdmin
       .from('task_submissions')
-      .insert(insertPayload)
+      .insert({
+        user_id: user.id,
+        task_id: task_id,
+        task_category: task.category,
+        task_type: proof_url ? 'link' : 'screenshot',
+        proof: proof_url || screenshot_data,
+        link_url: proof_url || null,
+        status: 'pending',
+        cp_reward: task.points,
+      })
       .select()
       .single();
 
-    if (error) {
-      console.error('Supabase insert error:', error);
-
-      // Return detailed error info for debugging
+    if (insertError) {
+      console.error('Supabase insert error:', insertError);
       return NextResponse.json(
-        {
-          ok: false,
-          error: 'Database insert failed',
-          details: error.message,
-          hint: error.hint || undefined,
-          code: error.code,
-        },
+        { ok: false, error: 'Failed to submit task', details: insertError.message },
         { status: 500 }
       );
     }
 
-    return NextResponse.json(
-      {
-        ok: true,
-        data: data as TaskSubmission,
-      },
-      { status: 200 }
-    );
+    return NextResponse.json({
+      ok: true,
+      data: submission,
+    });
   } catch (err) {
     console.error('Submit task error:', err);
-
-    const message = err instanceof Error ? err.message : 'Unknown error';
     return NextResponse.json(
-      {
-        ok: false,
-        error: 'Internal server error',
-        details: message,
-      },
+      { ok: false, error: 'Internal server error' },
       { status: 500 }
     );
   }
