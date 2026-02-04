@@ -190,7 +190,7 @@ export default function DashboardPage() {
                   </div>
                 ) : (
                   <Link
-                    href={`/task/${task.id}`}
+                    href={`/submit?task=${task.id}`}
                     className="block px-4 py-2 bg-white text-black font-semibold rounded-lg text-center hover:bg-zinc-200 transition"
                   >
                     Start Task
