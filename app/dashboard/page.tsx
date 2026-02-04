@@ -288,23 +288,23 @@ export default function DashboardPage() {
           {/* Leaderboard Card */}
           <button
             onClick={() => setShowLeaderboardModal(true)}
-            className="glass-card p-6 hover-lift opacity-0 animate-fade-in-up text-left cursor-pointer group transition-all duration-300 hover:border-[#FFD700]/30"
+            className="glass-card p-6 hover-lift opacity-0 animate-fade-in-up text-left cursor-pointer group transition-all duration-300 hover:border-[#b9f0d7]/30"
             style={{ animationDelay: '450ms', animationFillMode: 'forwards' }}
           >
             <div className="flex items-center gap-3 mb-4">
-              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#FFD700]/20 to-[#FFD700]/5 border border-[#FFD700]/20 flex items-center justify-center group-hover:scale-110 transition-transform">
-                <svg className="w-6 h-6 text-[#FFD700]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#b9f0d7]/20 to-[#b9f0d7]/5 border border-[#b9f0d7]/20 flex items-center justify-center group-hover:scale-110 transition-transform">
+                <svg className="w-6 h-6 text-[#b9f0d7]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M16 4v12l-4-2-4 2V4M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
               <div className="flex items-center gap-2">
                 <span className="text-[#b6bbff]/50 text-sm">Leaderboard</span>
-                <svg className="w-4 h-4 text-[#b6bbff]/30 group-hover:text-[#FFD700] group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-4 h-4 text-[#b6bbff]/30 group-hover:text-[#b9f0d7] group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
                 </svg>
               </div>
             </div>
-            <div className="text-4xl font-bold text-[#FFD700]">
+            <div className="text-4xl font-bold text-[#b9f0d7]">
               {userRank ? `#${userRank}` : '—'}
             </div>
             <div className="text-[10px] text-[#b6bbff]/30 mt-1 uppercase tracking-wider">Your Rank</div>
@@ -487,15 +487,15 @@ export default function DashboardPage() {
                             <td className="py-4 px-6">
                               <div className="flex items-center gap-2">
                                 {entry.rank === 1 ? (
-                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#FFD700] to-[#FFA500] flex items-center justify-center text-sm font-bold text-black shadow-[0_0_15px_rgba(255,215,0,0.4)]">
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#b9f0d7] to-[#6265fe] flex items-center justify-center text-sm font-bold text-[#070713] shadow-[0_0_15px_rgba(185,240,215,0.4)]">
                                     1
                                   </div>
                                 ) : entry.rank === 2 ? (
-                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#C0C0C0] to-[#A0A0A0] flex items-center justify-center text-sm font-bold text-black">
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#c9e8ff] to-[#7d85d0] flex items-center justify-center text-sm font-bold text-[#070713]">
                                     2
                                   </div>
                                 ) : entry.rank === 3 ? (
-                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#CD7F32] to-[#8B4513] flex items-center justify-center text-sm font-bold text-white">
+                                  <div className="w-8 h-8 rounded-full bg-gradient-to-br from-[#7d85d0] to-[#6265fe] flex items-center justify-center text-sm font-bold text-white">
                                     3
                                   </div>
                                 ) : (
