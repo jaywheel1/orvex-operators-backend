@@ -2,43 +2,19 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { ApiResponse, TaskSubmission, RejectRequest } from '@/lib/types';
 
-// UUID validation regex
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-function isValidUUID(str: string): boolean {
-  return UUID_REGEX.test(str);
-}
-
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<TaskSubmission>>> {
   try {
     const body: RejectRequest = await request.json();
-    const { submission_id, operator_id, rejection_reason } = body;
+    const { submission_id, operator_id, reason } = body;
+    const rejection_reason = reason || body.rejection_reason;
 
     // Input validation
-    const errors: string[] = [];
-
-    if (!submission_id || typeof submission_id !== 'string') {
-      errors.push('submission_id is required');
-    } else if (!isValidUUID(submission_id)) {
-      errors.push('submission_id must be a valid UUID');
-    }
-
-    if (!operator_id || typeof operator_id !== 'string') {
-      errors.push('operator_id is required');
-    } else if (!isValidUUID(operator_id)) {
-      errors.push('operator_id must be a valid UUID');
-    }
-
-    if (!rejection_reason || typeof rejection_reason !== 'string' || rejection_reason.trim().length === 0) {
-      errors.push('rejection_reason is required and must be non-empty');
-    }
-
-    if (errors.length > 0) {
+    if (!submission_id || !operator_id) {
       return NextResponse.json(
         {
           ok: false,
-          error: 'Validation failed',
-          details: errors.join('; '),
+          error: 'Missing required fields',
+          details: 'submission_id and operator_id are required',
         },
         { status: 400 }
       );
@@ -48,7 +24,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
-      .eq('id', operator_id)
+      .eq('id', operator_id.toLowerCase())
       .single();
 
     if (profileError || !profile) {

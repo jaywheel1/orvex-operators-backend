@@ -2,13 +2,6 @@ import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { ApiResponse, TaskSubmission, ApproveRequest, CpLedgerEntry } from '@/lib/types';
 
-// UUID validation regex
-const UUID_REGEX = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
-
-function isValidUUID(str: string): boolean {
-  return UUID_REGEX.test(str);
-}
-
 interface ApproveResponseData {
   submission: TaskSubmission;
   cp_ledger_entry: CpLedgerEntry | null;
@@ -20,30 +13,12 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     const { submission_id, operator_id, cp_reward } = body;
 
     // Input validation
-    const errors: string[] = [];
-
-    if (!submission_id || typeof submission_id !== 'string') {
-      errors.push('submission_id is required');
-    } else if (!isValidUUID(submission_id)) {
-      errors.push('submission_id must be a valid UUID');
-    }
-
-    if (!operator_id || typeof operator_id !== 'string') {
-      errors.push('operator_id is required');
-    } else if (!isValidUUID(operator_id)) {
-      errors.push('operator_id must be a valid UUID');
-    }
-
-    if (cp_reward !== undefined && (typeof cp_reward !== 'number' || cp_reward < 0)) {
-      errors.push('cp_reward must be a non-negative number if provided');
-    }
-
-    if (errors.length > 0) {
+    if (!submission_id || !operator_id) {
       return NextResponse.json(
         {
           ok: false,
-          error: 'Validation failed',
-          details: errors.join('; '),
+          error: 'Missing required fields',
+          details: 'submission_id and operator_id are required',
         },
         { status: 400 }
       );
@@ -53,7 +28,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     const { data: profile, error: profileError } = await supabaseAdmin
       .from('profiles')
       .select('role')
-      .eq('id', operator_id)
+      .eq('id', operator_id.toLowerCase())
       .single();
 
     if (profileError || !profile) {

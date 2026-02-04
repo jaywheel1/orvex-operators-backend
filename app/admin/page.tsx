@@ -20,7 +20,10 @@ interface Submission {
   user_id: string;
   task_category: string;
   task_type: string;
+  proof: string;
+  link_url: string | null;
   status: string;
+  cp_reward: number;
   created_at: string;
 }
 
@@ -36,6 +39,8 @@ export default function AdminPage() {
   const [pointsWallet, setPointsWallet] = useState('');
   const [pointsAmount, setPointsAmount] = useState('');
   const [pointsAction, setPointsAction] = useState<'add' | 'remove'>('add');
+  const [aiReviewEnabled, setAiReviewEnabled] = useState(false);
+  const [reviewingId, setReviewingId] = useState<string | null>(null);
 
   useEffect(() => {
     if (address) {
@@ -115,6 +120,52 @@ export default function AdminPage() {
       setPointsWallet('');
       setPointsAmount('');
       fetchUsers();
+    }
+  };
+
+  const approveSubmission = async (submissionId: string) => {
+    setReviewingId(submissionId);
+    try {
+      const res = await fetch('/api/operator/approve', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          submission_id: submissionId,
+          operator_id: address,
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        fetchSubmissions();
+      } else {
+        alert(data.error || 'Failed to approve');
+      }
+    } finally {
+      setReviewingId(null);
+    }
+  };
+
+  const rejectSubmission = async (submissionId: string) => {
+    const reason = prompt('Rejection reason (optional):');
+    setReviewingId(submissionId);
+    try {
+      const res = await fetch('/api/operator/reject', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          submission_id: submissionId,
+          operator_id: address,
+          reason: reason || 'Rejected by admin',
+        }),
+      });
+      const data = await res.json();
+      if (data.ok) {
+        fetchSubmissions();
+      } else {
+        alert(data.error || 'Failed to reject');
+      }
+    } finally {
+      setReviewingId(null);
     }
   };
 
@@ -256,16 +307,40 @@ export default function AdminPage() {
 
           {activeTab === 'submissions' && (
             <div>
-              <h2 className="text-2xl font-bold mb-6">Recent Submissions</h2>
+              <div className="flex items-center justify-between mb-6">
+                <h2 className="text-2xl font-bold">Recent Submissions</h2>
+                <div className="flex items-center gap-3">
+                  <span className="text-sm text-zinc-400">AI Review</span>
+                  <button
+                    onClick={() => setAiReviewEnabled(!aiReviewEnabled)}
+                    className={`relative w-12 h-6 rounded-full transition-colors ${
+                      aiReviewEnabled ? 'bg-green-500' : 'bg-zinc-700'
+                    }`}
+                  >
+                    <span
+                      className={`absolute top-1 w-4 h-4 bg-white rounded-full transition-transform ${
+                        aiReviewEnabled ? 'left-7' : 'left-1'
+                      }`}
+                    />
+                  </button>
+                </div>
+              </div>
+              {aiReviewEnabled && (
+                <div className="mb-4 p-3 bg-blue-500/20 border border-blue-500/30 rounded-lg text-blue-400 text-sm">
+                  AI Review is enabled. Submissions will be automatically verified. (Coming soon)
+                </div>
+              )}
               <div className="overflow-x-auto">
                 <table className="w-full">
                   <thead>
                     <tr className="border-b border-zinc-800">
                       <th className="text-left py-3 px-4">ID</th>
                       <th className="text-left py-3 px-4">Category</th>
-                      <th className="text-left py-3 px-4">Type</th>
+                      <th className="text-left py-3 px-4">Proof</th>
+                      <th className="text-left py-3 px-4">Points</th>
                       <th className="text-left py-3 px-4">Status</th>
                       <th className="text-left py-3 px-4">Date</th>
+                      {!aiReviewEnabled && <th className="text-left py-3 px-4">Actions</th>}
                     </tr>
                   </thead>
                   <tbody>
@@ -273,7 +348,21 @@ export default function AdminPage() {
                       <tr key={sub.id} className="border-b border-zinc-800">
                         <td className="py-3 px-4 font-mono text-sm">{sub.id.slice(0, 8)}...</td>
                         <td className="py-3 px-4">{sub.task_category}</td>
-                        <td className="py-3 px-4">{sub.task_type}</td>
+                        <td className="py-3 px-4">
+                          {sub.link_url ? (
+                            <a
+                              href={sub.link_url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="text-blue-400 hover:underline text-sm"
+                            >
+                              View Link
+                            </a>
+                          ) : (
+                            <span className="text-zinc-500 text-sm">Screenshot</span>
+                          )}
+                        </td>
+                        <td className="py-3 px-4">{sub.cp_reward}</td>
                         <td className="py-3 px-4">
                           <span
                             className={`px-2 py-1 rounded text-xs ${
@@ -290,6 +379,28 @@ export default function AdminPage() {
                         <td className="py-3 px-4 text-zinc-500">
                           {new Date(sub.created_at).toLocaleDateString()}
                         </td>
+                        {!aiReviewEnabled && (
+                          <td className="py-3 px-4">
+                            {sub.status === 'pending' && (
+                              <div className="flex gap-2">
+                                <button
+                                  onClick={() => approveSubmission(sub.id)}
+                                  disabled={reviewingId === sub.id}
+                                  className="px-3 py-1 bg-green-500/20 text-green-500 rounded text-sm hover:bg-green-500/30 disabled:opacity-50"
+                                >
+                                  {reviewingId === sub.id ? '...' : 'Accept'}
+                                </button>
+                                <button
+                                  onClick={() => rejectSubmission(sub.id)}
+                                  disabled={reviewingId === sub.id}
+                                  className="px-3 py-1 bg-red-500/20 text-red-500 rounded text-sm hover:bg-red-500/30 disabled:opacity-50"
+                                >
+                                  {reviewingId === sub.id ? '...' : 'Deny'}
+                                </button>
+                              </div>
+                            )}
+                          </td>
+                        )}
                       </tr>
                     ))}
                   </tbody>
