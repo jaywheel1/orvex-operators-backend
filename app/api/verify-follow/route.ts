@@ -42,17 +42,19 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
             },
             {
               type: 'text',
-              text: `Analyze this screenshot and determine if it shows proof that the user is following the Twitter/X account @OrvexFi (or a similar Orvex-related account).
+              text: `Look at this screenshot. Does it show that someone is following the @OrvexFi account (or an account named "Orvex") on Twitter/X?
 
-You must verify ALL of these criteria:
-1. The image is actually a screenshot of a Twitter/X profile page (reject random images, memes, unrelated screenshots, etc.)
-2. The profile shown is @OrvexFi or an Orvex-related account (name containing "Orvex")
-3. The "Following" button is visible and shows the user IS following (not the "Follow" button)
+The ONLY things that matter:
+1. The screenshot is from Twitter/X (desktop or mobile - both are fine)
+2. An account named "Orvex" or with the handle @OrvexFi is visible on the page
+3. A "Following" button is visible (NOT a "Follow" button - "Following" means the user already follows them)
 
-Be STRICT: if the image is not clearly a Twitter/X profile page showing a follow, reject it. If it's an unrelated image, explain what you see and say it's not valid proof.
+IMPORTANT: On mobile, the user's own handle may NOT be visible - that's fine. You do NOT need to see who is logged in. Just confirm the Orvex profile is shown and the "Following" button state is active.
+
+If the image is clearly not from Twitter/X at all (e.g. a random meme, a different website, etc.), reject it.
 
 Respond with JSON only:
-{"verified": true/false, "reason": "brief explanation of what you see and why it passes or fails"}`,
+{"verified": true/false, "reason": "brief explanation"}`,
             },
           ],
         },
