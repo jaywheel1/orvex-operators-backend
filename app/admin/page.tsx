@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface User {
   id: string;
@@ -30,7 +31,7 @@ interface Submission {
   created_at: string;
 }
 
-export default function AdminPage() {
+function AdminPageContent() {
   const { address, isConnected } = useAccount();
   const [isAdmin, setIsAdmin] = useState(false);
   const [loading, setLoading] = useState(true);
@@ -632,5 +633,13 @@ export default function AdminPage() {
         </main>
       </div>
     </div>
+  );
+}
+
+export default function AdminPage() {
+  return (
+    <ErrorBoundary>
+      <AdminPageContent />
+    </ErrorBoundary>
   );
 }

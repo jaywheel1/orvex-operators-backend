@@ -7,6 +7,7 @@ import Link from 'next/link';
 import Image from 'next/image';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 import {
   CATEGORIES,
   getTasksByCategory,
@@ -117,7 +118,7 @@ interface LeaderboardEntry {
   points: number;
 }
 
-export default function DashboardPage() {
+function DashboardPageContent() {
   const { address, isConnected } = useAccount();
   const [userData, setUserData] = useState<UserData | null>(null);
   const [campaignLive, setCampaignLive] = useState(false);
@@ -997,5 +998,14 @@ export default function DashboardPage() {
         </div>
       )}
     </div>
+  );
+}
+
+
+export default function DashboardPage() {
+  return (
+    <ErrorBoundary>
+      <DashboardPageContent />
+    </ErrorBoundary>
   );
 }

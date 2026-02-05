@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 type Step = 'welcome' | 'wallet' | 'tweet' | 'follow' | 'complete';
 
@@ -563,12 +564,14 @@ Code: ${verificationCode}
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#070713] text-white flex items-center justify-center">
-        <div className="w-16 h-16 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" />
-      </div>
-    }>
-      <RegisterContent />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={
+        <div className="min-h-screen bg-[#070713] text-white flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" />
+        </div>
+      }>
+        <RegisterContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

@@ -5,6 +5,7 @@ import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
 import { useParams } from 'next/navigation';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface Task {
   id: string;
@@ -14,7 +15,7 @@ interface Task {
   points: number;
 }
 
-export default function TaskSubmissionPage() {
+function TaskSubmissionPageContent() {
   const params = useParams();
   const id = params?.id as string;
   const { address, isConnected } = useAccount();
@@ -221,5 +222,13 @@ export default function TaskSubmissionPage() {
         </form>
       </main>
     </div>
+  );
+}
+
+export default function TaskSubmissionPage() {
+  return (
+    <ErrorBoundary>
+      <TaskSubmissionPageContent />
+    </ErrorBoundary>
   );
 }

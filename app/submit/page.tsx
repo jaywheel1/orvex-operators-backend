@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface Task {
   id: string;
@@ -289,7 +290,7 @@ function SubmitForm() {
   );
 }
 
-export default function SubmitPage() {
+function SubmitPageContent() {
   return (
     <div className="min-h-screen bg-[#070713] text-white">
       <AnimatedBackground />
@@ -324,5 +325,13 @@ export default function SubmitPage() {
         <SubmitForm />
       </Suspense>
     </div>
+  );
+}
+
+export default function SubmitPage() {
+  return (
+    <ErrorBoundary>
+      <SubmitPageContent />
+    </ErrorBoundary>
   );
 }
