@@ -334,9 +334,21 @@ Code: ${verificationCode}
                 <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-3">
                   Post Verification Tweet
                 </h1>
-                <p className="text-[#b6bbff]/50 text-sm">
-                  Post this tweet to verify you own this X account.
+                <p className="text-[#b6bbff]/50 text-sm mb-4">
+                  Verify you own this X account by posting a specific tweet with your verification code.
                 </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#6265fe]/10 border border-[#6265fe]/20 text-[#b6bbff] text-sm">
+                <div className="flex gap-3">
+                  <svg className="w-5 h-5 text-[#6265fe] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="font-semibold text-white mb-1">How it works:</p>
+                    <p className="text-xs text-[#b6bbff]/70">Click &quot;Post on X&quot; to post the verification tweet. It will contain a unique code derived from your wallet address. Once posted, paste the tweet URL below for AI verification.</p>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -431,9 +443,21 @@ Code: ${verificationCode}
                 <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-3">
                   Follow @OrvexFi
                 </h1>
-                <p className="text-[#b6bbff]/50 text-sm">
-                  Follow our X account and upload a screenshot as proof.
+                <p className="text-[#b6bbff]/50 text-sm mb-4">
+                  Complete your registration by following @OrvexFi on X and verifying it with a screenshot.
                 </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#b9f0d7]/10 border border-[#b9f0d7]/20 text-[#b6bbff] text-sm">
+                <div className="flex gap-3">
+                  <svg className="w-5 h-5 text-[#b9f0d7] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="font-semibold text-white mb-1">How it works:</p>
+                    <p className="text-xs text-[#b6bbff]/70">Click &quot;Follow @OrvexFi&quot; to open X. Then take a screenshot showing that you followed the account (the &quot;Following&quot; button should be visible). Upload that screenshot below for AI verification.</p>
+                  </div>
+                </div>
               </div>
 
               <a

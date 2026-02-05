@@ -181,13 +181,23 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (!aiVerified) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Tweet verification failed',
+          details: verificationReason || 'The verification code was not found in your tweet. Please ensure you posted the exact tweet with the code visible.',
+          verified: false,
+        },
+        { status: 400 }
+      );
+    }
+
     return NextResponse.json({
       ok: true,
-      verified: aiVerified,
+      verified: true,
+      message: 'Tweet verified successfully',
       reason: verificationReason,
-      message: aiVerified
-        ? 'Tweet verified successfully'
-        : 'Tweet verification failed - code not found in tweet',
     });
   } catch (err) {
     console.error('Verify tweet error:', err);

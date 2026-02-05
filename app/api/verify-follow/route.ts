@@ -123,13 +123,27 @@ export async function POST(request: NextRequest) {
 
     console.log('AI verification result:', aiResult);
 
+    // If verification failed, return error immediately without updating database
+    if (!aiVerified) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Follow verification failed',
+          details: aiResult.reason || 'The screenshot does not show that you follow @OrvexFi. Please ensure the "Following" button is visible in your screenshot.',
+          verified: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Only update user if verification passed
     const { error: updateError } = await supabaseAdmin
       .from('users')
       .update({
-        follow_verified: aiVerified,
-        follow_verified_at: aiVerified ? new Date().toISOString() : null,
-        registration_complete: aiVerified,
-        registration_completed_at: aiVerified ? new Date().toISOString() : null,
+        follow_verified: true,
+        follow_verified_at: new Date().toISOString(),
+        registration_complete: true,
+        registration_completed_at: new Date().toISOString(),
       })
       .eq('wallet_address', wallet_address.toLowerCase());
 
@@ -199,10 +213,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      verified: aiVerified,
-      message: aiVerified
-        ? 'Follow verified successfully. Registration complete!'
-        : 'Follow verification failed - screenshot does not show follow',
+      verified: true,
+      message: 'Follow verified successfully. Registration complete!',
     });
   } catch (err) {
     console.error('Verify follow error:', err);
