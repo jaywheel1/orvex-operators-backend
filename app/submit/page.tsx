@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
@@ -29,16 +29,7 @@ function SubmitForm() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) {
-      fetchTask();
-    } else {
-      setLoading(false);
-      setError('No task specified');
-    }
-  }, [id]);
-
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       const res = await fetch(`/api/tasks/${id}`);
       const data = await res.json();
@@ -52,7 +43,16 @@ function SubmitForm() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchTask();
+    } else {
+      setLoading(false);
+      setError('No task specified');
+    }
+  }, [id, fetchTask]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();

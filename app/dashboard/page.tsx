@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
@@ -111,15 +111,6 @@ interface ReferralStats {
   total_cp_earned: number;
 }
 
-interface Task {
-  id: string;
-  name: string;
-  description: string;
-  category: string;
-  points: number;
-  status: 'available' | 'pending' | 'completed';
-}
-
 interface LeaderboardEntry {
   rank: number;
   wallet_address: string;
@@ -129,7 +120,6 @@ interface LeaderboardEntry {
 export default function DashboardPage() {
   const { address, isConnected } = useAccount();
   const [userData, setUserData] = useState<UserData | null>(null);
-  const [tasks, setTasks] = useState<Task[]>([]);
   const [campaignLive, setCampaignLive] = useState(false);
   const [loading, setLoading] = useState(true);
   const [leaderboard, setLeaderboard] = useState<LeaderboardEntry[]>([]);
@@ -163,24 +153,7 @@ export default function DashboardPage() {
     });
   };
 
-  useEffect(() => {
-    if (address) {
-      fetchUserData();
-      fetchTasks();
-      checkCampaignStatus();
-      fetchLeaderboard();
-      fetchReferralStats();
-
-      // Refresh leaderboard every 30 minutes
-      const interval = setInterval(() => {
-        fetchLeaderboard();
-      }, 30 * 60 * 1000);
-
-      return () => clearInterval(interval);
-    }
-  }, [address]);
-
-  const fetchUserData = async () => {
+  const fetchUserData = useCallback(async () => {
     try {
       const res = await fetch(`/api/user?wallet=${address}`);
       const data = await res.json();
@@ -192,21 +165,22 @@ export default function DashboardPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [address]);
 
-  const fetchTasks = async () => {
+  const fetchTasks = useCallback(async () => {
     try {
       const res = await fetch(`/api/tasks?wallet=${address}`);
       const data = await res.json();
       if (data.ok) {
-        setTasks(data.data);
+        // Tasks are fetched but not used in this component
+        // They are displayed through the CATEGORIES and getTasksByCategory functions
       }
     } catch (err) {
       console.error('Failed to fetch tasks:', err);
     }
-  };
+  }, [address]);
 
-  const checkCampaignStatus = async () => {
+  const checkCampaignStatus = useCallback(async () => {
     try {
       const res = await fetch('/api/campaign-status');
       const data = await res.json();
@@ -214,9 +188,9 @@ export default function DashboardPage() {
     } catch {
       setCampaignLive(false);
     }
-  };
+  }, []);
 
-  const fetchLeaderboard = async () => {
+  const fetchLeaderboard = useCallback(async () => {
     setLeaderboardLoading(true);
     try {
       const res = await fetch('/api/leaderboard?limit=50');
@@ -238,9 +212,9 @@ export default function DashboardPage() {
     } finally {
       setLeaderboardLoading(false);
     }
-  };
+  }, [address]);
 
-  const fetchReferralStats = async () => {
+  const fetchReferralStats = useCallback(async () => {
     try {
       const res = await fetch(`/api/referral/stats?wallet=${address}`);
       const data = await res.json();
@@ -269,7 +243,24 @@ export default function DashboardPage() {
     } catch (err) {
       console.error('Failed to fetch referral stats:', err);
     }
-  };
+  }, [address]);
+
+  useEffect(() => {
+    if (address) {
+      fetchUserData();
+      fetchTasks();
+      checkCampaignStatus();
+      fetchLeaderboard();
+      fetchReferralStats();
+
+      // Refresh leaderboard every 30 minutes
+      const interval = setInterval(() => {
+        fetchLeaderboard();
+      }, 30 * 60 * 1000);
+
+      return () => clearInterval(interval);
+    }
+  }, [address, fetchUserData, fetchTasks, checkCampaignStatus, fetchLeaderboard, fetchReferralStats]);
 
   const copyReferralLink = async () => {
     if (referralStats?.referral_link) {
@@ -597,7 +588,6 @@ export default function DashboardPage() {
             const categoryTasks = getTasksByCategory(category.id);
             const isExpanded = expandedCategories.has(category.id);
             const isLocked = category.status === 'coming_soon';
-            const activeTasks = categoryTasks.filter(t => t.status === 'active');
 
             return (
               <div

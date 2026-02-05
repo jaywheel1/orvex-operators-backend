@@ -129,7 +129,6 @@ Code: ${verificationCode}
     }
   };
 
-  const steps = ['welcome', 'wallet', 'tweet', 'follow', 'complete'];
   const displaySteps = ['wallet', 'tweet', 'follow', 'complete'];
   const currentIndex = displaySteps.indexOf(step);
 

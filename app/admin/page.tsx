@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
@@ -45,46 +45,48 @@ export default function AdminPage() {
   const [aiReviewEnabled, setAiReviewEnabled] = useState(false);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
 
-  useEffect(() => {
-    if (address) {
-      checkAdminStatus();
-    }
-  }, [address]);
-
-  const checkAdminStatus = async () => {
-    try {
-      const res = await fetch(`/api/admin/check?wallet=${address}`);
-      const data = await res.json();
-      setIsAdmin(data.isAdmin);
-      if (data.isAdmin) {
-        fetchCampaignStatus();
-        fetchUsers();
-        fetchSubmissions();
-      }
-    } catch {
-      setIsAdmin(false);
-    } finally {
-      setLoading(false);
-    }
-  };
-
-  const fetchCampaignStatus = async () => {
+  const fetchCampaignStatus = useCallback(async () => {
     const res = await fetch('/api/campaign-status');
     const data = await res.json();
     setCampaignLive(data.live);
-  };
+  }, []);
 
-  const fetchUsers = async () => {
-    const res = await fetch('/api/admin/users');
+  const fetchUsers = useCallback(async () => {
+    const res = await fetch('/api/admin/users', {
+      headers: { 'x-wallet-address': address || '' },
+    });
     const data = await res.json();
     if (data.ok) setUsers(data.data);
-  };
+  }, [address]);
 
-  const fetchSubmissions = async () => {
+  const fetchSubmissions = useCallback(async () => {
     const res = await fetch(`/api/operator/submissions?operator_id=${address}`);
     const data = await res.json();
     if (data.ok) setSubmissions(data.data);
-  };
+  }, [address]);
+
+  useEffect(() => {
+    const checkAdminStatus = async () => {
+      try {
+        const res = await fetch(`/api/admin/check?wallet=${address}`);
+        const data = await res.json();
+        setIsAdmin(data.isAdmin);
+        if (data.isAdmin) {
+          await fetchCampaignStatus();
+          await fetchUsers();
+          await fetchSubmissions();
+        }
+      } catch {
+        setIsAdmin(false);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    if (address) {
+      checkAdminStatus();
+    }
+  }, [address, fetchCampaignStatus, fetchUsers, fetchSubmissions]);
 
   const toggleCampaign = async () => {
     const res = await fetch('/api/admin/campaign', {
