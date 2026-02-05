@@ -44,15 +44,17 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
             },
             {
               type: 'text',
-              text: `Analyze this screenshot and determine if it shows that the user is following the Twitter/X account @OrvexFi (or a similar Orvex-related account).
+              text: `Analyze this screenshot and determine if it shows proof that the user is following the Twitter/X account @OrvexFi (or a similar Orvex-related account).
 
-Look for:
-1. The "Following" button state (not "Follow")
-2. The account name containing "Orvex" or "OrvexFi"
-3. Any indication this is a Twitter/X profile page
+You must verify ALL of these criteria:
+1. The image is actually a screenshot of a Twitter/X profile page (reject random images, memes, unrelated screenshots, etc.)
+2. The profile shown is @OrvexFi or an Orvex-related account (name containing "Orvex")
+3. The "Following" button is visible and shows the user IS following (not the "Follow" button)
+
+Be STRICT: if the image is not clearly a Twitter/X profile page showing a follow, reject it. If it's an unrelated image, explain what you see and say it's not valid proof.
 
 Respond with JSON only:
-{"verified": true/false, "reason": "brief explanation"}`,
+{"verified": true/false, "reason": "brief explanation of what you see and why it passes or fails"}`,
             },
           ],
         },
@@ -210,12 +212,18 @@ export async function POST(request: NextRequest) {
       }
     }
 
+    if (!aiVerified) {
+      return NextResponse.json({
+        ok: false,
+        error: aiResult.reason || 'Screenshot does not show proof of following @OrvexFi. Please upload a clear screenshot showing you are following the account.',
+        verified: false,
+      });
+    }
+
     return NextResponse.json({
       ok: true,
-      verified: aiVerified,
-      message: aiVerified
-        ? 'Follow verified successfully. Registration complete!'
-        : 'Follow verification failed - screenshot does not show follow',
+      verified: true,
+      message: 'Follow verified successfully. Registration complete!',
     });
   } catch (err) {
     console.error('Verify follow error:', err);
