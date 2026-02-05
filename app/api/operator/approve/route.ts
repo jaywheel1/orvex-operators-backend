@@ -86,7 +86,38 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
     // Determine CP reward amount - use provided value, submission's stored value, or default to 10
     const rewardAmount = cp_reward ?? submission.cp_reward ?? 10;
 
-    // Update the submission to approved
+    // Create CP ledger entry FIRST before approving submission to ensure atomicity
+    let cpLedgerEntry: CpLedgerEntry | null = null;
+
+    if (rewardAmount > 0) {
+      const { data: ledgerData, error: ledgerError } = await supabaseAdmin
+        .from('cp_ledger')
+        .insert({
+          user_id: submission.user_id,
+          amount: rewardAmount,
+          reason: `Task approved: ${submission.task_category} - ${submission.task_type}`,
+          submission_id: submission_id,
+        })
+        .select()
+        .single();
+
+      if (ledgerError) {
+        console.error('CP ledger insert error:', ledgerError);
+        return NextResponse.json(
+          {
+            ok: false,
+            error: 'Failed to create CP ledger entry',
+            details: ledgerError.message,
+            hint: 'CP ledger entry must be created before approval',
+            code: ledgerError.code,
+          },
+          { status: 500 }
+        );
+      }
+      cpLedgerEntry = ledgerData as CpLedgerEntry;
+    }
+
+    // Now update the submission to approved (this is now safe since ledger was created)
     const { data: updated, error: updateError } = await supabaseAdmin
       .from('task_submissions')
       .update({
@@ -111,31 +142,6 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
         },
         { status: 500 }
       );
-    }
-
-    // Create CP ledger entry for the reward
-    let cpLedgerEntry: CpLedgerEntry | null = null;
-
-    if (rewardAmount > 0) {
-      const { data: ledgerData, error: ledgerError } = await supabaseAdmin
-        .from('cp_ledger')
-        .insert({
-          user_id: submission.user_id,
-          amount: rewardAmount,
-          reason: `Task approved: ${submission.task_category} - ${submission.task_type}`,
-          submission_id: submission_id,
-        })
-        .select()
-        .single();
-
-      if (ledgerError) {
-        console.error('CP ledger insert error:', ledgerError);
-        // Note: submission is already approved, so we log the error but don't fail
-        // In production, you might want to use a transaction or compensation logic
-        console.warn('Submission approved but CP ledger entry failed. Manual intervention may be needed.');
-      } else {
-        cpLedgerEntry = ledgerData as CpLedgerEntry;
-      }
     }
 
     return NextResponse.json(

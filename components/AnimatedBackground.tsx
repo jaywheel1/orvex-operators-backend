@@ -123,7 +123,6 @@ export default function AnimatedBackground() {
       ctx.fill();
 
       // Draw trail (gravitational streak)
-      const trailLength = 30;
       const trailAngle = particle.angle - particle.speed * 15;
       const trailX = centerX + Math.cos(trailAngle) * (particle.radius + 5);
       const trailY = centerY + Math.sin(trailAngle) * (particle.radius + 5);

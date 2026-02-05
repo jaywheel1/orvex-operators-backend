@@ -16,7 +16,7 @@ import { createConfig, http } from 'wagmi';
 import { mainnet, base, sepolia } from 'wagmi/chains';
 import '@rainbow-me/rainbowkit/styles.css';
 
-const projectId = 'a0907a623f2adde61e9e244d21c3cfa9';
+const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'a0907a623f2adde61e9e244d21c3cfa9';
 
 const connectors = connectorsForWallets(
   [

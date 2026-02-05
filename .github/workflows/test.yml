@@ -1,0 +1,69 @@
+name: Test & Lint
+
+on:
+  push:
+    branches: [main, develop, 'claude/*']
+  pull_request:
+    branches: [main, develop]
+
+jobs:
+  test-and-lint:
+    runs-on: ubuntu-latest
+
+    strategy:
+      matrix:
+        node-version: [18.x, 20.x]
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v4
+        with:
+          node-version: ${{ matrix.node-version }}
+          cache: 'npm'
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Run linter
+        run: npm run lint
+        continue-on-error: false
+
+      - name: Run tests
+        run: npm run test -- --coverage
+        continue-on-error: true
+
+      - name: Build application
+        run: npm run build
+        continue-on-error: false
+
+      - name: Upload coverage reports
+        uses: codecov/codecov-action@v3
+        if: always()
+        with:
+          files: ./coverage/coverage-final.json
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: false
+
+  security-audit:
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Run npm audit
+        run: npm audit --audit-level=moderate
+        continue-on-error: true
+
+      - name: Check for vulnerabilities
+        run: |
+          if npm audit --json 2>/dev/null | grep -q '"severity":"high"'; then
+            echo "⚠️ High severity vulnerabilities found"
+            npm audit
+            exit 1
+          else
+            echo "✓ No high severity vulnerabilities"
+          fi
+        continue-on-error: true

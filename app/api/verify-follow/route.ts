@@ -114,35 +114,36 @@ export async function POST(request: NextRequest) {
 
     const bytes = await screenshot.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const fileName = `follows/${wallet_address.toLowerCase()}_${Date.now()}.${screenshot.type.split('/')[1] || 'png'}`;
-
-    const { error: uploadError } = await supabaseAdmin.storage
-      .from('verification-screenshots')
-      .upload(fileName, buffer, {
-        contentType: screenshot.type,
-        upsert: true,
-      });
-
-    if (uploadError) {
-      console.error('Screenshot upload error:', uploadError);
-    }
-
     const imageBase64 = buffer.toString('base64');
     const mediaType = screenshot.type || 'image/png';
 
+    // Verify with AI (screenshot is not stored, only processed for verification)
     const aiResult = await verifyFollowWithAI(imageBase64, mediaType);
     const aiVerified = aiResult.verified;
 
     console.log('AI verification result:', aiResult);
 
+    // If verification failed, return error immediately without updating database
+    if (!aiVerified) {
+      return NextResponse.json(
+        {
+          ok: false,
+          error: 'Follow verification failed',
+          details: aiResult.reason || 'The screenshot does not show that you follow @OrvexFi. Please ensure the "Following" button is visible in your screenshot.',
+          verified: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Only update user if verification passed
     const { error: updateError } = await supabaseAdmin
       .from('users')
       .update({
-        follow_verified: aiVerified,
-        follow_verified_at: aiVerified ? new Date().toISOString() : null,
-        follow_screenshot_url: fileName,
-        registration_complete: aiVerified,
-        registration_completed_at: aiVerified ? new Date().toISOString() : null,
+        follow_verified: true,
+        follow_verified_at: new Date().toISOString(),
+        registration_complete: true,
+        registration_completed_at: new Date().toISOString(),
       })
       .eq('wallet_address', wallet_address.toLowerCase());
 

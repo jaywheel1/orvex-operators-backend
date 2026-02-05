@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface Task {
   id: string;
@@ -29,16 +30,7 @@ function SubmitForm() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) {
-      fetchTask();
-    } else {
-      setLoading(false);
-      setError('No task specified');
-    }
-  }, [id]);
-
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       const res = await fetch(`/api/tasks/${id}`);
       const data = await res.json();
@@ -52,7 +44,16 @@ function SubmitForm() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchTask();
+    } else {
+      setLoading(false);
+      setError('No task specified');
+    }
+  }, [id, fetchTask]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -289,7 +290,7 @@ function SubmitForm() {
   );
 }
 
-export default function SubmitPage() {
+function SubmitPageContent() {
   return (
     <div className="min-h-screen bg-[#070713] text-white">
       <AnimatedBackground />
@@ -324,5 +325,13 @@ export default function SubmitPage() {
         <SubmitForm />
       </Suspense>
     </div>
+  );
+}
+
+export default function SubmitPage() {
+  return (
+    <ErrorBoundary>
+      <SubmitPageContent />
+    </ErrorBoundary>
   );
 }

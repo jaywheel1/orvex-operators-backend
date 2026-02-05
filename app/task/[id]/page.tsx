@@ -1,10 +1,11 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
-import { useParams, useRouter } from 'next/navigation';
+import { useParams } from 'next/navigation';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface Task {
   id: string;
@@ -14,10 +15,9 @@ interface Task {
   points: number;
 }
 
-export default function TaskSubmissionPage() {
+function TaskSubmissionPageContent() {
   const params = useParams();
   const id = params?.id as string;
-  const router = useRouter();
   const { address, isConnected } = useAccount();
   const [task, setTask] = useState<Task | null>(null);
   const [proofUrl, setProofUrl] = useState('');
@@ -27,13 +27,7 @@ export default function TaskSubmissionPage() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) {
-      fetchTask();
-    }
-  }, [id]);
-
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       const res = await fetch(`/api/tasks/${id}`);
       const data = await res.json();
@@ -47,7 +41,13 @@ export default function TaskSubmissionPage() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchTask();
+    }
+  }, [id, fetchTask]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -222,5 +222,13 @@ export default function TaskSubmissionPage() {
         </form>
       </main>
     </div>
+  );
+}
+
+export default function TaskSubmissionPage() {
+  return (
+    <ErrorBoundary>
+      <TaskSubmissionPageContent />
+    </ErrorBoundary>
   );
 }
