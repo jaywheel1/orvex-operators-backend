@@ -1,14 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-
-async function verifyAdmin(wallet: string): Promise<boolean> {
-  const { data: profile } = await supabaseAdmin
-    .from('profiles')
-    .select('role')
-    .eq('id', wallet.toLowerCase())
-    .single();
-  return profile?.role === 'admin';
-}
+import { verifyAdmin } from '@/lib/admin-wallets';
 
 // GET all tasks (admin view)
 export async function GET(request: NextRequest) {

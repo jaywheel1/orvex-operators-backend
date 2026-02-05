@@ -1,17 +1,12 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { verifyAdmin } from '@/lib/admin-wallets';
 
 export async function POST(request: NextRequest) {
   try {
     const { user_id, ban, admin_wallet } = await request.json();
 
-    const { data: profile } = await supabaseAdmin
-      .from('profiles')
-      .select('role')
-      .eq('id', admin_wallet?.toLowerCase())
-      .single();
-
-    if (profile?.role !== 'admin') {
+    if (!admin_wallet || !(await verifyAdmin(admin_wallet))) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 403 });
     }
 

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabaseAdmin } from '@/lib/supabase';
+import { verifyAdmin } from '@/lib/admin-wallets';
 
 export async function GET(request: NextRequest) {
   const { searchParams } = new URL(request.url);
@@ -9,13 +9,6 @@ export async function GET(request: NextRequest) {
     return NextResponse.json({ isAdmin: false });
   }
 
-  const { data: profile } = await supabaseAdmin
-    .from('profiles')
-    .select('role')
-    .eq('id', wallet.toLowerCase())
-    .single();
-
-  const isAdmin = profile?.role === 'admin' || profile?.role === 'operator';
-
+  const isAdmin = await verifyAdmin(wallet);
   return NextResponse.json({ isAdmin });
 }
