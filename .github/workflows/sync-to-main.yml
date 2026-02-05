@@ -1,0 +1,23 @@
+name: Sync vercel-main to main
+
+on:
+  push:
+    branches:
+      - claude/vercel-main-BkzVK
+
+jobs:
+  sync:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Configure git
+        run: |
+          git config --global user.name "github-actions"
+          git config --global user.email "actions@github.com"
+
+      - name: Sync to main
+        run: |
+          git push origin claude/vercel-main-BkzVK:main -f
