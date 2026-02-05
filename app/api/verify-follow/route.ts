@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { isWhitelisted } from '@/lib/whitelist';
-import { isRegistrationAiEnabled, parseAiJson } from '@/lib/ai-verify';
+import { isRegistrationAiEnabled } from '@/lib/ai-verify';
 import Anthropic from '@anthropic-ai/sdk';
 
 const REFERRAL_CP_REWARD = 1000;
@@ -26,8 +26,8 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
   try {
     const anthropic = getAnthropicClient();
     const response = await anthropic.messages.create({
-      model: 'claude-haiku-4-5-20251001',
-      max_tokens: 256,
+      model: 'claude-sonnet-4-20250514',
+      max_tokens: 300,
       messages: [
         {
           role: 'user',
@@ -42,19 +42,7 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
             },
             {
               type: 'text',
-              text: `Look at this screenshot. Does it show that someone is following the @OrvexFi account (or an account named "Orvex") on Twitter/X?
-
-The ONLY things that matter:
-1. The screenshot is from Twitter/X (desktop or mobile - both are fine)
-2. An account named "Orvex" or with the handle @OrvexFi is visible on the page
-3. A "Following" button is visible (NOT a "Follow" button - "Following" means the user already follows them)
-
-IMPORTANT: On mobile, the user's own handle may NOT be visible - that's fine. You do NOT need to see who is logged in. Just confirm the Orvex profile is shown and the "Following" button state is active.
-
-If the image is clearly not from Twitter/X at all (e.g. a random meme, a different website, etc.), reject it.
-
-Respond with JSON only:
-{"verified": true/false, "reason": "brief explanation"}`,
+              text: 'List all visible text and button labels you can see in this screenshot. Be thorough - include usernames, handles, button text, profile names, tab labels, and any other text visible in the image.',
             },
           ],
         },
@@ -62,14 +50,40 @@ Respond with JSON only:
     });
 
     const textContent = response.content.find(c => c.type === 'text');
-    if (textContent && textContent.type === 'text') {
-      const result = parseAiJson(textContent.text);
-      if (result) return result;
+    if (!textContent || textContent.type !== 'text') {
+      return { verified: false, reason: 'AI could not read the screenshot. Please try again.' };
     }
-    return { verified: false, reason: 'No response from AI verification' };
+
+    const extractedText = textContent.text.toLowerCase();
+    console.log('AI extracted text from screenshot:', extractedText.slice(0, 500));
+
+    // Check for Orvex account presence
+    const hasOrvex = extractedText.includes('orvex') || extractedText.includes('@orvexfi');
+    // Check for "Following" button (not just "Follow")
+    const hasFollowing = extractedText.includes('following');
+    // Check it looks like Twitter/X
+    const isTwitter = extractedText.includes('twitter') || extractedText.includes('x.com') ||
+      extractedText.includes('posts') || extractedText.includes('replies') ||
+      extractedText.includes('followers') || extractedText.includes('repost') ||
+      extractedText.includes('home') || extractedText.includes('explore') ||
+      extractedText.includes('grok') || extractedText.includes('premium');
+
+    if (!isTwitter) {
+      return { verified: false, reason: 'This does not appear to be a Twitter/X screenshot. Please upload a screenshot from Twitter/X.' };
+    }
+
+    if (!hasOrvex) {
+      return { verified: false, reason: 'Could not find the @OrvexFi account in the screenshot. Please upload a screenshot of the @OrvexFi profile page.' };
+    }
+
+    if (!hasFollowing) {
+      return { verified: false, reason: 'Could not find the "Following" button in the screenshot. Make sure you are following @OrvexFi and the "Following" button is visible.' };
+    }
+
+    return { verified: true, reason: 'Verified: Orvex profile with Following button detected.' };
   } catch (error) {
     console.error('AI verification error:', error);
-    return { verified: false, reason: 'AI verification failed - please try again' };
+    return { verified: false, reason: 'AI verification failed - please try again. If this persists, contact support.' };
   }
 }
 
