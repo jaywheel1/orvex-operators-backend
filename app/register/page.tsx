@@ -90,7 +90,7 @@ Code: ${verificationCode}
       if (data.ok) {
         setStep('follow');
       } else {
-        setError(data.error || 'Verification failed');
+        setError(data.details || data.error || 'Verification failed');
       }
     } catch {
       setError('Failed to verify tweet');
@@ -121,7 +121,7 @@ Code: ${verificationCode}
       if (data.ok) {
         setStep('complete');
       } else {
-        setError(data.error || 'Verification failed');
+        setError(data.details || data.error || 'Verification failed');
       }
     } catch {
       setError('Failed to verify follow');
