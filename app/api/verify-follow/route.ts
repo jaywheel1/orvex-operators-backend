@@ -61,16 +61,6 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
     const hasOrvex = extractedText.includes('orvex') || extractedText.includes('@orvexfi');
     // Check for "Following" button (not just "Follow")
     const hasFollowing = extractedText.includes('following');
-    // Check it looks like Twitter/X
-    const isTwitter = extractedText.includes('twitter') || extractedText.includes('x.com') ||
-      extractedText.includes('posts') || extractedText.includes('replies') ||
-      extractedText.includes('followers') || extractedText.includes('repost') ||
-      extractedText.includes('home') || extractedText.includes('explore') ||
-      extractedText.includes('grok') || extractedText.includes('premium');
-
-    if (!isTwitter) {
-      return { verified: false, reason: 'This does not appear to be a Twitter/X screenshot. Please upload a screenshot from Twitter/X.' };
-    }
 
     if (!hasOrvex) {
       return { verified: false, reason: 'Could not find the @OrvexFi account in the screenshot. Please upload a screenshot of the @OrvexFi profile page.' };
