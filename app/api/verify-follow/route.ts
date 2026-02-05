@@ -26,7 +26,7 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
   try {
     const anthropic = getAnthropicClient();
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 256,
       messages: [
         {
@@ -104,12 +104,18 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Block re-verification unless whitelisted
-    if (user.follow_verified && !isWhitelisted(wallet_address)) {
-      return NextResponse.json(
-        { ok: false, error: 'Follow already verified' },
-        { status: 400 }
-      );
+    // Block re-verification unless whitelisted or admin testing
+    // Allow re-verification so admins can test AI when toggling settings
+    if (user.follow_verified && user.registration_complete && !isWhitelisted(wallet_address)) {
+      const aiEnabled = await isRegistrationAiEnabled();
+      if (!aiEnabled) {
+        return NextResponse.json(
+          { ok: false, error: 'Registration already complete for this wallet. Connect a different wallet to register again.' },
+          { status: 400 }
+        );
+      }
+      // When AI is enabled, allow re-submission so screenshots are actually checked
+      console.log('Re-verification allowed: AI is enabled and user wants to re-verify follow');
     }
 
     const bytes = await screenshot.arrayBuffer();
@@ -125,11 +131,11 @@ export async function POST(request: NextRequest) {
 
     // If verification failed, return error immediately without updating database
     if (!aiVerified) {
+      const userMessage = aiResult.reason || 'The screenshot does not show that you follow @OrvexFi. Please ensure the "Following" button is visible in your screenshot.';
       return NextResponse.json(
         {
           ok: false,
-          error: 'Follow verification failed',
-          details: aiResult.reason || 'The screenshot does not show that you follow @OrvexFi. Please ensure the "Following" button is visible in your screenshot.',
+          error: userMessage,
           verified: false,
         },
         { status: 400 }

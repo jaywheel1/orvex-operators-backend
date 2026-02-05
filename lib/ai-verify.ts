@@ -44,7 +44,7 @@ export async function verifyScreenshotTask(
     prompt += `\nBe reasonably lenient - if the screenshot plausibly shows task completion, mark as verified.\nRespond with JSON only: {"verified": true/false, "reason": "brief explanation"}`;
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 256,
       messages: [{
         role: 'user',
@@ -92,7 +92,7 @@ export async function verifyLinkTask(
     prompt += `\nConsider:\n- Is the URL format valid for the expected platform (twitter.com/x.com)?\n- Does it look like a real tweet/post URL?\n- Be reasonably lenient.\n\nRespond with JSON only: {"verified": true/false, "reason": "brief explanation"}`;
 
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
+      model: 'claude-haiku-4-5-20251001',
       max_tokens: 256,
       messages: [{
         role: 'user',
