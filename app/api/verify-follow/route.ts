@@ -1,7 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { isWhitelisted } from '@/lib/whitelist';
-import { isRegistrationAiEnabled } from '@/lib/ai-verify';
+import { isRegistrationAiEnabled, parseAiJson } from '@/lib/ai-verify';
 import Anthropic from '@anthropic-ai/sdk';
 
 const REFERRAL_CP_REWARD = 1000;
@@ -63,10 +63,10 @@ Respond with JSON only:
 
     const textContent = response.content.find(c => c.type === 'text');
     if (textContent && textContent.type === 'text') {
-      const parsed = JSON.parse(textContent.text);
-      return { verified: parsed.verified, reason: parsed.reason };
+      const result = parseAiJson(textContent.text);
+      if (result) return result;
     }
-    return { verified: false, reason: 'Could not parse AI response' };
+    return { verified: false, reason: 'No response from AI verification' };
   } catch (error) {
     console.error('AI verification error:', error);
     return { verified: false, reason: 'AI verification failed - please try again' };

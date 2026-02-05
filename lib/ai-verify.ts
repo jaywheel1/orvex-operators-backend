@@ -7,6 +7,31 @@ function getAnthropicClient() {
   return new Anthropic({ apiKey });
 }
 
+/** Parse AI response JSON, handling markdown code blocks */
+export function parseAiJson(text: string): { verified: boolean; reason: string } | null {
+  let jsonText = text.trim();
+  // Strip markdown code blocks (```json ... ``` or ``` ... ```)
+  const codeBlockMatch = jsonText.match(/```(?:json)?\s*([\s\S]*?)```/);
+  if (codeBlockMatch) {
+    jsonText = codeBlockMatch[1].trim();
+  }
+  try {
+    const parsed = JSON.parse(jsonText);
+    return { verified: !!parsed.verified, reason: parsed.reason || '' };
+  } catch {
+    // Fallback: look for "verified": true/false pattern in raw text
+    const verifiedMatch = text.match(/"verified"\s*:\s*(true|false)/i);
+    const reasonMatch = text.match(/"reason"\s*:\s*"([^"]+)"/);
+    if (verifiedMatch) {
+      return {
+        verified: verifiedMatch[1].toLowerCase() === 'true',
+        reason: reasonMatch ? reasonMatch[1] : 'Parsed from AI response',
+      };
+    }
+    return null;
+  }
+}
+
 export async function isAiReviewEnabled(): Promise<boolean> {
   const { data } = await supabaseAdmin
     .from('settings')
@@ -64,8 +89,8 @@ export async function verifyScreenshotTask(
 
     const textContent = response.content.find(c => c.type === 'text');
     if (textContent?.type === 'text') {
-      const parsed = JSON.parse(textContent.text);
-      return { verified: parsed.verified, reason: parsed.reason };
+      const result = parseAiJson(textContent.text);
+      if (result) return result;
     }
     return { verified: false, reason: 'Could not parse AI response' };
   } catch (error) {
@@ -102,8 +127,8 @@ export async function verifyLinkTask(
 
     const textContent = response.content.find(c => c.type === 'text');
     if (textContent?.type === 'text') {
-      const parsed = JSON.parse(textContent.text);
-      return { verified: parsed.verified, reason: parsed.reason };
+      const result = parseAiJson(textContent.text);
+      if (result) return result;
     }
     return { verified: false, reason: 'Could not parse AI response' };
   } catch (error) {
