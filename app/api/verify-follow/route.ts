@@ -3,11 +3,16 @@ import { supabaseAdmin } from '@/lib/supabase';
 import { isWhitelisted } from '@/lib/whitelist';
 import Anthropic from '@anthropic-ai/sdk';
 
-const anthropic = new Anthropic({
-  apiKey: process.env.ANTHROPIC_API_KEY,
-});
-
 const REFERRAL_CP_REWARD = 1000;
+
+// Lazy-load Anthropic client only when needed
+function getAnthropicClient() {
+  const apiKey = process.env.ANTHROPIC_API_KEY;
+  if (!apiKey) {
+    throw new Error('ANTHROPIC_API_KEY not configured');
+  }
+  return new Anthropic({ apiKey });
+}
 const MAX_REFERRALS = 5;
 
 // Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
@@ -21,6 +26,7 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
   }
 
   try {
+    const anthropic = getAnthropicClient();
     const response = await anthropic.messages.create({
       model: 'claude-sonnet-4-20250514',
       max_tokens: 256,
