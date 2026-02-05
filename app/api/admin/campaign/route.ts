@@ -1,18 +1,22 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { requireAdminAuth } from '@/lib/auth';
 
 export async function POST(request: NextRequest) {
   try {
-    const { live, admin_wallet } = await request.json();
+    // Verify admin authentication
+    const auth = await requireAdminAuth(request);
+    if (!auth.authorized) {
+      return auth.response!;
+    }
 
-    const { data: profile } = await supabaseAdmin
-      .from('profiles')
-      .select('role')
-      .eq('id', admin_wallet?.toLowerCase())
-      .single();
+    const { live } = await request.json();
 
-    if (profile?.role !== 'admin') {
-      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 403 });
+    if (typeof live !== 'boolean') {
+      return NextResponse.json(
+        { ok: false, error: 'Invalid request parameters' },
+        { status: 400 }
+      );
     }
 
     const { error } = await supabaseAdmin

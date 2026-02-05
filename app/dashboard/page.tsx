@@ -247,22 +247,24 @@ export default function DashboardPage() {
       if (data.ok) {
         setReferralStats(data.data);
 
-        // Check for new referrals
-        const storageKey = `orvex_last_seen_referrals_${address?.toLowerCase()}`;
-        const hasVisitedKey = `orvex_visited_${address?.toLowerCase()}`;
-        const lastSeenCount = parseInt(localStorage.getItem(storageKey) || '0', 10);
-        const hasVisitedBefore = localStorage.getItem(hasVisitedKey) === 'true';
-        const currentCount = data.data.verified_referrals || 0;
+        // Check for new referrals (client-side only)
+        if (typeof window !== 'undefined') {
+          const storageKey = `orvex_last_seen_referrals_${address?.toLowerCase()}`;
+          const hasVisitedKey = `orvex_visited_${address?.toLowerCase()}`;
+          const lastSeenCount = parseInt(localStorage.getItem(storageKey) || '0', 10);
+          const hasVisitedBefore = localStorage.getItem(hasVisitedKey) === 'true';
+          const currentCount = data.data.verified_referrals || 0;
 
-        if (hasVisitedBefore && currentCount > lastSeenCount) {
-          // New referrals since last visit
-          setNewReferralCount(currentCount - lastSeenCount);
-          setShowNewReferralNotification(true);
+          if (hasVisitedBefore && currentCount > lastSeenCount) {
+            // New referrals since last visit
+            setNewReferralCount(currentCount - lastSeenCount);
+            setShowNewReferralNotification(true);
+          }
+
+          // Update last seen count and mark as visited
+          localStorage.setItem(storageKey, currentCount.toString());
+          localStorage.setItem(hasVisitedKey, 'true');
         }
-
-        // Update last seen count and mark as visited
-        localStorage.setItem(storageKey, currentCount.toString());
-        localStorage.setItem(hasVisitedKey, 'true');
       }
     } catch (err) {
       console.error('Failed to fetch referral stats:', err);

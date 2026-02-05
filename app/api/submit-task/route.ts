@@ -1,6 +1,10 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 
+// File upload constraints
+const MAX_FILE_SIZE = 10 * 1024 * 1024; // 10MB
+const ALLOWED_IMAGE_TYPES = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+
 export async function POST(request: NextRequest) {
   try {
     const formData = await request.formData();
@@ -22,6 +26,35 @@ export async function POST(request: NextRequest) {
         { ok: false, error: 'Please provide a proof URL or screenshot' },
         { status: 400 }
       );
+    }
+
+    // Validate screenshot if provided
+    if (screenshot) {
+      if (screenshot.size > MAX_FILE_SIZE) {
+        return NextResponse.json(
+          { ok: false, error: `File size exceeds ${MAX_FILE_SIZE / 1024 / 1024}MB limit` },
+          { status: 400 }
+        );
+      }
+
+      if (!ALLOWED_IMAGE_TYPES.includes(screenshot.type)) {
+        return NextResponse.json(
+          { ok: false, error: 'Invalid file type. Allowed: JPEG, PNG, GIF, WebP' },
+          { status: 400 }
+        );
+      }
+    }
+
+    // Validate proof URL format if provided
+    if (proof_url) {
+      try {
+        new URL(proof_url);
+      } catch {
+        return NextResponse.json(
+          { ok: false, error: 'Invalid proof URL format' },
+          { status: 400 }
+        );
+      }
     }
 
     // Get user by wallet address
@@ -80,15 +113,7 @@ export async function POST(request: NextRequest) {
         .eq('id', existingSubmission.id);
     }
 
-    // Handle screenshot upload (store as base64 for simplicity)
-    let screenshot_data: string | null = null;
-    if (screenshot) {
-      const bytes = await screenshot.arrayBuffer();
-      const buffer = Buffer.from(bytes);
-      screenshot_data = `data:${screenshot.type};base64,${buffer.toString('base64')}`;
-    }
-
-    // Create submission
+    // Create submission without storing screenshot data
     const { data: submission, error: insertError } = await supabaseAdmin
       .from('task_submissions')
       .insert({
@@ -96,10 +121,11 @@ export async function POST(request: NextRequest) {
         task_id: task_id,
         task_category: task.category,
         task_type: proof_url ? 'link' : 'screenshot',
-        proof: proof_url || screenshot_data,
+        proof: proof_url || 'screenshot_provided', // Just mark that a screenshot was provided
         link_url: proof_url || null,
         status: 'pending',
         cp_reward: task.points,
+        wallet_address: wallet_address.toLowerCase(), // Capture wallet for reference
       })
       .select()
       .single();

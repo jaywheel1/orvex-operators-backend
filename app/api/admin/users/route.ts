@@ -1,8 +1,15 @@
-import { NextResponse } from 'next/server';
+import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { requireAdminAuth } from '@/lib/auth';
 
-export async function GET() {
+export async function GET(request: NextRequest) {
   try {
+    // Verify admin authentication
+    const auth = await requireAdminAuth(request);
+    if (!auth.authorized) {
+      return auth.response!;
+    }
+
     const { data, error } = await supabaseAdmin
       .from('users')
       .select('*')
