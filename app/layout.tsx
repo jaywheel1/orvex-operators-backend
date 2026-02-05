@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import AdminFooterLink from "@/components/AdminFooterLink";
 
 export const metadata: Metadata = {
   title: "Orvex Operators",
@@ -20,7 +21,10 @@ export default function RootLayout({
         <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
       </head>
       <body className="antialiased font-poppins">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <AdminFooterLink />
+        </Providers>
       </body>
     </html>
   );
