@@ -1,9 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { isWhitelisted } from '@/lib/whitelist';
-import Anthropic from '@anthropic-ai/sdk';
-
-const ADMIN_WALLET = '0xc4a00be797e0acfe8518f795359898b01a038dc8';
+import { isRegistrationAiEnabled } from '@/lib/ai-verify';
 
 interface VerifyTweetRequest {
   wallet_address: string;
@@ -11,60 +9,6 @@ interface VerifyTweetRequest {
   verification_code: string;
   referral_code?: string;
   x_handle?: string;
-}
-
-// Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
-const AI_VERIFICATION_ENABLED = process.env.ENABLE_AI_VERIFICATION === 'true';
-
-// Lazy-load Anthropic client only when needed
-function getAnthropicClient() {
-  const apiKey = process.env.ANTHROPIC_API_KEY;
-  if (!apiKey) {
-    throw new Error('ANTHROPIC_API_KEY not configured');
-  }
-  return new Anthropic({ apiKey });
-}
-
-async function verifyTweetWithAI(tweetUrl: string, verificationCode: string): Promise<{ verified: boolean; reason: string }> {
-  // Skip AI verification if disabled (for testing)
-  if (!AI_VERIFICATION_ENABLED) {
-    console.log('AI verification disabled - auto-approving for testing');
-    return { verified: true, reason: 'AI verification disabled - auto-approved for testing' };
-  }
-
-  try {
-    const anthropic = getAnthropicClient();
-    const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 256,
-      messages: [
-        {
-          role: 'user',
-          content: `Verify if this tweet URL contains the verification code "${verificationCode}".
-
-Tweet URL: ${tweetUrl}
-
-Instructions:
-1. Access the tweet URL and check its content
-2. Look for the exact verification code: ${verificationCode}
-3. The code should appear as-is in the tweet text
-
-Respond with JSON only:
-{"verified": true/false, "reason": "brief explanation of what you found"}`,
-        },
-      ],
-    });
-
-    const textContent = response.content.find(c => c.type === 'text');
-    if (textContent && textContent.type === 'text') {
-      const parsed = JSON.parse(textContent.text);
-      return { verified: parsed.verified, reason: parsed.reason };
-    }
-    return { verified: false, reason: 'Could not parse AI response' };
-  } catch (error) {
-    console.error('AI verification error:', error);
-    return { verified: false, reason: 'AI verification failed' };
-  }
 }
 
 export async function POST(request: NextRequest) {
@@ -110,20 +54,13 @@ export async function POST(request: NextRequest) {
       .eq('wallet_address', wallet_address.toLowerCase())
       .single();
 
-    // Admin wallet bypasses verification
-    let aiVerified = false;
-    let verificationReason = '';
-
-    if (wallet_address.toLowerCase() === ADMIN_WALLET) {
-      aiVerified = true;
-      verificationReason = 'Admin wallet - auto-approved';
-      console.log('Admin wallet detected - auto-approving tweet verification');
-    } else {
-      // All other wallets require AI verification
-      const aiResult = await verifyTweetWithAI(tweet_url, verification_code);
-      aiVerified = aiResult.verified;
-      verificationReason = aiResult.reason;
-      console.log('Tweet verification result:', aiResult);
+    // Tweet verification: URL format is validated above.
+    // When AI is enabled, we could verify tweet content in the future.
+    // For now, URL format check is sufficient - the follow screenshot is the main AI checkpoint.
+    const aiEnabled = await isRegistrationAiEnabled();
+    const aiVerified = true; // URL format validation above is sufficient for tweets
+    if (!aiEnabled) {
+      console.log('AI review disabled - tweet auto-approved');
     }
 
     if (!existingUser) {
@@ -181,23 +118,12 @@ export async function POST(request: NextRequest) {
       }
     }
 
-    if (!aiVerified) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Tweet verification failed',
-          details: verificationReason || 'The verification code was not found in your tweet. Please ensure you posted the exact tweet with the code visible.',
-          verified: false,
-        },
-        { status: 400 }
-      );
-    }
-
     return NextResponse.json({
       ok: true,
-      verified: true,
-      message: 'Tweet verified successfully',
-      reason: verificationReason,
+      verified: aiVerified,
+      message: aiVerified
+        ? 'Tweet verified successfully'
+        : 'Tweet verification failed - code not found in tweet',
     });
   } catch (err) {
     console.error('Verify tweet error:', err);

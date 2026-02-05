@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { isWhitelisted } from '@/lib/whitelist';
+import { isRegistrationAiEnabled } from '@/lib/ai-verify';
 import Anthropic from '@anthropic-ai/sdk';
 
 const REFERRAL_CP_REWARD = 1000;
 
-// Lazy-load Anthropic client only when needed
 function getAnthropicClient() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -15,14 +15,12 @@ function getAnthropicClient() {
 }
 const MAX_REFERRALS = 5;
 
-// Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
-const AI_VERIFICATION_ENABLED = process.env.ENABLE_AI_VERIFICATION === 'true';
-
 async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promise<{ verified: boolean; reason: string }> {
-  // Skip AI verification if disabled (for testing)
-  if (!AI_VERIFICATION_ENABLED) {
-    console.log('AI verification disabled - auto-approving for testing');
-    return { verified: true, reason: 'AI verification disabled - auto-approved for testing' };
+  // Check the registration AI toggle from admin panel settings
+  const aiEnabled = await isRegistrationAiEnabled();
+  if (!aiEnabled) {
+    console.log('AI review disabled in admin panel - auto-approving');
+    return { verified: true, reason: 'AI review disabled - auto-approved' };
   }
 
   try {
@@ -44,15 +42,17 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
             },
             {
               type: 'text',
-              text: `Analyze this screenshot and determine if it shows that the user is following the Twitter/X account @OrvexFi (or a similar Orvex-related account).
+              text: `Analyze this screenshot and determine if it shows proof that the user is following the Twitter/X account @OrvexFi (or a similar Orvex-related account).
 
-Look for:
-1. The "Following" button state (not "Follow")
-2. The account name containing "Orvex" or "OrvexFi"
-3. Any indication this is a Twitter/X profile page
+You must verify ALL of these criteria:
+1. The image is actually a screenshot of a Twitter/X profile page (reject random images, memes, unrelated screenshots, etc.)
+2. The profile shown is @OrvexFi or an Orvex-related account (name containing "Orvex")
+3. The "Following" button is visible and shows the user IS following (not the "Follow" button)
+
+Be STRICT: if the image is not clearly a Twitter/X profile page showing a follow, reject it. If it's an unrelated image, explain what you see and say it's not valid proof.
 
 Respond with JSON only:
-{"verified": true/false, "reason": "brief explanation"}`,
+{"verified": true/false, "reason": "brief explanation of what you see and why it passes or fails"}`,
             },
           ],
         },
@@ -67,7 +67,7 @@ Respond with JSON only:
     return { verified: false, reason: 'Could not parse AI response' };
   } catch (error) {
     console.error('AI verification error:', error);
-    return { verified: false, reason: 'AI verification failed' };
+    return { verified: false, reason: 'AI verification failed - please try again' };
   }
 }
 
@@ -158,7 +158,6 @@ export async function POST(request: NextRequest) {
     // Process referral if registration just completed and user was referred
     if (aiVerified && !user.registration_complete && user.referred_by) {
       try {
-        // Find the referrer by their referral code
         const { data: referrer } = await supabaseAdmin
           .from('users')
           .select('id, wallet_address, points')
@@ -166,7 +165,6 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (referrer) {
-          // Check if referrer hasn't hit the cap
           const { count: existingReferrals } = await supabaseAdmin
             .from('referrals')
             .select('*', { count: 'exact', head: true })
@@ -174,7 +172,6 @@ export async function POST(request: NextRequest) {
             .eq('verified', true);
 
           if ((existingReferrals || 0) < MAX_REFERRALS) {
-            // Create referral record
             await supabaseAdmin
               .from('referrals')
               .insert({
@@ -187,13 +184,11 @@ export async function POST(request: NextRequest) {
                 cp_awarded: REFERRAL_CP_REWARD,
               });
 
-            // Award CP to referrer
             await supabaseAdmin
               .from('users')
               .update({ points: (referrer.points || 0) + REFERRAL_CP_REWARD })
               .eq('id', referrer.id);
 
-            // Log to CP ledger
             await supabaseAdmin
               .from('cp_ledger')
               .insert({
@@ -206,9 +201,16 @@ export async function POST(request: NextRequest) {
           }
         }
       } catch (refError) {
-        // Log but don't fail the registration
         console.error('Referral processing error:', refError);
       }
+    }
+
+    if (!aiVerified) {
+      return NextResponse.json({
+        ok: false,
+        error: aiResult.reason || 'Screenshot does not show proof of following @OrvexFi. Please upload a clear screenshot showing you are following the account.',
+        verified: false,
+      });
     }
 
     return NextResponse.json({

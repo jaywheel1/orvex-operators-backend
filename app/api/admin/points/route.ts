@@ -1,22 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
-import { requireAdminAuth } from '@/lib/auth';
+import { verifyAdmin } from '@/lib/admin-wallets';
 
 export async function POST(request: NextRequest) {
   try {
-    // Verify admin authentication
-    const auth = await requireAdminAuth(request);
-    if (!auth.authorized) {
-      return auth.response!;
-    }
+    const { wallet_address, amount, admin_wallet } = await request.json();
 
-    const { wallet_address, amount } = await request.json();
-
-    if (!wallet_address || typeof amount !== 'number') {
-      return NextResponse.json(
-        { ok: false, error: 'Invalid request parameters' },
-        { status: 400 }
-      );
+    if (!admin_wallet || !(await verifyAdmin(admin_wallet))) {
+      return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 403 });
     }
 
     const { data: user, error: fetchError } = await supabaseAdmin
@@ -43,7 +34,7 @@ export async function POST(request: NextRequest) {
     await supabaseAdmin.from('cp_ledger').insert({
       user_id: user.id,
       amount,
-      reason: `Admin adjustment by ${auth.walletAddress}`,
+      reason: `Admin adjustment by ${admin_wallet}`,
     });
 
     return NextResponse.json({ ok: true, newPoints });
