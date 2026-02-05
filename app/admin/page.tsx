@@ -72,6 +72,7 @@ export default function AdminPage() {
   const [pointsAmount, setPointsAmount] = useState('');
   const [pointsAction, setPointsAction] = useState<'add' | 'remove'>('add');
   const [aiReviewEnabled, setAiReviewEnabled] = useState(false);
+  const [aiRegistrationEnabled, setAiRegistrationEnabled] = useState(false);
   const [reviewingId, setReviewingId] = useState<string | null>(null);
 
   // Tasks management state
@@ -137,7 +138,10 @@ export default function AdminPage() {
     try {
       const res = await fetch(`/api/admin/settings?wallet=${address}`);
       const data = await res.json();
-      if (data.ok) setAiReviewEnabled(data.ai_review_enabled);
+      if (data.ok) {
+        setAiReviewEnabled(data.ai_review_enabled);
+        setAiRegistrationEnabled(data.ai_registration_enabled);
+      }
     } catch {
       // ignore
     }
@@ -167,9 +171,29 @@ export default function AdminPage() {
         }),
       });
       const data = await res.json();
-      if (!data.ok) setAiReviewEnabled(!newValue); // revert on failure
+      if (!data.ok) setAiReviewEnabled(!newValue);
     } catch {
-      setAiReviewEnabled(!newValue); // revert on failure
+      setAiReviewEnabled(!newValue);
+    }
+  };
+
+  const toggleAiRegistration = async () => {
+    const newValue = !aiRegistrationEnabled;
+    setAiRegistrationEnabled(newValue);
+    try {
+      const res = await fetch('/api/admin/settings', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          admin_wallet: address,
+          key: 'ai_registration_enabled',
+          value: String(newValue),
+        }),
+      });
+      const data = await res.json();
+      if (!data.ok) setAiRegistrationEnabled(!newValue);
+    } catch {
+      setAiRegistrationEnabled(!newValue);
     }
   };
 
@@ -521,7 +545,7 @@ export default function AdminPage() {
               <h2 className="text-3xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent mb-8">
                 Campaign Control
               </h2>
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 max-w-2xl">
+              <div className="grid grid-cols-1 md:grid-cols-3 gap-6 max-w-4xl">
                 <div className="glass-card p-8 rounded-2xl hover-lift">
                   <div className="flex items-center justify-between mb-8">
                     <span className="text-lg text-[#b6bbff]/80">Campaign Status</span>
@@ -548,7 +572,7 @@ export default function AdminPage() {
 
                 <div className="glass-card p-8 rounded-2xl hover-lift">
                   <div className="flex items-center justify-between mb-8">
-                    <span className="text-lg text-[#b6bbff]/80">AI Review</span>
+                    <span className="text-lg text-[#b6bbff]/80">Task AI Review</span>
                     <div className="flex items-center gap-3">
                       <div className={`relative w-4 h-4 rounded-full ${aiReviewEnabled ? 'bg-[#b9f0d7]' : 'bg-[#7d85d0]/40'}`}>
                         {aiReviewEnabled && <div className="absolute inset-0 rounded-full bg-[#b9f0d7] animate-ping opacity-50" />}
@@ -566,10 +590,37 @@ export default function AdminPage() {
                         : 'bg-gradient-to-r from-[#b9f0d7] to-[#6265fe] text-white hover:shadow-[0_0_30px_rgba(185,240,215,0.4)] hover:scale-[1.02]'
                     }`}
                   >
-                    {aiReviewEnabled ? 'Disable AI Review' : 'Enable AI Review'}
+                    {aiReviewEnabled ? 'Disable' : 'Enable'}
                   </button>
                   <p className="text-xs text-[#b6bbff]/40 mt-3 text-center">
-                    When enabled, submissions are auto-verified by AI
+                    AI auto-verifies task submissions
+                  </p>
+                </div>
+
+                <div className="glass-card p-8 rounded-2xl hover-lift">
+                  <div className="flex items-center justify-between mb-8">
+                    <span className="text-lg text-[#b6bbff]/80">Registration AI</span>
+                    <div className="flex items-center gap-3">
+                      <div className={`relative w-4 h-4 rounded-full ${aiRegistrationEnabled ? 'bg-[#b9f0d7]' : 'bg-[#7d85d0]/40'}`}>
+                        {aiRegistrationEnabled && <div className="absolute inset-0 rounded-full bg-[#b9f0d7] animate-ping opacity-50" />}
+                      </div>
+                      <span className={`font-bold text-lg ${aiRegistrationEnabled ? 'text-[#b9f0d7]' : 'text-[#7d85d0]'}`}>
+                        {aiRegistrationEnabled ? 'ON' : 'OFF'}
+                      </span>
+                    </div>
+                  </div>
+                  <button
+                    onClick={toggleAiRegistration}
+                    className={`w-full py-4 rounded-xl font-semibold transition-all duration-300 ${
+                      aiRegistrationEnabled
+                        ? 'bg-[#ff5252]/20 text-[#ff5252] border border-[#ff5252]/30 hover:bg-[#ff5252]/30 hover:shadow-[0_0_20px_rgba(255,82,82,0.3)]'
+                        : 'bg-gradient-to-r from-[#b9f0d7] to-[#6265fe] text-white hover:shadow-[0_0_30px_rgba(185,240,215,0.4)] hover:scale-[1.02]'
+                    }`}
+                  >
+                    {aiRegistrationEnabled ? 'Disable' : 'Enable'}
+                  </button>
+                  <p className="text-xs text-[#b6bbff]/40 mt-3 text-center">
+                    AI verifies follow screenshots on signup
                   </p>
                 </div>
               </div>

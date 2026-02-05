@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
   const { data } = await supabaseAdmin
     .from('settings')
     .select('key, value')
-    .in('key', ['ai_review_enabled']);
+    .in('key', ['ai_review_enabled', 'ai_registration_enabled']);
 
   const settings: Record<string, string> = {};
   data?.forEach(row => { settings[row.key] = row.value; });
@@ -21,6 +21,7 @@ export async function GET(request: NextRequest) {
   return NextResponse.json({
     ok: true,
     ai_review_enabled: settings.ai_review_enabled === 'true',
+    ai_registration_enabled: settings.ai_registration_enabled === 'true',
   });
 }
 
@@ -33,7 +34,7 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ ok: false, error: 'Unauthorized' }, { status: 403 });
     }
 
-    const allowedKeys = ['ai_review_enabled'];
+    const allowedKeys = ['ai_review_enabled', 'ai_registration_enabled'];
     if (!allowedKeys.includes(key)) {
       return NextResponse.json({ ok: false, error: 'Invalid setting key' }, { status: 400 });
     }

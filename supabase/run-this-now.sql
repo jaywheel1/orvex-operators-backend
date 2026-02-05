@@ -95,6 +95,8 @@ ON CONFLICT (task_key) DO UPDATE SET
 -- =====================
 INSERT INTO settings (key, value) VALUES ('ai_review_enabled', 'false')
 ON CONFLICT (key) DO NOTHING;
+INSERT INTO settings (key, value) VALUES ('ai_registration_enabled', 'false')
+ON CONFLICT (key) DO NOTHING;
 
 -- =====================
 -- 9. STORAGE BUCKET

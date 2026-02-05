@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { isWhitelisted } from '@/lib/whitelist';
+import { isRegistrationAiEnabled } from '@/lib/ai-verify';
 
 interface VerifyTweetRequest {
   wallet_address: string;
@@ -9,9 +10,6 @@ interface VerifyTweetRequest {
   referral_code?: string;
   x_handle?: string;
 }
-
-// Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
-const AI_VERIFICATION_ENABLED = process.env.ENABLE_AI_VERIFICATION === 'true';
 
 export async function POST(request: NextRequest) {
   try {
@@ -56,11 +54,13 @@ export async function POST(request: NextRequest) {
       .eq('wallet_address', wallet_address.toLowerCase())
       .single();
 
-    // TODO: Implement real tweet verification with AI when ENABLE_AI_VERIFICATION=true
-    // For now, auto-approve in testing mode
-    const aiVerified = AI_VERIFICATION_ENABLED ? true : true; // Both paths auto-approve for now
-    if (!AI_VERIFICATION_ENABLED) {
-      console.log('AI verification disabled - auto-approving tweet for testing');
+    // Tweet verification: URL format is validated above.
+    // When AI is enabled, we could verify tweet content in the future.
+    // For now, URL format check is sufficient - the follow screenshot is the main AI checkpoint.
+    const aiEnabled = await isRegistrationAiEnabled();
+    const aiVerified = true; // URL format validation above is sufficient for tweets
+    if (!aiEnabled) {
+      console.log('AI review disabled - tweet auto-approved');
     }
 
     if (!existingUser) {

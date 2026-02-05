@@ -16,6 +16,15 @@ export async function isAiReviewEnabled(): Promise<boolean> {
   return data?.value === 'true';
 }
 
+export async function isRegistrationAiEnabled(): Promise<boolean> {
+  const { data } = await supabaseAdmin
+    .from('settings')
+    .select('value')
+    .eq('key', 'ai_registration_enabled')
+    .single();
+  return data?.value === 'true';
+}
+
 export async function verifyScreenshotTask(
   imageBase64: string,
   mediaType: string,
