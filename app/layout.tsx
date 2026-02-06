@@ -4,8 +4,8 @@ import { Providers } from "./providers";
 import AdminFooterLink from "@/components/AdminFooterLink";
 
 export const metadata: Metadata = {
-  title: "Orvex Operators",
-  description: "Complete tasks, earn rewards",
+  title: "Orvex Console Operators",
+  description: "Deploy on testnet. Earn Command Points. Rise through operator ranks.",
 };
 
 export default function RootLayout({

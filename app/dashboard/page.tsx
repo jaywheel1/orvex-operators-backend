@@ -88,18 +88,18 @@ function TaskCard({ task, onStart }: { task: TaskData; onStart: (task: TaskData)
             <svg className="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
             </svg>
-            Done
+            Complete
           </span>
         ) : isPending ? (
           <span className="text-[10px] px-3 py-1.5 rounded-lg bg-[#ffc107]/20 text-[#ffc107] font-medium">
-            Pending
+            Pending Review
           </span>
         ) : (
           <button
             onClick={() => onStart(task)}
             className="text-[10px] px-3 py-1.5 rounded-lg bg-gradient-to-r from-[#6265fe] to-[#7d85d0] text-white font-medium hover:shadow-[0_0_15px_rgba(98,101,254,0.3)] transition-all cursor-pointer"
           >
-            {isCompleted && task.cap > 1 ? 'Submit Again' : 'Start'}
+            {isCompleted && task.cap > 1 ? 'Resubmit' : 'Execute'}
           </button>
         )}
       </div>
@@ -336,7 +336,7 @@ export default function DashboardPage() {
               </svg>
             </div>
             <h1 className="text-2xl font-bold gradient-text mb-3">Connect Wallet</h1>
-            <p className="text-[#b6bbff]/50 text-sm mb-8">Connect your wallet to enter the Console</p>
+            <p className="text-[#b6bbff]/50 text-sm mb-8">Connect your wallet to access the Console.</p>
             <ConnectButton />
           </div>
         </main>
@@ -351,7 +351,7 @@ export default function DashboardPage() {
         <div className="noise-overlay" />
         <div className="relative z-10 flex flex-col items-center justify-center min-h-screen">
           <div className="w-16 h-16 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin mb-4" />
-          <span className="text-[#b6bbff]/50 text-sm">Loading Console...</span>
+          <span className="text-[#b6bbff]/50 text-sm">Initialising Console...</span>
         </div>
       </div>
     );
@@ -380,8 +380,8 @@ export default function DashboardPage() {
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 9v3.75m9-.75a9 9 0 11-18 0 9 9 0 0118 0zm-9 3.75h.008v.008H12v-.008z" />
               </svg>
             </div>
-            <h1 className="text-2xl font-bold gradient-text mb-3">Complete Registration</h1>
-            <p className="text-[#b6bbff]/50 text-sm mb-8">Verify your X account to enter the Console.</p>
+            <h1 className="text-2xl font-bold gradient-text mb-3">Registration Incomplete</h1>
+            <p className="text-[#b6bbff]/50 text-sm mb-8">Complete identity verification to access the Console.</p>
             <Link href="/register" className="group inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.4)] transition-all duration-300 hover:-translate-y-0.5">
               Complete Registration
               <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -423,7 +423,7 @@ export default function DashboardPage() {
       <main className="relative z-10 max-w-6xl mx-auto px-6 py-8 md:py-12">
         <div className="mb-10 opacity-0 animate-fade-in-up" style={{ animationDelay: '100ms', animationFillMode: 'forwards' }}>
           <h1 className="text-3xl md:text-4xl font-bold gradient-text mb-2">Console</h1>
-          <p className="text-[#b6bbff]/50">Coordinate. Complete tasks. Earn points.</p>
+          <p className="text-[#b6bbff]/50">Execute operations. Earn Command Points. Activate mainnet multipliers.</p>
         </div>
 
         {/* Stats Grid */}
@@ -433,7 +433,7 @@ export default function DashboardPage() {
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#6265fe]/20 to-[#6265fe]/5 border border-[#6265fe]/20 flex items-center justify-center">
                 <svg className="w-6 h-6 text-[#6265fe]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
-              <span className="text-[#b6bbff]/50 text-sm">Total Points</span>
+              <span className="text-[#b6bbff]/50 text-sm">Command Points</span>
             </div>
             <div className="text-4xl font-bold gradient-text-accent">{(userData?.points || 0).toLocaleString()}</div>
           </div>
@@ -442,7 +442,7 @@ export default function DashboardPage() {
               <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#7d85d0]/20 to-[#7d85d0]/5 border border-[#7d85d0]/20 flex items-center justify-center">
                 <svg className="w-6 h-6 text-[#7d85d0]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
               </div>
-              <span className="text-[#b6bbff]/50 text-sm">Tasks Completed</span>
+              <span className="text-[#b6bbff]/50 text-sm">Operations Complete</span>
             </div>
             <div className="text-4xl font-bold text-[#c9e8ff]">{userData?.tasks_completed || 0}</div>
           </div>
@@ -453,7 +453,7 @@ export default function DashboardPage() {
               </div>
               <span className="text-[#b6bbff]/50 text-sm">Campaign Status</span>
             </div>
-            <div className={`text-4xl font-bold ${campaignLive ? 'text-[#b9f0d7]' : 'text-[#7d85d0]/60'}`}>{campaignLive ? 'LIVE' : 'OFFLINE'}</div>
+            <div className={`text-4xl font-bold ${campaignLive ? 'text-[#b9f0d7]' : 'text-[#7d85d0]/60'}`}>{campaignLive ? 'ACTIVE' : 'STANDBY'}</div>
           </div>
           <button onClick={() => setShowLeaderboardModal(true)} className="glass-card p-6 hover-lift opacity-0 animate-fade-in-up text-left cursor-pointer group transition-all duration-300 hover:border-[#b9f0d7]/30" style={{ animationDelay: '450ms', animationFillMode: 'forwards' }}>
             <div className="flex items-center gap-3 mb-4">
@@ -466,7 +466,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="text-4xl font-bold text-[#b9f0d7]">{userRank ? `#${userRank}` : '—'}</div>
-            <div className="text-[10px] text-[#b6bbff]/30 mt-1 uppercase tracking-wider">Your Rank</div>
+            <div className="text-[10px] text-[#b6bbff]/30 mt-1 uppercase tracking-wider">Your Position</div>
           </button>
         </div>
 
@@ -479,8 +479,8 @@ export default function DashboardPage() {
                   <svg className="w-7 h-7 text-[#ffc107]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" /></svg>
                 </div>
                 <div>
-                  <h3 className="text-lg font-semibold text-white mb-1">Invite Friends</h3>
-                  <p className="text-[#b6bbff]/50 text-sm">Earn <span className="text-[#ffc107] font-semibold">1,000 CP</span> for each friend who registers (max 5)</p>
+                  <h3 className="text-lg font-semibold text-white mb-1">Recruit Operators</h3>
+                  <p className="text-[#b6bbff]/50 text-sm">Earn <span className="text-[#ffc107] font-semibold">1,000 CP</span> for each operator you recruit (max 5).</p>
                 </div>
               </div>
               <div className="flex items-center gap-3">
@@ -510,13 +510,13 @@ export default function DashboardPage() {
                 <div>
                   <div className="flex items-center gap-2">
                     <h3 className="text-lg font-semibold text-white">{currentRank?.name || 'Recruit'}</h3>
-                    {currentRank && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#6265fe]/20 text-[#6265fe] font-medium uppercase">{currentRank.multiplier}x Multiplier</span>}
+                    {currentRank && <span className="text-[10px] px-2 py-0.5 rounded-full bg-[#6265fe]/20 text-[#6265fe] font-medium uppercase">{currentRank.multiplier}x Mainnet Multiplier</span>}
                   </div>
-                  <p className="text-[#b6bbff]/50 text-sm">{nextRank ? `${(nextRank.cp_required - userCP).toLocaleString()} CP to ${nextRank.name}` : 'Maximum rank achieved!'}</p>
+                  <p className="text-[#b6bbff]/50 text-sm">{nextRank ? `${(nextRank.cp_required - userCP).toLocaleString()} CP to ${nextRank.name}` : 'Maximum rank achieved — 10x Architect'}</p>
                 </div>
               </div>
               <div className="text-right">
-                <div className="text-sm text-[#b6bbff]/50">Total CP</div>
+                <div className="text-sm text-[#b6bbff]/50">Total Command Points</div>
                 <div className="text-2xl font-bold gradient-text">{userCP.toLocaleString()}</div>
               </div>
             </div>
@@ -577,7 +577,7 @@ export default function DashboardPage() {
                   <div className="flex items-center gap-4">
                     <div className="text-right hidden sm:block">
                       <div className={`text-lg font-bold ${isLocked ? 'text-[#7d85d0]/50' : 'text-[#b9f0d7]'}`}>{maxCp.toLocaleString()} CP</div>
-                      <div className="text-[10px] text-[#7d85d0] uppercase">Max Possible</div>
+                      <div className="text-[10px] text-[#7d85d0] uppercase">Max CP</div>
                     </div>
                     <svg className={`w-5 h-5 text-[#7d85d0] transition-transform duration-300 ${isExpanded ? 'rotate-180' : ''}`} fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
@@ -611,7 +611,7 @@ export default function DashboardPage() {
           <div className="relative glass-card w-full max-w-2xl max-h-[80vh] overflow-hidden rounded-2xl animate-scale-in">
             <div className="flex items-center justify-between p-6 border-b border-[#7d85d0]/10">
               <div>
-                <h2 className="text-2xl font-bold gradient-text">Leaderboard</h2>
+                <h2 className="text-2xl font-bold gradient-text">Operator Leaderboard</h2>
                 {lastUpdated && <p className="text-[#7d85d0] text-xs mt-1">Updates every 30 min</p>}
               </div>
               <button onClick={() => setShowLeaderboardModal(false)} className="w-10 h-10 rounded-xl bg-[#7d85d0]/10 hover:bg-[#7d85d0]/20 flex items-center justify-center transition-colors">
@@ -622,15 +622,15 @@ export default function DashboardPage() {
               {leaderboardLoading ? (
                 <div className="flex items-center justify-center py-16"><div className="w-10 h-10 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" /></div>
               ) : leaderboard.length === 0 ? (
-                <div className="text-center py-16 text-[#b6bbff]/50">No participants yet.</div>
+                <div className="text-center py-16 text-[#b6bbff]/50">No operators deployed yet.</div>
               ) : (
                 <div className="overflow-x-auto">
                   <table className="w-full">
                     <thead className="sticky top-0 bg-[#0d0d1a]">
                       <tr className="border-b border-[#7d85d0]/10">
                         <th className="text-left py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Rank</th>
-                        <th className="text-left py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Wallet</th>
-                        <th className="text-right py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Points</th>
+                        <th className="text-left py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Operator</th>
+                        <th className="text-right py-4 px-6 text-[#b6bbff]/50 text-xs uppercase tracking-wider font-medium">Command Points</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -680,12 +680,12 @@ export default function DashboardPage() {
               <div className="w-20 h-20 mx-auto mb-6 rounded-full bg-gradient-to-br from-[#ffc107] to-[#ffab00] flex items-center justify-center shadow-[0_0_40px_rgba(255,193,7,0.5)] animate-pulse">
                 <svg className="w-10 h-10 text-[#070713]" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v13m0-13V6a2 2 0 112 2h-2zm0 0V5.5A2.5 2.5 0 109.5 8H12zm-7 4h14M5 12a2 2 0 110-4h14a2 2 0 110 4M5 12v7a2 2 0 002 2h10a2 2 0 002-2v-7" /></svg>
               </div>
-              <h2 className="text-2xl font-bold text-white mb-2">New Referral{newReferralCount > 1 ? 's' : ''}!</h2>
-              <p className="text-[#b6bbff]/70 mb-2">{newReferralCount} new friend{newReferralCount > 1 ? 's' : ''} joined!</p>
+              <h2 className="text-2xl font-bold text-white mb-2">New Recruit{newReferralCount > 1 ? 's' : ''}!</h2>
+              <p className="text-[#b6bbff]/70 mb-2">{newReferralCount} new operator{newReferralCount > 1 ? 's' : ''} deployed!</p>
               <div className="inline-flex items-center gap-2 px-4 py-2 rounded-xl bg-[#ffc107]/20 border border-[#ffc107]/30 mb-6">
                 <span className="text-[#ffc107] font-bold text-lg">+{(newReferralCount * 1000).toLocaleString()} CP</span>
               </div>
-              <button onClick={() => setShowNewReferralNotification(false)} className="w-full py-3 bg-gradient-to-r from-[#ffc107] to-[#ffab00] text-[#070713] font-bold rounded-xl hover:shadow-[0_0_30px_rgba(255,193,7,0.4)] transition-all duration-300">Awesome!</button>
+              <button onClick={() => setShowNewReferralNotification(false)} className="w-full py-3 bg-gradient-to-r from-[#ffc107] to-[#ffab00] text-[#070713] font-bold rounded-xl hover:shadow-[0_0_30px_rgba(255,193,7,0.4)] transition-all duration-300">Confirmed</button>
             </div>
           </div>
         </div>
@@ -698,8 +698,8 @@ export default function DashboardPage() {
           <div className="relative glass-card w-full max-w-md overflow-hidden rounded-2xl animate-scale-in">
             <div className="flex items-center justify-between p-6 border-b border-[#7d85d0]/10">
               <div>
-                <h2 className="text-2xl font-bold gradient-text">Your Referrals</h2>
-                <p className="text-[#7d85d0] text-xs mt-1">{referralStats?.verified_referrals || 0} of {referralStats?.max_referrals || 5} slots used</p>
+                <h2 className="text-2xl font-bold gradient-text">Your Recruits</h2>
+                <p className="text-[#7d85d0] text-xs mt-1">{referralStats?.verified_referrals || 0} of {referralStats?.max_referrals || 5} slots deployed</p>
               </div>
               <button onClick={() => setShowReferralModal(false)} className="w-10 h-10 rounded-xl bg-[#7d85d0]/10 hover:bg-[#7d85d0]/20 flex items-center justify-center transition-colors">
                 <svg className="w-5 h-5 text-[#b6bbff]/50" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M6 18L18 6M6 6l12 12" /></svg>
@@ -708,10 +708,10 @@ export default function DashboardPage() {
             <div className="p-6 space-y-6">
               <div className="grid grid-cols-2 gap-4">
                 <div className="p-4 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20"><div className="text-[#b6bbff]/50 text-xs mb-1">Total Earned</div><div className="text-2xl font-bold text-[#ffc107]">{referralStats?.total_cp_earned || 0} CP</div></div>
-                <div className="p-4 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20"><div className="text-[#b6bbff]/50 text-xs mb-1">Remaining</div><div className="text-2xl font-bold text-[#b6bbff]">{referralStats?.remaining_slots || 5} slots</div></div>
+                <div className="p-4 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20"><div className="text-[#b6bbff]/50 text-xs mb-1">Remaining Slots</div><div className="text-2xl font-bold text-[#b6bbff]">{referralStats?.remaining_slots || 5} slots</div></div>
               </div>
               <div>
-                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Your Referral Link</label>
+                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Your Recruitment Link</label>
                 <div className="flex items-center gap-2">
                   <input type="text" readOnly value={referralStats?.referral_link || ''} className="flex-1 px-4 py-3 bg-[#0d0d1a]/80 border border-[#7d85d0]/20 rounded-xl text-sm text-[#c9e8ff] font-mono" />
                   <button onClick={copyReferralLink} className="px-4 py-3 bg-gradient-to-r from-[#ffc107] to-[#ffab00] text-[#070713] font-semibold rounded-xl">{copied ? 'Copied!' : 'Copy'}</button>
@@ -724,7 +724,7 @@ export default function DashboardPage() {
               <div className="p-4 rounded-xl bg-[#ffc107]/10 border border-[#ffc107]/20">
                 <div className="flex items-start gap-3">
                   <svg className="w-5 h-5 text-[#ffc107] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" /></svg>
-                  <div className="text-sm text-[#ffc107]/80"><p className="font-medium mb-1">How it works</p><p className="text-[#ffc107]/60">Share your link. When friends register, you earn {referralStats?.cp_per_referral || 1000} CP automatically.</p></div>
+                  <div className="text-sm text-[#ffc107]/80"><p className="font-medium mb-1">How it works</p><p className="text-[#ffc107]/60">Share your link. When recruited operators complete registration, you earn {referralStats?.cp_per_referral || 1000} CP automatically.</p></div>
                 </div>
               </div>
             </div>
