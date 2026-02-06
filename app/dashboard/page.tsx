@@ -463,7 +463,7 @@ export default function DashboardPage() {
               </div>
             </div>
             <div className="text-4xl font-bold text-[#b9f0d7]">
-              {userRank ? `#${userRank}` : '—'}
+              {userRank ? `#${userRank}` : '-'}
             </div>
             <div className="text-[10px] text-[#b6bbff]/30 mt-1 uppercase tracking-wider">Your Rank</div>
           </button>
