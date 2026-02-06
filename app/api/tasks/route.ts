@@ -18,7 +18,7 @@ export async function GET(request: NextRequest) {
     }
 
     // Get user submission counts if wallet provided
-    let submissionMap: Record<string, { approved: number; pending: number; rejected: number }> = {};
+    const submissionMap: Record<string, { approved: number; pending: number; rejected: number }> = {};
     if (wallet) {
       const { data: user } = await supabaseAdmin
         .from('users')
