@@ -465,8 +465,10 @@ export default function DashboardPage() {
                 <svg className="w-4 h-4 text-[#b6bbff]/30 group-hover:text-[#b9f0d7] group-hover:translate-x-1 transition-all" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" /></svg>
               </div>
             </div>
-            <div className="text-4xl font-bold text-[#b9f0d7]">{userRank ? `#${userRank}` : '—'}</div>
-            <div className="text-[10px] text-[#b6bbff]/30 mt-1 uppercase tracking-wider">Your Position</div>
+            <div className="text-4xl font-bold text-[#b9f0d7]">
+              {userRank ? `#${userRank}` : '-'}
+            </div>
+            <div className="text-[10px] text-[#b6bbff]/30 mt-1 uppercase tracking-wider">Your Rank</div>
           </button>
         </div>
 
