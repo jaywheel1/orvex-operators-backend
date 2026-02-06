@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 type Step = 'welcome' | 'wallet' | 'tweet' | 'follow' | 'complete';
 
@@ -53,11 +54,11 @@ function RegisterContent() {
   }, [searchParams]);
 
   const verificationCode = address ? address.slice(-8).toUpperCase() : '';
-  const tweetText = `Verifying my wallet for @OrvexFi
+  const tweetText = `Verifying my wallet for the @OrvexFi Console Operators campaign.
 
 Code: ${verificationCode}
 
-#Orvex #Web3`;
+Entering the Vortex. #Orvex #StatusNetwork`;
 
   const handleTweetSubmit = async () => {
     const parsedHandle = parseXHandle(xHandle);
@@ -89,7 +90,7 @@ Code: ${verificationCode}
       if (data.ok) {
         setStep('follow');
       } else {
-        setError(data.error || 'Verification failed');
+        setError(data.details || data.error || 'Verification failed');
       }
     } catch {
       setError('Failed to verify tweet');
@@ -120,7 +121,7 @@ Code: ${verificationCode}
       if (data.ok) {
         setStep('complete');
       } else {
-        setError(data.error || 'Verification failed');
+        setError(data.details || data.error || 'Verification failed');
       }
     } catch {
       setError('Failed to verify follow');
@@ -129,7 +130,6 @@ Code: ${verificationCode}
     }
   };
 
-  const steps = ['welcome', 'wallet', 'tweet', 'follow', 'complete'];
   const displaySteps = ['wallet', 'tweet', 'follow', 'complete'];
   const currentIndex = displaySteps.indexOf(step);
 
@@ -203,9 +203,9 @@ Code: ${verificationCode}
           </div>
           <div className="flex justify-between mt-3">
             <span className={`text-xs w-12 text-center transition-colors ${currentIndex >= 0 ? 'text-[#b6bbff]/70' : 'text-[#b6bbff]/30'}`}>Wallet</span>
-            <span className={`text-xs w-12 text-center transition-colors ${currentIndex >= 1 ? 'text-[#b6bbff]/70' : 'text-[#b6bbff]/30'}`}>Tweet</span>
+            <span className={`text-xs w-12 text-center transition-colors ${currentIndex >= 1 ? 'text-[#b6bbff]/70' : 'text-[#b6bbff]/30'}`}>Verify</span>
             <span className={`text-xs w-12 text-center transition-colors ${currentIndex >= 2 ? 'text-[#b6bbff]/70' : 'text-[#b6bbff]/30'}`}>Follow</span>
-            <span className={`text-xs w-12 text-center transition-colors ${currentIndex >= 3 ? 'text-[#b6bbff]/70' : 'text-[#b6bbff]/30'}`}>Done</span>
+            <span className={`text-xs w-12 text-center transition-colors ${currentIndex >= 3 ? 'text-[#b6bbff]/70' : 'text-[#b6bbff]/30'}`}>Confirmed</span>
           </div>
         </div>
         )}
@@ -227,10 +227,10 @@ Code: ${verificationCode}
               {/* Welcome Message */}
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-3">
-                  You&apos;ve Been Invited!
+                  You&apos;ve Been Recruited
                 </h1>
                 <p className="text-[#b6bbff]/70 text-sm max-w-sm mx-auto mb-4">
-                  A friend has invited you to join the <span className="text-white font-semibold">Orvex Console Operators</span> incentivized testnet campaign.
+                  An operator has invited you to the <span className="text-white font-semibold">Orvex Vortex</span> — an 8-week incentivised testnet campaign on Status Network.
                 </p>
               </div>
 
@@ -239,31 +239,31 @@ Code: ${verificationCode}
                 <svg className="w-5 h-5 text-[#ffc107]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                 </svg>
-                <span className="text-[#ffc107]">Referred by</span>
+                <span className="text-[#ffc107]">Recruited by</span>
                 <span className="text-[#ffc107] font-mono font-bold">{referralCode}</span>
               </div>
 
               {/* Benefits */}
               <div className="p-5 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20 text-left">
-                <h3 className="text-sm font-semibold text-white mb-3">What you&apos;ll get:</h3>
+                <h3 className="text-sm font-semibold text-white mb-3">What you&apos;ll unlock:</h3>
                 <ul className="space-y-3 text-sm text-[#b6bbff]/70">
                   <li className="flex items-start gap-3">
                     <svg className="w-5 h-5 text-[#b9f0d7] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Earn <span className="text-[#b9f0d7] font-semibold">Console Points (CP)</span> by completing tasks</span>
+                    <span>Earn <span className="text-[#b9f0d7] font-semibold">Command Points (CP)</span> across 5 operation categories</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <svg className="w-5 h-5 text-[#b9f0d7] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Climb <span className="text-[#6265fe] font-semibold">Operator ranks</span> for point multipliers</span>
+                    <span>Climb from <span className="text-[#6265fe] font-semibold">Operator to Architect</span> rank</span>
                   </li>
                   <li className="flex items-start gap-3">
                     <svg className="w-5 h-5 text-[#b9f0d7] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                     </svg>
-                    <span>Position yourself for <span className="text-[#ffc107] font-semibold">future rewards</span></span>
+                    <span>Activate up to <span className="text-[#ffc107] font-semibold">10x multipliers</span> on mainnet</span>
                   </li>
                 </ul>
               </div>
@@ -273,7 +273,7 @@ Code: ${verificationCode}
                 onClick={() => setStep('wallet')}
                 className="group w-full py-4 bg-gradient-to-r from-[#ffc107] to-[#ffab00] text-[#070713] font-bold rounded-xl hover:shadow-[0_0_30px_rgba(255,193,7,0.4)] transition-all duration-300 hover:-translate-y-0.5 flex items-center justify-center gap-2"
               >
-                Start Registration
+                Begin Registration
                 <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                 </svg>
@@ -288,7 +288,7 @@ Code: ${verificationCode}
                   <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M18 9v3m0 0v3m0-3h3m-3 0h-3m-2-5a4 4 0 11-8 0 4 4 0 018 0zM3 20a6 6 0 0112 0v1H3v-1z" />
                   </svg>
-                  Referred by <span className="font-mono font-semibold">{referralCode}</span>
+                  Recruited by <span className="font-mono font-semibold">{referralCode}</span>
                 </div>
               )}
               <div className="text-center">
@@ -301,7 +301,7 @@ Code: ${verificationCode}
                   Connect Your Wallet
                 </h1>
                 <p className="text-[#b6bbff]/50 text-sm">
-                  Connect to begin verification.
+                  Link your wallet to initialise verification.
                 </p>
               </div>
 
@@ -332,11 +332,23 @@ Code: ${verificationCode}
                   </svg>
                 </div>
                 <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-3">
-                  Post Verification Tweet
+                  Post Verification Signal
                 </h1>
-                <p className="text-[#b6bbff]/50 text-sm">
-                  Post this tweet to verify you own this X account.
+                <p className="text-[#b6bbff]/50 text-sm mb-4">
+                  Confirm wallet ownership by posting a verification code to X.
                 </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#6265fe]/10 border border-[#6265fe]/20 text-[#b6bbff] text-sm">
+                <div className="flex gap-3">
+                  <svg className="w-5 h-5 text-[#6265fe] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="font-semibold text-white mb-1">How it works:</p>
+                    <p className="text-xs text-[#b6bbff]/70">Click &quot;Post on X&quot; to broadcast your verification signal. It contains a unique code derived from your wallet address. Once posted, paste the tweet URL below to confirm.</p>
+                  </div>
+                </div>
               </div>
 
               <div className="space-y-2">
@@ -406,11 +418,11 @@ Code: ${verificationCode}
                 {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                    Verifying...
+                    Confirming...
                   </>
                 ) : (
                   <>
-                    Verify Tweet
+                    Confirm Verification
                     <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                     </svg>
@@ -431,9 +443,21 @@ Code: ${verificationCode}
                 <h1 className="text-2xl md:text-3xl font-bold gradient-text mb-3">
                   Follow @OrvexFi
                 </h1>
-                <p className="text-[#b6bbff]/50 text-sm">
-                  Follow our X account and upload a screenshot as proof.
+                <p className="text-[#b6bbff]/50 text-sm mb-4">
+                  Final step. Follow @OrvexFi on X and submit proof to complete registration.
                 </p>
+              </div>
+
+              <div className="p-4 rounded-xl bg-[#b9f0d7]/10 border border-[#b9f0d7]/20 text-[#b6bbff] text-sm">
+                <div className="flex gap-3">
+                  <svg className="w-5 h-5 text-[#b9f0d7] flex-shrink-0 mt-0.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <div>
+                    <p className="font-semibold text-white mb-1">How it works:</p>
+                    <p className="text-xs text-[#b6bbff]/70">Click &quot;Follow @OrvexFi&quot; to open X. Take a screenshot showing the &quot;Following&quot; status is visible. Upload below to confirm.</p>
+                  </div>
+                </div>
               </div>
 
               <a
@@ -450,7 +474,7 @@ Code: ${verificationCode}
 
               <div className="space-y-2">
                 <label className="block text-sm text-[#b6bbff]/50">
-                  Upload screenshot showing you follow @OrvexFi
+                  Upload screenshot showing &quot;Following&quot; status
                 </label>
                 <div className="relative">
                   <input
@@ -487,7 +511,7 @@ Code: ${verificationCode}
                 {isSubmitting ? (
                   <>
                     <div className="w-5 h-5 rounded-full border-2 border-white/30 border-t-white animate-spin" />
-                    Verifying...
+                    Confirming...
                   </>
                 ) : (
                   <>
@@ -514,10 +538,10 @@ Code: ${verificationCode}
 
               <div>
                 <h1 className="text-2xl md:text-3xl font-bold gradient-text-accent mb-3">
-                  Verification Complete
+                  STATUS: CONFIRMED
                 </h1>
                 <p className="text-[#b6bbff]/50 text-sm max-w-sm mx-auto">
-                  Identity confirmed. You&apos;re cleared to coordinate when the Vortex opens.
+                  Identity verified. You&apos;re cleared to operate. The Vortex opens soon.
                 </p>
               </div>
 
@@ -540,12 +564,14 @@ Code: ${verificationCode}
 
 export default function RegisterPage() {
   return (
-    <Suspense fallback={
-      <div className="min-h-screen bg-[#070713] text-white flex items-center justify-center">
-        <div className="w-16 h-16 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" />
-      </div>
-    }>
-      <RegisterContent />
-    </Suspense>
+    <ErrorBoundary>
+      <Suspense fallback={
+        <div className="min-h-screen bg-[#070713] text-white flex items-center justify-center">
+          <div className="w-16 h-16 rounded-full border-2 border-[#6265fe]/30 border-t-[#6265fe] animate-spin" />
+        </div>
+      }>
+        <RegisterContent />
+      </Suspense>
+    </ErrorBoundary>
   );
 }

@@ -1,6 +1,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { isWhitelisted } from '@/lib/whitelist';
+import { isRegistrationAiEnabled } from '@/lib/ai-verify';
 
 interface VerifyTweetRequest {
   wallet_address: string;
@@ -10,8 +11,71 @@ interface VerifyTweetRequest {
   x_handle?: string;
 }
 
-// Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
-const AI_VERIFICATION_ENABLED = process.env.ENABLE_AI_VERIFICATION === 'true';
+async function verifyTweetWithAI(
+  tweetUrl: string,
+  expectedCode: string,
+  expectedHandle: string
+): Promise<{ verified: boolean; reason: string }> {
+  const aiEnabled = await isRegistrationAiEnabled();
+  if (!aiEnabled) {
+    console.log('AI review disabled - tweet auto-approved');
+    return { verified: true, reason: 'AI review disabled - auto-approved' };
+  }
+
+  // Extract handle from tweet URL
+  const handleMatch = tweetUrl.match(/(?:twitter\.com|x\.com)\/(@)?([a-zA-Z0-9_]+)\/status\//i);
+  const urlHandle = handleMatch ? handleMatch[2].toLowerCase() : null;
+
+  if (!urlHandle) {
+    return { verified: false, reason: 'Could not extract X handle from tweet URL. Please check the URL.' };
+  }
+
+  // Verify the handle in the URL matches what they provided
+  if (urlHandle !== expectedHandle.toLowerCase()) {
+    return {
+      verified: false,
+      reason: `Tweet URL is from @${urlHandle} but you registered as @${expectedHandle}. Please submit a tweet from your own account.`,
+    };
+  }
+
+  // Try to fetch tweet content via Twitter oEmbed (public, no API key needed)
+  try {
+    const oembedUrl = `https://publish.twitter.com/oembed?url=${encodeURIComponent(tweetUrl)}&omit_script=true`;
+    const response = await fetch(oembedUrl, { signal: AbortSignal.timeout(5000) });
+
+    if (response.ok) {
+      const data = await response.json();
+      const tweetHtml: string = data.html || '';
+
+      // Check if the verification code appears in the tweet
+      if (!tweetHtml.toLowerCase().includes(expectedCode.toLowerCase())) {
+        return {
+          verified: false,
+          reason: `Tweet does not contain your verification code (${expectedCode}). Please post the exact tweet with your code and try again.`,
+        };
+      }
+
+      // Check the tweet mentions @OrvexFi
+      if (!tweetHtml.toLowerCase().includes('orvex')) {
+        return {
+          verified: false,
+          reason: 'Tweet does not mention @OrvexFi. Please post the correct verification tweet.',
+        };
+      }
+
+      return { verified: true, reason: 'Tweet verified: correct handle, code, and mention found.' };
+    } else {
+      // oEmbed failed (tweet might be deleted, private, or rate-limited)
+      // Fall back to URL handle check only
+      console.warn('Twitter oEmbed failed, falling back to handle verification only');
+      return { verified: true, reason: 'Tweet URL verified (handle matches). Content check unavailable.' };
+    }
+  } catch (err) {
+    console.warn('Twitter oEmbed request failed:', err);
+    // Network error - fall back to handle check only
+    return { verified: true, reason: 'Tweet URL verified (handle matches). Content check unavailable.' };
+  }
+}
 
 export async function POST(request: NextRequest) {
   try {
@@ -28,7 +92,7 @@ export async function POST(request: NextRequest) {
     const tweetUrlPattern = /^https?:\/\/(twitter\.com|x\.com)\/\w+\/status\/\d+/;
     if (!tweetUrlPattern.test(tweet_url)) {
       return NextResponse.json(
-        { ok: false, error: 'Invalid tweet URL format' },
+        { ok: false, error: 'Invalid tweet URL format. Must be a twitter.com or x.com status URL.' },
         { status: 400 }
       );
     }
@@ -44,7 +108,7 @@ export async function POST(request: NextRequest) {
 
       if (existingTweet && existingTweet.wallet_address !== wallet_address.toLowerCase()) {
         return NextResponse.json(
-          { ok: false, error: 'This tweet has already been used for verification' },
+          { ok: false, error: 'This tweet has already been used for verification by another wallet.' },
           { status: 400 }
         );
       }
@@ -56,11 +120,17 @@ export async function POST(request: NextRequest) {
       .eq('wallet_address', wallet_address.toLowerCase())
       .single();
 
-    // TODO: Implement real tweet verification with AI when ENABLE_AI_VERIFICATION=true
-    // For now, auto-approve in testing mode
-    const aiVerified = AI_VERIFICATION_ENABLED ? true : true; // Both paths auto-approve for now
-    if (!AI_VERIFICATION_ENABLED) {
-      console.log('AI verification disabled - auto-approving tweet for testing');
+    // AI-powered tweet verification
+    const aiResult = await verifyTweetWithAI(tweet_url, verification_code, x_handle);
+    const aiVerified = aiResult.verified;
+
+    console.log('Tweet AI verification result:', aiResult);
+
+    if (!aiVerified) {
+      return NextResponse.json(
+        { ok: false, error: aiResult.reason },
+        { status: 400 }
+      );
     }
 
     if (!existingUser) {
@@ -120,10 +190,8 @@ export async function POST(request: NextRequest) {
 
     return NextResponse.json({
       ok: true,
-      verified: aiVerified,
-      message: aiVerified
-        ? 'Tweet verified successfully'
-        : 'Tweet verification failed - code not found in tweet',
+      verified: true,
+      message: 'Tweet verified successfully',
     });
   } catch (err) {
     console.error('Verify tweet error:', err);

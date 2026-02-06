@@ -13,8 +13,17 @@ export async function GET(request: Request) {
     const supabase = createClient(supabaseUrl, supabaseKey);
 
     const { searchParams } = new URL(request.url);
-    const limit = parseInt(searchParams.get('limit') || '100');
-    const offset = parseInt(searchParams.get('offset') || '0');
+    let limit = parseInt(searchParams.get('limit') || '100');
+    let offset = parseInt(searchParams.get('offset') || '0');
+
+    // Enforce pagination limits - max 1000 rows per request
+    const MAX_LIMIT = 1000;
+    const MAX_OFFSET = 1000000;
+
+    if (limit > MAX_LIMIT) limit = MAX_LIMIT;
+    if (limit < 1) limit = 1;
+    if (offset < 0) offset = 0;
+    if (offset > MAX_OFFSET) offset = MAX_OFFSET;
 
     // Get users sorted by points descending
     const { data: users, error, count } = await supabase
@@ -38,7 +47,7 @@ export async function GET(request: Request) {
       joined: user.created_at,
     })) || [];
 
-    return NextResponse.json({
+    const response = NextResponse.json({
       ok: true,
       data: rankedUsers,
       total: count || 0,
@@ -46,6 +55,11 @@ export async function GET(request: Request) {
       offset,
       lastUpdated: new Date().toISOString(),
     });
+
+    // Add cache headers - leaderboard data updates less frequently
+    response.headers.set('Cache-Control', 'public, s-maxage=300, stale-while-revalidate=600');
+
+    return response;
   } catch (error) {
     console.error('Leaderboard error:', error);
     return NextResponse.json({ ok: false, error: 'Internal server error' }, { status: 500 });

@@ -1,11 +1,11 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
 import { isWhitelisted } from '@/lib/whitelist';
+import { isRegistrationAiEnabled } from '@/lib/ai-verify';
 import Anthropic from '@anthropic-ai/sdk';
 
 const REFERRAL_CP_REWARD = 1000;
 
-// Lazy-load Anthropic client only when needed
 function getAnthropicClient() {
   const apiKey = process.env.ANTHROPIC_API_KEY;
   if (!apiKey) {
@@ -15,21 +15,19 @@ function getAnthropicClient() {
 }
 const MAX_REFERRALS = 5;
 
-// Set ENABLE_AI_VERIFICATION=true in .env.local to enable real AI verification
-const AI_VERIFICATION_ENABLED = process.env.ENABLE_AI_VERIFICATION === 'true';
-
 async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promise<{ verified: boolean; reason: string }> {
-  // Skip AI verification if disabled (for testing)
-  if (!AI_VERIFICATION_ENABLED) {
-    console.log('AI verification disabled - auto-approving for testing');
-    return { verified: true, reason: 'AI verification disabled - auto-approved for testing' };
+  // Check the registration AI toggle from admin panel settings
+  const aiEnabled = await isRegistrationAiEnabled();
+  if (!aiEnabled) {
+    console.log('AI review disabled in admin panel - auto-approving');
+    return { verified: true, reason: 'AI review disabled - auto-approved' };
   }
 
   try {
     const anthropic = getAnthropicClient();
     const response = await anthropic.messages.create({
-      model: 'claude-sonnet-4-20250514',
-      max_tokens: 256,
+      model: 'claude-haiku-4-5-20251001',
+      max_tokens: 300,
       messages: [
         {
           role: 'user',
@@ -44,15 +42,7 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
             },
             {
               type: 'text',
-              text: `Analyze this screenshot and determine if it shows that the user is following the Twitter/X account @OrvexFi (or a similar Orvex-related account).
-
-Look for:
-1. The "Following" button state (not "Follow")
-2. The account name containing "Orvex" or "OrvexFi"
-3. Any indication this is a Twitter/X profile page
-
-Respond with JSON only:
-{"verified": true/false, "reason": "brief explanation"}`,
+              text: 'List all visible text and button labels you can see in this screenshot. Be thorough - include usernames, handles, button text, profile names, tab labels, and any other text visible in the image.',
             },
           ],
         },
@@ -60,14 +50,31 @@ Respond with JSON only:
     });
 
     const textContent = response.content.find(c => c.type === 'text');
-    if (textContent && textContent.type === 'text') {
-      const parsed = JSON.parse(textContent.text);
-      return { verified: parsed.verified, reason: parsed.reason };
+    if (!textContent || textContent.type !== 'text') {
+      return { verified: false, reason: 'AI could not read the screenshot. Please try again.' };
     }
-    return { verified: false, reason: 'Could not parse AI response' };
-  } catch (error) {
-    console.error('AI verification error:', error);
-    return { verified: false, reason: 'AI verification failed' };
+
+    const extractedText = textContent.text.toLowerCase();
+    console.log('AI extracted text from screenshot:', extractedText.slice(0, 500));
+
+    // Check for Orvex account presence
+    const hasOrvex = extractedText.includes('orvex') || extractedText.includes('@orvexfi');
+    // Check for "Following" button (not just "Follow")
+    const hasFollowing = extractedText.includes('following');
+
+    if (!hasOrvex) {
+      return { verified: false, reason: 'Could not find the @OrvexFi account in the screenshot. Please upload a screenshot of the @OrvexFi profile page.' };
+    }
+
+    if (!hasFollowing) {
+      return { verified: false, reason: 'Could not find the "Following" button in the screenshot. Make sure you are following @OrvexFi and the "Following" button is visible.' };
+    }
+
+    return { verified: true, reason: 'Verified: Orvex profile with Following button detected.' };
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error('AI verification error:', errMsg);
+    return { verified: false, reason: `AI verification error: ${errMsg}` };
   }
 }
 
@@ -104,45 +111,52 @@ export async function POST(request: NextRequest) {
       );
     }
 
-    // Block re-verification unless whitelisted
-    if (user.follow_verified && !isWhitelisted(wallet_address)) {
-      return NextResponse.json(
-        { ok: false, error: 'Follow already verified' },
-        { status: 400 }
-      );
+    // Block re-verification unless whitelisted or admin testing
+    // Allow re-verification so admins can test AI when toggling settings
+    if (user.follow_verified && user.registration_complete && !isWhitelisted(wallet_address)) {
+      const aiEnabled = await isRegistrationAiEnabled();
+      if (!aiEnabled) {
+        return NextResponse.json(
+          { ok: false, error: 'Registration already complete for this wallet. Connect a different wallet to register again.' },
+          { status: 400 }
+        );
+      }
+      // When AI is enabled, allow re-submission so screenshots are actually checked
+      console.log('Re-verification allowed: AI is enabled and user wants to re-verify follow');
     }
 
     const bytes = await screenshot.arrayBuffer();
     const buffer = Buffer.from(bytes);
-    const fileName = `follows/${wallet_address.toLowerCase()}_${Date.now()}.${screenshot.type.split('/')[1] || 'png'}`;
-
-    const { error: uploadError } = await supabaseAdmin.storage
-      .from('verification-screenshots')
-      .upload(fileName, buffer, {
-        contentType: screenshot.type,
-        upsert: true,
-      });
-
-    if (uploadError) {
-      console.error('Screenshot upload error:', uploadError);
-    }
-
     const imageBase64 = buffer.toString('base64');
     const mediaType = screenshot.type || 'image/png';
 
+    // Verify with AI (screenshot is not stored, only processed for verification)
     const aiResult = await verifyFollowWithAI(imageBase64, mediaType);
     const aiVerified = aiResult.verified;
 
     console.log('AI verification result:', aiResult);
 
+    // If verification failed, return error immediately without updating database
+    if (!aiVerified) {
+      const userMessage = aiResult.reason || 'The screenshot does not show that you follow @OrvexFi. Please ensure the "Following" button is visible in your screenshot.';
+      return NextResponse.json(
+        {
+          ok: false,
+          error: userMessage,
+          verified: false,
+        },
+        { status: 400 }
+      );
+    }
+
+    // Only update user if verification passed
     const { error: updateError } = await supabaseAdmin
       .from('users')
       .update({
-        follow_verified: aiVerified,
-        follow_verified_at: aiVerified ? new Date().toISOString() : null,
-        follow_screenshot_url: fileName,
-        registration_complete: aiVerified,
-        registration_completed_at: aiVerified ? new Date().toISOString() : null,
+        follow_verified: true,
+        follow_verified_at: new Date().toISOString(),
+        registration_complete: true,
+        registration_completed_at: new Date().toISOString(),
       })
       .eq('wallet_address', wallet_address.toLowerCase());
 
@@ -157,7 +171,6 @@ export async function POST(request: NextRequest) {
     // Process referral if registration just completed and user was referred
     if (aiVerified && !user.registration_complete && user.referred_by) {
       try {
-        // Find the referrer by their referral code
         const { data: referrer } = await supabaseAdmin
           .from('users')
           .select('id, wallet_address, points')
@@ -165,7 +178,6 @@ export async function POST(request: NextRequest) {
           .single();
 
         if (referrer) {
-          // Check if referrer hasn't hit the cap
           const { count: existingReferrals } = await supabaseAdmin
             .from('referrals')
             .select('*', { count: 'exact', head: true })
@@ -173,7 +185,6 @@ export async function POST(request: NextRequest) {
             .eq('verified', true);
 
           if ((existingReferrals || 0) < MAX_REFERRALS) {
-            // Create referral record
             await supabaseAdmin
               .from('referrals')
               .insert({
@@ -186,13 +197,11 @@ export async function POST(request: NextRequest) {
                 cp_awarded: REFERRAL_CP_REWARD,
               });
 
-            // Award CP to referrer
             await supabaseAdmin
               .from('users')
               .update({ points: (referrer.points || 0) + REFERRAL_CP_REWARD })
               .eq('id', referrer.id);
 
-            // Log to CP ledger
             await supabaseAdmin
               .from('cp_ledger')
               .insert({
@@ -205,17 +214,22 @@ export async function POST(request: NextRequest) {
           }
         }
       } catch (refError) {
-        // Log but don't fail the registration
         console.error('Referral processing error:', refError);
       }
     }
 
+    if (!aiVerified) {
+      return NextResponse.json({
+        ok: false,
+        error: aiResult.reason || 'Screenshot does not show proof of following @OrvexFi. Please upload a clear screenshot showing you are following the account.',
+        verified: false,
+      });
+    }
+
     return NextResponse.json({
       ok: true,
-      verified: aiVerified,
-      message: aiVerified
-        ? 'Follow verified successfully. Registration complete!'
-        : 'Follow verification failed - screenshot does not show follow',
+      verified: true,
+      message: 'Follow verified successfully. Registration complete!',
     });
   } catch (err) {
     console.error('Verify follow error:', err);

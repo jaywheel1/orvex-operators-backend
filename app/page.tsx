@@ -76,7 +76,7 @@ export default function Home() {
       <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-5 glass border-b border-[#7d85d0]/10">
         <div className="flex items-center">
           <Link href="/" className="group">
-            <Image src="/orvex-logo.png" alt="Orvex" width={120} height={30} className="opacity-90 group-hover:opacity-100 transition-opacity duration-300" style={{ filter: 'brightness(0) invert(1)' }} />
+            <Image src="/orvex-text-logo.svg" alt="Orvex" width={120} height={30} className="opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
           </Link>
         </div>
 
@@ -107,7 +107,7 @@ export default function Home() {
             rel="noopener noreferrer"
             className="hidden sm:flex items-center gap-2 px-4 h-9 rounded-xl bg-[#0d0d1a]/80 border border-[#b9f0d7]/30 text-[#b9f0d7] text-sm font-medium hover:bg-[#b9f0d7]/10 hover:border-[#b9f0d7]/50 transition-all duration-300"
           >
-            Launch Orvex
+            Launch Console
             <svg className="w-3.5 h-3.5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
@@ -124,17 +124,16 @@ export default function Home() {
             {/* Headline */}
             <h1 className="mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
               <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1]">
-                <span className="gradient-text">Enter The Vortex</span>
+                <span className="gradient-text">Enter the Orvex Vortex</span>
               </span>
               <span className="block text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1] mt-4">
-                <span className="gradient-text-accent animate-text-glow">Incentivised Testnet</span>
+                <span className="gradient-text-accent animate-text-glow">Console Operators — Incentivised Testnet</span>
               </span>
             </h1>
 
             {/* Subheadline */}
             <p className="text-base md:text-lg text-[#b6bbff]/60 max-w-xl mb-10 leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
-              Liquidity coordination infrastructure. Deploy capital where it matters.
-              Complete tasks. Earn coordination points.
+              Deploy on testnet. Activate up to 10x multipliers on mainnet. Earn Command Points. Rise through operator ranks. Your testnet activity follows you.
             </p>
 
             {/* CTA Buttons */}
@@ -144,7 +143,7 @@ export default function Home() {
                 className="group relative px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-2xl text-lg overflow-hidden transition-all duration-300 hover:shadow-[0_0_50px_rgba(98,101,254,0.5)] hover:-translate-y-1"
               >
                 <span className="relative z-10 flex items-center gap-2">
-                  Register Now
+                  Begin Operations
                   <svg className="w-5 h-5 group-hover:translate-x-1 transition-transform" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 7l5 5m0 0l-5 5m5-5H6" />
                   </svg>
@@ -331,7 +330,7 @@ export default function Home() {
             </div>
             <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Connect</h3>
             <p className="text-sm text-[#b6bbff]/50 leading-relaxed">
-              Link your wallet. Enter the Console.
+              Link your wallet. Access the Console.
             </p>
           </div>
 
@@ -342,7 +341,7 @@ export default function Home() {
             </div>
             <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Verify</h3>
             <p className="text-sm text-[#b6bbff]/50 leading-relaxed">
-              Post verification. Submit proof.
+              Confirm your identity. Prove you&apos;re an operator.
             </p>
           </div>
 
@@ -351,9 +350,9 @@ export default function Home() {
             <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#b9f0d7]/20 to-[#b9f0d7]/5 border border-[#b9f0d7]/20 flex items-center justify-center mb-5 group-hover:scale-110 group-hover:shadow-[0_0_30px_rgba(185,240,215,0.3)] transition-all duration-300">
               <span className="text-2xl font-bold text-[#b9f0d7]">3</span>
             </div>
-            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Coordinate</h3>
+            <h3 className="text-lg font-semibold text-white mb-2 group-hover:text-[#c9e8ff] transition-colors">Deploy</h3>
             <p className="text-sm text-[#b6bbff]/50 leading-relaxed">
-              Complete tasks. Collect points.
+              Execute operations. Earn Command Points.
             </p>
           </div>
         </div>
@@ -376,7 +375,7 @@ export default function Home() {
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
             </svg>
-            <span>Depth That Holds</span>
+            <span>Depth That Holds Under Load</span>
           </div>
         </div>
       </main>
@@ -385,7 +384,7 @@ export default function Home() {
       <footer className="relative z-10 glass border-t border-[#7d85d0]/10 px-6 py-5">
         <div className="max-w-6xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4">
           <div className="flex items-center gap-2 text-sm text-[#7d85d0]/60">
-            <span className="gradient-text font-medium">Orvex Operators</span>
+            <span className="gradient-text font-medium">Orvex Console Operators</span>
             <span>2026</span>
           </div>
           <div className="flex items-center gap-6">

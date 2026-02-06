@@ -1,10 +1,11 @@
 import type { Metadata } from "next";
 import "./globals.css";
 import { Providers } from "./providers";
+import AdminFooterLink from "@/components/AdminFooterLink";
 
 export const metadata: Metadata = {
-  title: "Orvex Operators",
-  description: "Complete tasks, earn rewards",
+  title: "Orvex Console Operators",
+  description: "Deploy on testnet. Earn Command Points. Rise through operator ranks.",
 };
 
 export default function RootLayout({
@@ -14,13 +15,11 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <head>
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link rel="preconnect" href="https://fonts.gstatic.com" crossOrigin="anonymous" />
-        <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet" />
-      </head>
       <body className="antialiased font-poppins">
-        <Providers>{children}</Providers>
+        <Providers>
+          {children}
+          <AdminFooterLink />
+        </Providers>
       </body>
     </html>
   );

@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, Suspense } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
@@ -8,6 +8,7 @@ import Image from 'next/image';
 import { useSearchParams } from 'next/navigation';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
+import { ErrorBoundary } from '@/components/ErrorBoundary';
 
 interface Task {
   id: string;
@@ -29,16 +30,7 @@ function SubmitForm() {
   const [success, setSuccess] = useState(false);
   const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    if (id) {
-      fetchTask();
-    } else {
-      setLoading(false);
-      setError('No task specified');
-    }
-  }, [id]);
-
-  const fetchTask = async () => {
+  const fetchTask = useCallback(async () => {
     try {
       const res = await fetch(`/api/tasks/${id}`);
       const data = await res.json();
@@ -52,7 +44,16 @@ function SubmitForm() {
     } finally {
       setLoading(false);
     }
-  };
+  }, [id]);
+
+  useEffect(() => {
+    if (id) {
+      fetchTask();
+    } else {
+      setLoading(false);
+      setError('No task specified');
+    }
+  }, [id, fetchTask]);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -103,7 +104,7 @@ function SubmitForm() {
           <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent mb-4">
             Connect Wallet to Continue
           </h1>
-          <p className="text-[#b6bbff]/60 mb-8">Connect to submit proof</p>
+          <p className="text-[#b6bbff]/60 mb-8">Connect to submit proof of completion.</p>
           <ConnectButton />
         </div>
       </main>
@@ -137,16 +138,16 @@ function SubmitForm() {
             </div>
           </div>
           <h1 className="text-4xl font-bold bg-gradient-to-r from-[#b9f0d7] to-[#6265fe] bg-clip-text text-transparent mb-4">
-            Task Submitted!
+            Submission Received
           </h1>
           <p className="text-[#b6bbff]/60 mb-8 text-lg">
-            Submission received. Points awarded on verification.
+            Under review. Command Points awarded on verification.
           </p>
           <Link
             href="/dashboard"
             className="inline-block px-10 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.5)] hover:scale-[1.02] transition-all duration-300"
           >
-            Back to Console
+            Return to Console
           </Link>
         </div>
       </main>
@@ -163,14 +164,14 @@ function SubmitForm() {
             </svg>
           </div>
           <h1 className="text-3xl font-bold bg-gradient-to-r from-white to-[#b6bbff] bg-clip-text text-transparent mb-4">
-            Task Not Found
+            Operation Not Found
           </h1>
-          <p className="text-[#b6bbff]/60 mb-8">{error || 'This task does not exist.'}</p>
+          <p className="text-[#b6bbff]/60 mb-8">{error || 'This operation does not exist or has been deactivated.'}</p>
           <Link
             href="/dashboard"
             className="inline-block px-8 py-4 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.5)] hover:scale-[1.02] transition-all duration-300"
           >
-            Back to Console
+            Return to Console
           </Link>
         </div>
       </main>
@@ -204,7 +205,7 @@ function SubmitForm() {
           </div>
           <div>
             <span className="text-2xl font-bold text-[#b9f0d7]">+{task.points}</span>
-            <span className="text-[#7d85d0] ml-2">points on approval</span>
+            <span className="text-[#7d85d0] ml-2">CP on approval</span>
           </div>
         </div>
       </div>
@@ -277,7 +278,7 @@ function SubmitForm() {
             </span>
           ) : (
             <span className="flex items-center justify-center gap-2">
-              Submit Task
+              Submit for Review
               <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
               </svg>
@@ -289,7 +290,7 @@ function SubmitForm() {
   );
 }
 
-export default function SubmitPage() {
+function SubmitPageContent() {
   return (
     <div className="min-h-screen bg-[#070713] text-white">
       <AnimatedBackground />
@@ -324,5 +325,13 @@ export default function SubmitPage() {
         <SubmitForm />
       </Suspense>
     </div>
+  );
+}
+
+export default function SubmitPage() {
+  return (
+    <ErrorBoundary>
+      <SubmitPageContent />
+    </ErrorBoundary>
   );
 }
