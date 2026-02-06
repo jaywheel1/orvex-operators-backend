@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { verifyAdmin } from '@/lib/admin-wallets';
 import { ApiResponse, TaskSubmission, ApproveRequest, CpLedgerEntry } from '@/lib/types';
 
 interface ApproveResponseData {
@@ -24,34 +25,25 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       );
     }
 
-    // Verify the operator has operator or admin role
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .select('role')
-      .eq('id', operator_id.toLowerCase())
-      .single();
-
-    if (profileError || !profile) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Operator not found',
-          details: 'No profile found for the provided operator_id',
-        },
-        { status: 404 }
-      );
-    }
-
-    if (profile.role !== 'operator' && profile.role !== 'admin') {
+    // Verify the operator has operator or admin role (operator_id is wallet address)
+    const isAuthorized = await verifyAdmin(operator_id);
+    if (!isAuthorized) {
       return NextResponse.json(
         {
           ok: false,
           error: 'Unauthorized',
-          details: 'User does not have operator or admin role',
+          details: 'Wallet does not have operator or admin role',
         },
         { status: 403 }
       );
     }
+
+    // Get profile UUID for reviewed_by FK (optional - won't block approval)
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('wallet_address', operator_id.toLowerCase())
+      .single();
 
     // Check if submission exists and is pending
     const { data: submission, error: fetchError } = await supabaseAdmin
@@ -106,24 +98,38 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
         return NextResponse.json(
           {
             ok: false,
-            error: 'Failed to create CP ledger entry',
+            error: `Failed to create CP ledger entry: ${ledgerError.message}`,
             details: ledgerError.message,
-            hint: 'CP ledger entry must be created before approval',
+            hint: ledgerError.hint || undefined,
             code: ledgerError.code,
           },
           { status: 500 }
         );
       }
       cpLedgerEntry = ledgerData as CpLedgerEntry;
+
+      // Update user's total points
+      const { data: userData } = await supabaseAdmin
+        .from('users')
+        .select('points')
+        .eq('id', submission.user_id)
+        .single();
+
+      if (userData) {
+        await supabaseAdmin
+          .from('users')
+          .update({ points: (userData.points || 0) + rewardAmount })
+          .eq('id', submission.user_id);
+      }
     }
 
-    // Now update the submission to approved (this is now safe since ledger was created)
+    // Now update the submission to approved
     const { data: updated, error: updateError } = await supabaseAdmin
       .from('task_submissions')
       .update({
         status: 'approved',
         rejection_reason: null,
-        reviewed_by: operator_id,
+        reviewed_by: profile?.id || null,
         reviewed_at: new Date().toISOString(),
       })
       .eq('id', submission_id)

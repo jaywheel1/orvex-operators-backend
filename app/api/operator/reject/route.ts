@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { supabaseAdmin } from '@/lib/supabase';
+import { verifyAdmin } from '@/lib/admin-wallets';
 import { ApiResponse, TaskSubmission, RejectRequest } from '@/lib/types';
 
 export async function POST(request: NextRequest): Promise<NextResponse<ApiResponse<TaskSubmission>>> {
@@ -20,34 +21,25 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       );
     }
 
-    // Verify the operator has operator or admin role
-    const { data: profile, error: profileError } = await supabaseAdmin
-      .from('profiles')
-      .select('role')
-      .eq('id', operator_id.toLowerCase())
-      .single();
-
-    if (profileError || !profile) {
-      return NextResponse.json(
-        {
-          ok: false,
-          error: 'Operator not found',
-          details: 'No profile found for the provided operator_id',
-        },
-        { status: 404 }
-      );
-    }
-
-    if (profile.role !== 'operator' && profile.role !== 'admin') {
+    // Verify the operator has operator or admin role (operator_id is wallet address)
+    const isAuthorized = await verifyAdmin(operator_id);
+    if (!isAuthorized) {
       return NextResponse.json(
         {
           ok: false,
           error: 'Unauthorized',
-          details: 'User does not have operator or admin role',
+          details: 'Wallet does not have operator or admin role',
         },
         { status: 403 }
       );
     }
+
+    // Get profile UUID for reviewed_by FK (optional)
+    const { data: profile } = await supabaseAdmin
+      .from('profiles')
+      .select('id')
+      .eq('wallet_address', operator_id.toLowerCase())
+      .single();
 
     // Check if submission exists and is pending
     const { data: submission, error: fetchError } = await supabaseAdmin
@@ -85,7 +77,7 @@ export async function POST(request: NextRequest): Promise<NextResponse<ApiRespon
       .update({
         status: 'rejected',
         rejection_reason: rejection_reason.trim(),
-        reviewed_by: operator_id,
+        reviewed_by: profile?.id || null,
         reviewed_at: new Date().toISOString(),
       })
       .eq('id', submission_id)
