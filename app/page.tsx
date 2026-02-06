@@ -76,7 +76,7 @@ export default function Home() {
       <nav className="relative z-20 flex items-center justify-between px-6 md:px-12 py-5 glass border-b border-[#7d85d0]/10">
         <div className="flex items-center">
           <Link href="/" className="group">
-            <Image src="/orvex-logo.png" alt="Orvex" width={120} height={30} className="opacity-90 group-hover:opacity-100 transition-opacity duration-300" style={{ filter: 'brightness(0) invert(1)' }} />
+            <Image src="/orvex-text-logo.svg" alt="Orvex" width={120} height={30} className="opacity-90 group-hover:opacity-100 transition-opacity duration-300" />
           </Link>
         </div>
 
