@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef, useCallback } from 'react';
 import { useAccount } from 'wagmi';
 import { ConnectButton } from '@rainbow-me/rainbowkit';
 import Link from 'next/link';
@@ -8,6 +8,10 @@ import Image from 'next/image';
 import AnimatedBackground from '@/components/AnimatedBackground';
 import CursorGlow from '@/components/CursorGlow';
 import TaskModal, { type TaskData } from '@/components/TaskModal';
+import SkeletonLoader from '@/components/SkeletonLoader';
+import EmptyState from '@/components/EmptyState';
+import TaskSearchFilter from '@/components/TaskSearchFilter';
+import { useKeyboardNavigation } from '@/lib/useKeyboardNavigation';
 import {
   CATEGORIES,
   getUserRank,
@@ -171,6 +175,12 @@ export default function DashboardPage() {
   const [showNewReferralNotification, setShowNewReferralNotification] = useState(false);
   const [newReferralCount, setNewReferralCount] = useState(0);
   const [selectedTask, setSelectedTask] = useState<TaskData | null>(null);
+  const [searchQuery, setSearchQuery] = useState('');
+  const [filterStatus, setFilterStatus] = useState<'all' | 'available' | 'completed'>('all');
+  const containerRef = useRef<HTMLDivElement>(null);
+  const { updateFocusableElements, focusNext, focusPrevious } = useKeyboardNavigation({
+    onEscape: () => setSearchQuery(''),
+  });
 
   const userCP = userData?.points || 0;
   const currentRank = getUserRank(userCP);
@@ -188,6 +198,49 @@ export default function DashboardPage() {
       return newSet;
     });
   };
+
+  const handleSearch = useCallback((query: string) => {
+    setSearchQuery(query);
+  }, []);
+
+  const handleFilterChange = useCallback((filter: 'all' | 'available' | 'completed') => {
+    setFilterStatus(filter);
+  }, []);
+
+  const filteredTasks = useCallback((categoryTasks: TaskData[]) => {
+    return categoryTasks.filter(task => {
+      const matchesSearch = task.name.toLowerCase().includes(searchQuery.toLowerCase()) ||
+                           task.description.toLowerCase().includes(searchQuery.toLowerCase());
+
+      if (filterStatus === 'available') {
+        return matchesSearch && task.status === 'active';
+      } else if (filterStatus === 'completed') {
+        return matchesSearch && task.status !== 'active';
+      }
+      return matchesSearch;
+    });
+  }, [searchQuery, filterStatus]);
+
+  useEffect(() => {
+    if (containerRef.current) {
+      updateFocusableElements(containerRef.current);
+    }
+  }, [updateFocusableElements]);
+
+  useEffect(() => {
+    const handleArrowKeyNavigation = (e: KeyboardEvent) => {
+      if (e.key === 'ArrowDown') {
+        e.preventDefault();
+        focusNext();
+      } else if (e.key === 'ArrowUp') {
+        e.preventDefault();
+        focusPrevious();
+      }
+    };
+
+    window.addEventListener('keydown', handleArrowKeyNavigation);
+    return () => window.removeEventListener('keydown', handleArrowKeyNavigation);
+  }, [focusNext, focusPrevious]);
 
   useEffect(() => {
     if (address) {
@@ -548,7 +601,17 @@ export default function DashboardPage() {
           </div>
         </div>
 
-        <div className="space-y-4">
+        {/* Task Search and Filter */}
+        <div className="mb-8 opacity-0 animate-fade-in-up" style={{ animationDelay: '625ms', animationFillMode: 'forwards' }}>
+          <TaskSearchFilter
+            onSearch={handleSearch}
+            onFilterChange={handleFilterChange}
+            placeholder="Search operations by name or description..."
+          />
+        </div>
+
+        {/* Task Categories */}
+        <div className="space-y-4" ref={containerRef}>
           {CATEGORIES.map((category, catIndex) => {
             const catTasks = tasksByCategory[category.id] || [];
             const isExpanded = expandedCategories.has(category.id);
@@ -588,11 +651,38 @@ export default function DashboardPage() {
                 </button>
                 {isExpanded && catTasks.length > 0 && (
                   <div className="border-t border-[#7d85d0]/10 p-5">
-                    <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                      {catTasks.map((task) => (
-                        <TaskCard key={task.id} task={task} onStart={handleTaskStart} />
-                      ))}
-                    </div>
+                    {loading ? (
+                      <SkeletonLoader count={2} type="card" />
+                    ) : (
+                      <>
+                        {filteredTasks(catTasks).length > 0 ? (
+                          <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                            {filteredTasks(catTasks).map((task) => (
+                              <TaskCard key={task.id} task={task} onStart={handleTaskStart} />
+                            ))}
+                          </div>
+                        ) : searchQuery || filterStatus !== 'all' ? (
+                          <EmptyState
+                            title="No operations found"
+                            description={`No operations match your ${searchQuery ? 'search' : 'filter'} criteria.`}
+                            icon="search"
+                            action={{
+                              label: 'Clear filters',
+                              onClick: () => {
+                                setSearchQuery('');
+                                setFilterStatus('all');
+                              },
+                            }}
+                          />
+                        ) : (
+                          <EmptyState
+                            title="No available operations"
+                            description="Check back later for more operations to complete."
+                            icon="tasks"
+                          />
+                        )}
+                      </>
+                    )}
                   </div>
                 )}
               </div>
