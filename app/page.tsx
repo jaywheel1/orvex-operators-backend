@@ -124,7 +124,7 @@ export default function Home() {
             {/* Headline */}
             <h1 className="mb-6 opacity-0 animate-fade-in-up" style={{ animationDelay: '200ms', animationFillMode: 'forwards' }}>
               <span className="block text-5xl md:text-7xl lg:text-8xl font-bold tracking-tight leading-[1.1]">
-                <span className="gradient-text">Enter The Vortex</span>
+                <span className="gradient-text">Enter the Vortex</span>
               </span>
               <span className="block text-3xl md:text-4xl lg:text-5xl font-semibold tracking-tight leading-[1.1] mt-4">
                 <span className="gradient-text-accent animate-text-glow">Incentivised Testnet</span>
@@ -133,8 +133,8 @@ export default function Home() {
 
             {/* Subheadline */}
             <p className="text-base md:text-lg text-[#b6bbff]/60 max-w-xl mb-10 leading-relaxed opacity-0 animate-fade-in-up" style={{ animationDelay: '300ms', animationFillMode: 'forwards' }}>
-              Liquidity coordination infrastructure. Deploy capital where it matters.
-              Complete tasks. Earn coordination points.
+              Battle-test the platform to activate up to 10x multipliers on mainnet.
+              Earn Command Points to level up. Your testnet activity is your weapon.
             </p>
 
             {/* CTA Buttons */}
