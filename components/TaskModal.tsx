@@ -143,7 +143,7 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
           <div className="flex items-center gap-2 mb-5">
             {task.cap > 1 && (
               <span className="text-xs px-2 py-1 rounded-full bg-[#6265fe]/10 text-[#6265fe]">
-                {task.completions}/{task.cap} completed
+                {task.completions}/{task.cap} complete
               </span>
             )}
             <span className="text-xs px-2 py-1 rounded-full bg-[#7d85d0]/10 text-[#7d85d0]">
@@ -151,12 +151,12 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
             </span>
             {isPending && (
               <span className="text-xs px-2 py-1 rounded-full bg-[#ffc107]/10 text-[#ffc107]">
-                Pending review
+                Pending Review
               </span>
             )}
             {isCompleted && (
               <span className="text-xs px-2 py-1 rounded-full bg-[#b9f0d7]/10 text-[#b9f0d7]">
-                Completed
+                Complete
               </span>
             )}
           </div>
@@ -167,9 +167,9 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
               <svg className="w-12 h-12 text-[#b9f0d7] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-[#b9f0d7] font-semibold">Task Completed!</p>
+              <p className="text-[#b9f0d7] font-semibold">Operation Complete</p>
               <p className="text-[#b9f0d7]/60 text-sm mt-1">
-                You earned {task.completions * task.points} CP from this task
+                {task.completions * task.points} CP earned
               </p>
             </div>
           )}
@@ -180,8 +180,8 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
               <svg className="w-12 h-12 text-[#ffc107] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
-              <p className="text-[#ffc107] font-semibold">Submission Under Review</p>
-              <p className="text-[#ffc107]/60 text-sm mt-1">Your submission is being reviewed</p>
+              <p className="text-[#ffc107] font-semibold">STATUS: PENDING REVIEW</p>
+              <p className="text-[#ffc107]/60 text-sm mt-1">Submission under operator review</p>
             </div>
           )}
 
@@ -189,14 +189,14 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
           {isReferralTask && !isCompleted && (
             <div className="space-y-4">
               <div className="p-4 rounded-xl bg-[#0d0d1a]/80 border border-[#7d85d0]/20">
-                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Your Referral Code</label>
+                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Your Recruitment Code</label>
                 <div className="text-2xl font-bold font-mono text-[#ffc107]">
                   {referralStats?.referral_code || '...'}
                 </div>
               </div>
 
               <div>
-                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Your Referral Link</label>
+                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Your Recruitment Link</label>
                 <div className="flex items-center gap-2">
                   <input
                     type="text"
@@ -215,7 +215,7 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
 
               <div className="p-4 rounded-xl bg-[#ffc107]/10 border border-[#ffc107]/20">
                 <div className="flex items-center justify-between mb-2">
-                  <span className="text-[#ffc107]/80 text-sm">Referral Progress</span>
+                  <span className="text-[#ffc107]/80 text-sm">Recruitment Progress</span>
                   <span className="text-[#ffc107] font-bold">
                     {referralStats?.verified_referrals || 0} / {referralStats?.max_referrals || 5}
                   </span>
@@ -227,7 +227,7 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
                   />
                 </div>
                 <p className="text-[#ffc107]/50 text-xs mt-2">
-                  Earn {referralStats?.cp_per_referral || 200} CP for each friend who registers
+                  Earn {referralStats?.cp_per_referral || 200} CP per recruited operator
                 </p>
               </div>
             </div>
@@ -239,9 +239,9 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
               <svg className="w-12 h-12 text-[#6265fe] mx-auto mb-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9.813 15.904L9 18.75l-.813-2.846a4.5 4.5 0 00-3.09-3.09L2.25 12l2.846-.813a4.5 4.5 0 003.09-3.09L9 5.25l.813 2.846a4.5 4.5 0 003.09 3.09L15.75 12l-2.846.813a4.5 4.5 0 00-3.09 3.09z" />
               </svg>
-              <p className="text-[#6265fe] font-semibold">Automatic Verification</p>
+              <p className="text-[#6265fe] font-semibold">Auto-Verified</p>
               <p className="text-[#b6bbff]/50 text-sm mt-1">
-                This task is verified automatically when you meet the criteria
+                This operation confirms automatically when criteria are met
               </p>
             </div>
           )}
@@ -276,7 +276,7 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
                       <svg className="w-8 h-8 mb-2" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M3 16.5v2.25A2.25 2.25 0 005.25 21h13.5A2.25 2.25 0 0021 18.75V16.5m-13.5-9L12 3m0 0l4.5 4.5M12 3v13.5" />
                       </svg>
-                      <span className="text-sm">Click to upload screenshot</span>
+                      <span className="text-sm">Click to upload</span>
                     </div>
                   )}
                   <input
@@ -305,7 +305,7 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
                     rel="noopener noreferrer"
                     className="inline-flex items-center gap-2 px-4 py-2 bg-[#6265fe]/20 text-[#6265fe] rounded-lg text-sm font-medium hover:bg-[#6265fe]/30 transition-colors"
                   >
-                    Open Tweet
+                    Open on X
                     <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                       <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
                     </svg>
@@ -334,7 +334,7 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
               <div className="p-4 rounded-xl bg-[#6265fe]/10 border border-[#6265fe]/20">
                 <p className="text-sm text-[#c9e8ff]">
                   <span className="text-[#6265fe] font-medium">Instructions:</span>{' '}
-                  {task.description}. Submit your proof below for operator review.
+                  {task.description}. Submit proof below for review.
                 </p>
               </div>
 
@@ -350,7 +350,7 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
               </div>
 
               <div>
-                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Description / Notes</label>
+                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Notes</label>
                 <textarea
                   placeholder="Describe what you did..."
                   value={proofText}
