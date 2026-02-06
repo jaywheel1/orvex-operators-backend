@@ -242,7 +242,7 @@ export default function AdminPage() {
       if (data.ok) {
         fetchSubmissions();
       } else {
-        alert(data.error || 'Failed to approve');
+        alert(data.details || data.error || 'Failed to approve');
       }
     } finally {
       setReviewingId(null);
@@ -266,7 +266,7 @@ export default function AdminPage() {
       if (data.ok) {
         fetchSubmissions();
       } else {
-        alert(data.error || 'Failed to reject');
+        alert(data.details || data.error || 'Failed to reject');
       }
     } finally {
       setReviewingId(null);
