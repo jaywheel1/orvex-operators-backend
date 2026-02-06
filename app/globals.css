@@ -135,6 +135,17 @@ body {
   50% { text-shadow: 0 0 30px rgba(185, 240, 215, 0.5); }
 }
 
+@keyframes slide-in-right {
+  from {
+    opacity: 0;
+    transform: translateX(20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateX(0);
+  }
+}
+
 @keyframes particle-float {
   0%, 100% {
     transform: translateY(0) translateX(0);
@@ -210,6 +221,10 @@ body {
 
 .animate-text-glow {
   animation: text-glow 2s ease-in-out infinite;
+}
+
+.animate-slide-in-right {
+  animation: slide-in-right 0.3s ease-out forwards;
 }
 
 /* Staggered animation delays */

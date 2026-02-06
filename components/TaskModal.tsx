@@ -53,10 +53,33 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
   const isCompleted = task.user_status === 'completed';
   const isPending = task.user_status === 'pending';
   const remainingCompletions = task.cap - task.completions;
+  const canSubmit = !isCompleted && remainingCompletions > 0;
+
+  // File size validation (max 5MB)
+  const MAX_FILE_SIZE = 5 * 1024 * 1024;
+  const formatFileSize = (bytes: number) => {
+    if (bytes === 0) return '0 Bytes';
+    const k = 1024;
+    const sizes = ['Bytes', 'KB', 'MB'];
+    const i = Math.floor(Math.log(bytes) / Math.log(k));
+    return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
+  };
 
   const handleSubmit = async () => {
     setError('');
     setSuccess('');
+
+    // Validate task cap
+    if (!canSubmit) {
+      setError(`You've completed this task the maximum number of times (${task.cap})`);
+      return;
+    }
+
+    // File size validation
+    if (screenshot && screenshot.size > MAX_FILE_SIZE) {
+      setError(`Screenshot too large (${formatFileSize(screenshot.size)}). Max size is ${formatFileSize(MAX_FILE_SIZE)}`);
+      return;
+    }
 
     if (isScreenshotTask && !screenshot) {
       setError('Please upload a screenshot');
@@ -64,6 +87,10 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
     }
     if (isLinkTask && !proofUrl) {
       setError('Please enter a proof URL');
+      return;
+    }
+    if (proofUrl && !proofUrl.startsWith('http')) {
+      setError('Please enter a valid URL starting with http:// or https://');
       return;
     }
     if (isManualTask && !proofUrl && !proofText && !screenshot) {
@@ -89,15 +116,18 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
 
       if (data.ok) {
         setSuccess(data.message || 'Submission received!');
-        setProofUrl('');
-        setProofText('');
-        setScreenshot(null);
-        onSubmitted();
+        // Keep form state visible for 2 seconds before closing
+        setTimeout(() => {
+          setProofUrl('');
+          setProofText('');
+          setScreenshot(null);
+          onSubmitted();
+        }, 2000);
       } else {
         setError(data.error || 'Submission failed');
       }
-    } catch {
-      setError('Network error. Please try again.');
+    } catch (err) {
+      setError(err instanceof Error ? err.message : 'Network error. Please try again.');
     } finally {
       setIsSubmitting(false);
     }
@@ -247,7 +277,7 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
           )}
 
           {/* Screenshot Task Form */}
-          {isScreenshotTask && !isCompleted && !isPending && (
+          {isScreenshotTask && !isCompleted && !isPending && canSubmit && (
             <div className="space-y-4">
               {task.metadata?.target_account && (
                 <div className="p-4 rounded-xl bg-[#6265fe]/10 border border-[#6265fe]/20">
@@ -262,14 +292,18 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
               )}
 
               <div>
-                <label className="text-[#b6bbff]/50 text-xs mb-2 block">Upload Screenshot</label>
+                <label className="text-[#b6bbff]/50 text-xs mb-2 block flex items-center justify-between">
+                  <span>Upload Screenshot</span>
+                  <span className="text-[#7d85d0]">Max {formatFileSize(MAX_FILE_SIZE)}</span>
+                </label>
                 <label className="flex flex-col items-center justify-center w-full h-32 border-2 border-dashed border-[#7d85d0]/30 rounded-xl cursor-pointer hover:border-[#6265fe]/50 transition-colors bg-[#0d0d1a]/50">
                   {screenshot ? (
-                    <div className="flex items-center gap-2 text-[#b9f0d7]">
-                      <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <div className="flex flex-col items-center text-[#b9f0d7]">
+                      <svg className="w-5 h-5 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                       </svg>
                       <span className="text-sm font-medium">{screenshot.name}</span>
+                      <span className="text-xs text-[#b6bbff]/50 mt-1">{formatFileSize(screenshot.size)}</span>
                     </div>
                   ) : (
                     <div className="flex flex-col items-center text-[#7d85d0]">
@@ -408,23 +442,37 @@ export default function TaskModal({ task, walletAddress, referralStats, onClose,
         {/* Footer with submit */}
         {!isCompleted && !isReferralTask && !isAutoTask && !isPending && (
           <div className="p-6 border-t border-[#7d85d0]/10">
-            {remainingCompletions > 0 && task.cap > 1 && (
-              <p className="text-xs text-[#7d85d0] mb-3 text-center">
-                {remainingCompletions} submission{remainingCompletions !== 1 ? 's' : ''} remaining
+            {task.cap > 1 && (
+              <p className={`text-xs mb-3 text-center ${remainingCompletions > 0 ? 'text-[#7d85d0]' : 'text-[#ff5252]'}`}>
+                {remainingCompletions > 0
+                  ? `${remainingCompletions} submission${remainingCompletions !== 1 ? 's' : ''} remaining`
+                  : 'Maximum completions reached'
+                }
               </p>
             )}
             <button
               onClick={handleSubmit}
-              disabled={isSubmitting}
-              className="w-full py-3.5 bg-gradient-to-r from-[#6265fe] to-[#7d85d0] text-white font-semibold rounded-xl hover:shadow-[0_0_30px_rgba(98,101,254,0.4)] transition-all duration-300 disabled:opacity-50 disabled:cursor-not-allowed"
+              disabled={isSubmitting || !canSubmit}
+              className={`w-full py-3.5 font-semibold rounded-xl transition-all duration-300 flex items-center justify-center gap-2 ${
+                canSubmit
+                  ? 'bg-gradient-to-r from-[#6265fe] to-[#7d85d0] text-white hover:shadow-[0_0_30px_rgba(98,101,254,0.4)]'
+                  : 'bg-[#7d85d0]/20 text-[#7d85d0]/60 cursor-not-allowed'
+              }`}
             >
               {isSubmitting ? (
-                <span className="flex items-center justify-center gap-2">
+                <>
                   <div className="w-4 h-4 border-2 border-white/30 border-t-white rounded-full animate-spin" />
                   Submitting...
-                </span>
+                </>
+              ) : !canSubmit ? (
+                <>
+                  <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 15v2m-6 4h12a2 2 0 002-2v-6a2 2 0 00-2-2H6a2 2 0 00-2 2v6a2 2 0 002 2zm10-10V7a4 4 0 00-8 0v4h8z" />
+                  </svg>
+                  Submission Limit Reached
+                </>
               ) : (
-                `Submit for Review`
+                'Submit for Review'
               )}
             </button>
           </div>

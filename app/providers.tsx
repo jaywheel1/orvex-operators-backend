@@ -15,6 +15,8 @@ import {
 import { createConfig, http } from 'wagmi';
 import { mainnet, base, sepolia } from 'wagmi/chains';
 import '@rainbow-me/rainbowkit/styles.css';
+import { ToastProvider, useToast } from '@/lib/toast-context';
+import { ToastContainer } from '@/components/Toast';
 
 const projectId = process.env.NEXT_PUBLIC_WALLETCONNECT_PROJECT_ID || 'a0907a623f2adde61e9e244d21c3cfa9';
 
@@ -54,19 +56,27 @@ const config = createConfig({
   ssr: true,
 });
 
+function ToastRendererComponent() {
+  const { messages, removeToast } = useToast();
+  return <ToastContainer messages={messages} onClose={removeToast} />;
+}
+
 export function Providers({ children }: { children: React.ReactNode }) {
   const [queryClient] = useState(() => new QueryClient());
 
   return (
-    <WagmiProvider config={config}>
-      <QueryClientProvider client={queryClient}>
-        <RainbowKitProvider
-          theme={darkTheme()}
-          modalSize="wide"
-        >
-          {children}
-        </RainbowKitProvider>
-      </QueryClientProvider>
-    </WagmiProvider>
+    <ToastProvider>
+      <WagmiProvider config={config}>
+        <QueryClientProvider client={queryClient}>
+          <RainbowKitProvider
+            theme={darkTheme()}
+            modalSize="wide"
+          >
+            {children}
+            <ToastRendererComponent />
+          </RainbowKitProvider>
+        </QueryClientProvider>
+      </WagmiProvider>
+    </ToastProvider>
   );
 }
