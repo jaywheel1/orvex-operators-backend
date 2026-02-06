@@ -82,7 +82,9 @@ export default function ShootingStarTrail({
     canvas.style.width = `${window.innerWidth}px`;
     canvas.style.height = `${window.innerHeight}px`;
     const ctx = canvas.getContext('2d');
-    if (ctx) ctx.scale(dpr, dpr);
+    if (ctx) {
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    }
   }, []);
 
   useEffect(() => {
@@ -213,13 +215,16 @@ export default function ShootingStarTrail({
         s.vy += 0.02; // tiny gravity
         s.life -= dt / s.maxLife;
 
-        const alpha = Math.max(0, s.life) * 0.7;
+        if (s.life <= 0) continue;
+
+        const alpha = s.life * 0.7;
+        const radius = s.size * s.life;
         const c = s.hue < 0.5
           ? lerpColor(s.hue)
           : lerpColor(0.5 + s.hue * 0.5);
 
         ctx.beginPath();
-        ctx.arc(s.x, s.y, s.size * s.life, 0, Math.PI * 2);
+        ctx.arc(s.x, s.y, radius, 0, Math.PI * 2);
         ctx.fillStyle = `rgba(${c.r|0},${c.g|0},${c.b|0},${alpha})`;
         ctx.fill();
       }
@@ -234,7 +239,7 @@ export default function ShootingStarTrail({
   return (
     <canvas
       ref={canvasRef}
-      className="pointer-events-none fixed inset-0 z-[60]"
+      className="pointer-events-none fixed inset-0 z-[999]"
       aria-hidden="true"
     />
   );
