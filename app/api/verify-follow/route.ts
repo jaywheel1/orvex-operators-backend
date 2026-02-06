@@ -71,9 +71,10 @@ async function verifyFollowWithAI(imageBase64: string, mediaType: string): Promi
     }
 
     return { verified: true, reason: 'Verified: Orvex profile with Following button detected.' };
-  } catch (error) {
-    console.error('AI verification error:', error);
-    return { verified: false, reason: 'AI verification failed - please try again. If this persists, contact support.' };
+  } catch (error: unknown) {
+    const errMsg = error instanceof Error ? error.message : String(error);
+    console.error('AI verification error:', errMsg);
+    return { verified: false, reason: `AI verification error: ${errMsg}` };
   }
 }
 
